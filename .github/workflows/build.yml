@@ -32,7 +32,7 @@ jobs:
           # Version = tag name, or a build number for manual runs. Repo = whichever repo runs this.
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then VER="$GITHUB_REF_NAME"; else VER="build-$GITHUB_RUN_NUMBER"; fi
           echo "VER=$VER" >> "$GITHUB_ENV"
-          LD="-s -w -X main.version=$VER -X main.repo=$GITHUB_REPOSITORY"
+          LD="-s -w -X main.version=$VER -X main.repo=$GITHUB_REPOSITORY -X main.defaultWorker=${{ vars.WORKER_URL }}"
           go mod tidy
           mkdir dist
           export CGO_ENABLED=0
