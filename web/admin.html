@@ -124,6 +124,19 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
 .fx{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.62);color:#fff;display:none;place-items:center;font-size:17px;line-height:1;padding:0}
 .ft:hover .fx,.ft:focus-within .fx{display:grid}
 .fx:hover{background:var(--bad)}
+.fm{position:absolute;top:12px;left:12px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.62);color:#fff;display:none;place-items:center;font-size:15px;line-height:1;padding:0}
+.ft:hover .fm,.ft:focus-within .fm{display:grid}
+.fm:hover{background:var(--a)}
+.ft.dt{border-color:var(--a);background:rgba(61,155,255,.18)}
+.ft.cut{opacity:.5}
+.crumbs button.dt{background:rgba(61,155,255,.25);color:var(--text)}
+.ren{width:100%;box-sizing:border-box;font:inherit;font-size:13px;margin-top:8px;background:var(--bg);color:var(--text);border:1px solid var(--a);border-radius:6px;padding:3px 5px}
+.cm{position:fixed;z-index:60;min-width:170px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+.cm.on{display:block}
+.cm button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 12px;border-radius:8px;font:inherit;font-size:14px}
+.cm button:hover{background:var(--field)}
+.cm button.dg{color:var(--bad)}
+.cm hr{border:0;border-top:1px solid var(--line);margin:4px 0}
 .fempty{text-align:center;color:var(--mute);padding:26px 10px;font-size:14px}
 .dover{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(8,12,20,.8);backdrop-filter:blur(4px)}
 .dover.on{display:flex}
@@ -220,6 +233,7 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
  <div class="fhead">
   <div><h2 id="ftitle">Shared folder</h2><div class="fpath" id="fpath"></div></div>
   <div class="facts">
+   <button class="g" id="fpaste" hidden>Paste here</button>
    <button class="g" id="fnew">New folder</button>
    <button class="g" id="fopen">Open folder</button>
    <label class="b">Add files<input id="fin" type="file" multiple hidden></label>
@@ -394,7 +408,7 @@ async function post(p,b){
 const vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.src=e.target.dataset.src;vio.unobserve(e.target)}}),{rootMargin:'250px'});
 
 async function loadFiles(){
- if(!inFiles())return;
+ if(!inFiles()||renaming)return;
  let j;try{j=await (await fetch('/admin/files?path='+encodeURIComponent(cur)+'&root='+root())).json()}catch(e){return}
  const key=JSON.stringify(j);if(key===lastL)return;lastL=key;drawFiles(j);
 }
@@ -403,15 +417,16 @@ function drawFiles(j){
  const g=$('#fgrid'),cr=$('#crumbs');
  g.textContent='';cr.textContent='';
  $('#fpath').textContent=j.dir||'';
+ updatePaste();
  $('#fnone').hidden=!!j.set;$('#fbody').hidden=!j.set;
  ['#fnew','#fopen'].forEach(x=>$(x).disabled=!j.set);
  if(!j.set)return;
- const rb=document.createElement('button');rb.textContent=baseName(j.dir)||(root()==='recv'?'Received':'Shared folder');rb.onclick=()=>go('');cr.append(rb);
+ const rb=document.createElement('button');rb.textContent=baseName(j.dir)||(root()==='recv'?'Received':'Shared folder');rb.onclick=()=>go('');dropOn(rb,()=>'');cr.append(rb);
  let acc='';
  j.path.split('/').filter(Boolean).forEach(p=>{
   acc=acc?acc+'/'+p:p;const a=acc;
   const i=document.createElement('i');i.textContent='›';
-  const b=document.createElement('button');b.textContent=p;b.onclick=()=>go(a);cr.append(i,b);
+  const b=document.createElement('button');b.textContent=p;b.onclick=()=>go(a);dropOn(b,()=>a);cr.append(i,b);
  });
  const n=j.items.length;
  $('#fcount').textContent=n?n+(n===1?' item':' items'):'';
@@ -423,6 +438,7 @@ function ftile(it){
  const full=(cur?cur+'/':'')+it.name,enc=ENC(full),ext=extOf(it.name);
  const el=document.createElement('div');el.className='ft';el.tabIndex=0;
  el.title=it.dir?'Open folder':'Double-click to open';
+ if(clip&&clip.mode==='cut'&&clip.root===root()&&clip.paths.includes(full))el.classList.add('cut');
  const th=document.createElement('div');th.className='fth';
  const fall=()=>{th.textContent='';th.append(badge(it.name))};
  if(it.dir)th.innerHTML=FOLDER;
@@ -437,16 +453,109 @@ function ftile(it){
  const sm=document.createElement('div');sm.className='fs';sm.textContent=it.dir?'Folder':sz(it.size);
  const x=document.createElement('button');x.className='fx';x.textContent='×';x.title='Delete';x.setAttribute('aria-label','Delete '+it.name);
  x.onclick=e=>{e.stopPropagation();del(full,it)};
- if(it.dir)el.onclick=()=>go(full);else el.ondblclick=()=>openIt(full);
+ const m=document.createElement('button');m.className='fm';m.textContent='⋯';m.title='More';m.setAttribute('aria-label','More options for '+it.name);
+ m.onclick=e=>{e.stopPropagation();const r=m.getBoundingClientRect();openMenu(r.left,r.bottom+4,full,it,el)};
+ el.oncontextmenu=e=>{e.preventDefault();openMenu(e.clientX,e.clientY,full,it,el)};
+ el.draggable=true;
+ el.ondragstart=e=>{e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:full}));e.dataTransfer.effectAllowed='copyMove'};
+ if(it.dir){el.onclick=()=>go(full);dropOn(el,()=>full)}else el.ondblclick=()=>openIt(full);
  el.onkeydown=e=>{
+  if(e.target!==el)return;
+  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
   if(e.key==='Enter')it.dir?go(full):openIt(full);
   else if(e.key==='Delete')del(full,it);
+  else if(e.key==='F2'){e.preventDefault();renameIt(full,it,el)}
+  else if(mod&&k==='c'){e.preventDefault();setClip('copy',full)}
+  else if(mod&&k==='x'){e.preventDefault();setClip('cut',full)}
+  else if(mod&&k==='v'&&clip){e.preventDefault();pasteTo(it.dir?full:cur)}
  };
- el.append(th,nm,sm,x);return el;
+ el.append(th,nm,sm,x,m);return el;
 }
 async function del(full,it){
- if(!confirm('Delete "'+it.name+'" from this PC?'))return;
- if(await post('/admin/del',{path:full,root:root()})){toast('Deleted');lastL='';loadFiles()}
+ const msg=it.dir?'Delete the folder "'+it.name+'" and everything inside it from this PC?':'Delete "'+it.name+'" from this PC?';
+ if(!confirm(msg))return;
+ if(await post('/admin/del',{path:full,root:root(),recursive:!!it.dir})){toast('Deleted');lastL='';loadFiles()}
+}
+
+/* ---------- rename / copy / cut / paste / move ---------- */
+const DT='application/x-shareup';
+let clip=null,renaming=false;
+const cm=document.createElement('div');cm.className='cm';document.body.append(cm);
+function closeMenu(){cm.classList.remove('on')}
+function openMenu(x,y,full,it,el){
+ cm.textContent='';
+ const add=(label,fn,cls)=>{const b=document.createElement('button');b.textContent=label;if(cls)b.className=cls;b.onclick=()=>{closeMenu();fn()};cm.append(b)};
+ add(it.dir?'Open folder':'Open',()=>it.dir?go(full):openIt(full));
+ add('Rename',()=>renameIt(full,it,el));
+ add('Copy',()=>setClip('copy',full));
+ add('Cut',()=>setClip('cut',full));
+ if(clip&&it.dir)add('Paste into folder',()=>pasteTo(full));
+ cm.append(document.createElement('hr'));
+ add('Delete',()=>del(full,it),'dg');
+ cm.classList.add('on');
+ const w=cm.offsetWidth,h=cm.offsetHeight;
+ cm.style.left=Math.max(6,Math.min(x,innerWidth-w-6))+'px';
+ cm.style.top=Math.max(6,Math.min(y,innerHeight-h-6))+'px';
+}
+document.addEventListener('click',e=>{if(!cm.contains(e.target))closeMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+window.addEventListener('scroll',closeMenu,true);
+
+function updatePaste(){
+ const b=$('#fpaste');
+ b.hidden=!(clip&&inFiles());
+ if(clip)b.textContent=(clip.mode==='cut'?'Move here':'Paste here');
+}
+function setClip(mode,full){
+ clip={mode,root:root(),paths:[full]};
+ toast(mode==='cut'?'Cut. Open a folder and choose Move here':'Copied. Open a folder and choose Paste here',2200);
+ lastL='';loadFiles();updatePaste();
+}
+async function transfer(c,dest){
+ const move=c.mode==='cut'||c.mode==='move';
+ const j=await post('/admin/'+(move?'move':'copy'),{root:c.root,paths:c.paths,to:dest,toRoot:root()});
+ if(!j)return null;
+ if(j.error)toast(j.error,3200);
+ else toast((move?'Moved ':'Copied ')+j.done+(j.done===1?' item':' items'));
+ lastL='';loadFiles();return j;
+}
+async function pasteTo(dest){
+ if(!clip)return;
+ const c=clip,j=await transfer(c,dest);
+ if(j&&c.mode==='cut'&&j.done){clip=null;updatePaste()}
+}
+$('#fpaste').onclick=()=>pasteTo(cur);
+
+const isInt=e=>[...((e.dataTransfer&&e.dataTransfer.types)||[])].includes(DT);
+function dropOn(el,dest){
+ el.addEventListener('dragover',e=>{if(!isInt(e))return;e.preventDefault();e.dataTransfer.dropEffect=(e.ctrlKey||e.altKey)?'copy':'move';el.classList.add('dt')});
+ el.addEventListener('dragleave',()=>el.classList.remove('dt'));
+ el.addEventListener('drop',e=>{
+  if(!isInt(e))return;
+  e.preventDefault();e.stopPropagation();el.classList.remove('dt');
+  let d;try{d=JSON.parse(e.dataTransfer.getData(DT))}catch(x){return}
+  const to=dest();if(d.path===to)return;
+  transfer({mode:(e.ctrlKey||e.altKey)?'copy':'move',root:d.root,paths:[d.path]},to);
+ });
+}
+function renameIt(full,it,el){
+ if(renaming)return;
+ const fn=el.querySelector('.fn');if(!fn)return;
+ renaming=true;el.draggable=false;
+ const inp=document.createElement('input');inp.className='ren';inp.value=it.name;inp.setAttribute('aria-label','New name');
+ fn.replaceWith(inp);inp.focus();
+ const dot=it.dir?-1:it.name.lastIndexOf('.');
+ inp.setSelectionRange(0,dot>0?dot:it.name.length);
+ let done=false;
+ const end=async ok=>{
+  if(done)return;done=true;
+  const v=inp.value.trim();
+  if(ok&&v&&v!==it.name){if(await post('/admin/rename',{path:full,name:v,root:root()}))toast('Renamed')}
+  renaming=false;lastL='';loadFiles();
+ };
+ inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')end(true);else if(e.key==='Escape')end(false)};
+ inp.onclick=e=>e.stopPropagation();inp.ondblclick=e=>e.stopPropagation();
+ inp.onblur=()=>end(true);
 }
 $('#fopen').onclick=()=>openIt(cur);
 $('#fchoose').onclick=()=>$(root()==='recv'?'#br':'#bs').click();
@@ -543,7 +652,10 @@ const two=n=>String(n).padStart(2,'0');
 function stamp(){const d=new Date();return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+' '+two(d.getHours())+'.'+two(d.getMinutes())+'.'+two(d.getSeconds())}
 document.addEventListener('paste',e=>{
  const cd=e.clipboardData;
- if(!cd||!cd.files||!cd.files.length)return;
+ if(!cd||!cd.files||!cd.files.length){
+  if(clip&&inFiles()&&!/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'')){e.preventDefault();pasteTo(cur)}
+  return;
+ }
  e.preventDefault();
  const list=[...cd.files].map(f=>{
   if(!f.name||/^image\.(png|jpe?g|gif|webp)$/i.test(f.name)){
