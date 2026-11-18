@@ -21,3 +21,10 @@ shareUp-এর fixed QR-এর জন্য একটা ছোট Cloudflare Wo
 - QR-এ যে ID আছে সেটা এই PC-র। Worker-এর কাছে PC-র private key-র শুধু hash থাকে, তাই অন্য কেউ আপনার QR-এর address বদলাতে পারবে না।
 - PC আর phone একই WiFi-তে থাকলে (দুটোর public IP এক হলে) QR সরাসরি local address-এ যায়। না হলে internet tunnel-এ যায়। অনিশ্চিত হলে phone-এ দুটো button দেখায়।
 - নতুন QR লাগলে Settings-এ **Reset fixed QR** চাপুন। তখন পুরোনো QR আর কাজ করবে না।
+
+## Shob user-er jonno auto (developer-er jonno, ekbar)
+Worker deploy kore URL pele, seta app-er bhitore baniye nao, tahole shob user-er kono setup lagbe na:
+1. GitHub repo → **Settings → Secrets and variables → Actions → Variables → New repository variable**
+2. Name: `WORKER_URL`, Value: `https://shareup.yourname.workers.dev`
+3. Notun build/release chalao. Ei build-er app prothom bar chalu hoyei fixed QR dekhabe.
+Kono user Settings-e nijer URL dile seta ei default-er upor priority pabe.

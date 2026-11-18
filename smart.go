@@ -44,8 +44,15 @@ func randID(n int) string {
 	return hex.EncodeToString(b)
 }
 
+// defaultWorker is baked into the build (-X main.defaultWorker=https://...) so users of the
+// released app need no setup. A URL saved in Settings overrides it.
+var defaultWorker = ""
+
 func workerBase(c Config) string {
 	u := strings.TrimRight(strings.TrimSpace(c.WorkerURL), "/")
+	if u == "" {
+		u = strings.TrimRight(strings.TrimSpace(defaultWorker), "/")
+	}
 	if !strings.HasPrefix(u, "https://") || strings.ContainsAny(u, " \t\r\n?#") {
 		return ""
 	}
@@ -138,16 +145,19 @@ func smartLoop() {
 		c := get()
 		up := onlineNow.Load()
 		maybeHotspot(c, up)
-		base := workerBase(c)
-		if base == "" || !up {
+		if !up {
 			continue
 		}
-		if c.AutoNet {
+		if c.AutoNet { // keep the internet link ready by itself
 			st := remoteSnapshot().Status
 			if (st == "off" || st == "error") && time.Since(tunTry) > 30*time.Second {
 				tunTry = time.Now()
 				remoteStart()
 			}
+		}
+		base := workerBase(c)
+		if base == "" {
+			continue
 		}
 		tunnel := ""
 		if rs := remoteSnapshot(); rs.Status == "on" {
