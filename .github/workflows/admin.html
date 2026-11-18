@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="bn"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Cpath d='M32 12 14 30h11v16h14V30h11z' fill='white'/%3E%3C/svg%3E">
+<title>shareUp</title>
+<style>/* shared files */
+.fp{padding:20px}
+@media (max-width:480px){.fp{padding:14px}}
+.fhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.fpath{font-size:12px;color:var(--mute);margin-top:2px;word-break:break-all}
+.facts{display:flex;gap:8px;flex-wrap:wrap}
+
+.note{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:rgba(245,165,36,.13);border:1px solid rgba(245,165,36,.45);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.fnone{text-align:center;padding:42px 16px}
+.fnone .big{font-size:46px;line-height:1}
+.fnone h3{margin:12px 0 4px;font-size:17px}
+.fnone p{margin:0 0 16px;color:var(--mute);font-size:14px}
+.dz{border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--mute);margin-bottom:14px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px}
+.dz svg{width:30px;height:30px;color:var(--g1);margin-bottom:2px}
+.dz b{color:var(--text);font-weight:600;font-size:15px}
+kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;font:600 12px ui-monospace,Consolas,monospace;color:var(--text)}
+.fup{background:var(--field);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.fup small{display:block;color:var(--mute);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:1px 0 8px}
+.fup .pb{margin:0}
+.nf{display:flex;gap:8px;margin-bottom:14px}
+.crumbhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:14px;min-width:0}
+.crumbs button{background:none;border:0;color:var(--mute);padding:4px 8px;border-radius:8px;font:inherit}
+.crumbs button:hover{background:var(--field);color:var(--text)}
+.crumbs button:last-child{color:var(--text);font-weight:600}
+.crumbs i{color:var(--mute);font-style:normal}
+.fcount{font-size:12.5px;color:var(--mute);white-space:nowrap}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px}
+.ft{position:relative;background:var(--field);border:1px solid transparent;border-radius:14px;padding:8px;cursor:pointer;min-width:0;user-select:none}
+.ft:hover{border-color:var(--g1)}
+.fth{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.fth img,.fth video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.fth svg.fold{width:62%;height:auto}
+.fb{width:54%;aspect-ratio:.8;border-radius:8px;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px}
+.vi{position:absolute;left:6px;bottom:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center}
+.vi::after{content:"";border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
+.fn{font-size:13px;margin-top:8px;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.fs{font-size:11.5px;color:var(--mute)}
+.fx{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.62);color:#fff;display:none;place-items:center;font-size:17px;line-height:1;padding:0}
+.ft:hover .fx,.ft:focus-within .fx{display:grid}
+.fx:hover{background:var(--bad)}
+.fm{position:absolute;top:12px;left:12px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.62);color:#fff;display:none;place-items:center;font-size:15px;line-height:1;padding:0}
+.ft:hover .fm,.ft:focus-within .fm{display:grid}
+.fm:hover{background:var(--g1)}
+.ft.dt{border-color:var(--g1);background:color-mix(in srgb,var(--g1) 20%,transparent)}
+.ft.cut{opacity:.5}
+.crumbs button.dt{background:color-mix(in srgb,var(--g1) 28%,transparent);color:var(--text)}
+.ren{width:100%;box-sizing:border-box;font:inherit;font-size:13px;margin-top:8px;background:var(--bg);color:var(--text);border:1px solid var(--g1);border-radius:6px;padding:3px 5px}
+.cm{position:fixed;z-index:60;min-width:170px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+.cm.on{display:block}
+.cm button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 12px;border-radius:8px;font:inherit;font-size:14px}
+.cm button:hover{background:var(--field)}
+.cm button.dg{color:var(--bad)}
+.cm hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.fempty{text-align:center;color:var(--mute);padding:26px 10px;font-size:14px}
+.dover{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(8,12,20,.8);backdrop-filter:blur(4px)}
+.dover.on{display:flex}
+.dover>div{border:2px dashed var(--g1);border-radius:22px;padding:42px clamp(24px,8vw,72px);text-align:center;color:#fff;background:color-mix(in srgb,var(--g1) 14%,transparent)}
+.dover svg{width:46px;height:46px;color:var(--g1)}
+.dover b{display:block;font-size:20px;margin-top:8px}
+.dover span{display:block;font-size:14px;opacity:.75;margin-top:2px;word-break:break-all}
+
+.mback{position:fixed;inset:0;z-index:90;background:rgba(5,8,20,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+.mback[hidden]{display:none}
+.mbox{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mbox .mic{width:70px;height:70px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:32px;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.mbox h2{margin:0 0 4px;font-size:20px}.mbox .mn{font-weight:650;font-size:17px}.mbox small{display:block;color:var(--mute);margin-top:4px}
+.mbar{height:6px;border-radius:99px;background:var(--field);overflow:hidden;margin:16px 0}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--g1),var(--g2));transition:width 1s linear}
+.mbtn{display:flex;flex-direction:column;gap:9px}.mbtn .b,.mbtn .g{width:100%}
+.dev{display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line)}
+.dev .dd{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}.dev .dd.off{background:var(--mute)}
+.dev .dx{flex:1;min-width:0}.dev .dx b{display:block;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dev .dx small{color:var(--mute);font-size:12.5px}
+.dev .g,.dev .b{padding:6px 12px;font-size:13px}
+.pwrow{display:flex;gap:10px;padding:0 20px 16px}.pwrow input{flex:1;min-width:0}
+input[type=password]{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:14px;min-width:0}
+.warnb{margin:0 20px 16px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad);font-size:13.5px;font-weight:600}
+.subh{padding:14px 20px 6px;font-weight:700;font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.guide{padding:16px 20px}.guide.warn{border-color:color-mix(in srgb,#f59e0b 60%,var(--line))}.guide.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 8%,var(--panel))}
+.gh{font-weight:700;font-size:17px;margin-bottom:8px}.gp{color:var(--mute);font-size:14px}
+.gr{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:15px}.gr i{font-style:normal;width:26px;text-align:center;font-size:18px;flex:none}
+.gr.ok{color:var(--ok)}.gr.bad{color:var(--bad)}.gr.cur{font-weight:650}
+.gspin{width:18px;height:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--g1);animation:gsp 1s linear infinite}
+@keyframes gsp{to{transform:rotate(360deg)}}
+.gact{margin-top:6px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:9px 18px;border-radius:99px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+:root{--bg:#0b1020;--panel:#141b2e;--line:#27324d;--field:#1b2440;--text:#eef2ff;--mute:#9aa7c7;--ok:#22c55e;--bad:#f43f5e;--g1:#3b82f6;--g2:#8b5cf6}
+@media (prefers-color-scheme:light){:root{--bg:#f2f4ff;--panel:#fff;--line:#dde3f6;--field:#eff2ff;--text:#151a3a;--mute:#5a6685}}
+body[data-tab=connect]{--g1:#3b82f6;--g2:#8b5cf6}
+body[data-tab=recv]{--g1:#10b981;--g2:#06b6d4}
+body[data-tab=files]{--g1:#f97316;--g2:#ec4899}
+body[data-tab=settings]{--g1:#a855f7;--g2:#6366f1}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;color:var(--text);font:15px/1.6 "Segoe UI Variable Text","Segoe UI","Nirmala UI",system-ui,-apple-system,sans-serif;padding:clamp(14px,3vw,30px) clamp(12px,3vw,24px) 40px;
+ background:radial-gradient(900px 420px at 90% -8%,color-mix(in srgb,var(--g2) 24%,transparent),transparent),radial-gradient(760px 400px at -10% 0,color-mix(in srgb,var(--g1) 20%,transparent),transparent),var(--bg);background-attachment:fixed}
+.wrap{max-width:820px;margin:0 auto}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--g1),var(--g2));display:grid;place-items:center;color:#fff;box-shadow:0 8px 22px color-mix(in srgb,var(--g1) 45%,transparent)}
+.logo .ic{width:24px;height:24px;stroke-width:2.2}
+h1{font-size:23px;margin:0;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.sub{font-size:13px;color:var(--mute)}
+.hr{display:flex;align-items:center;gap:10px}
+.pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 25%,transparent)}
+.dot.off{background:var(--bad);box-shadow:0 0 0 4px color-mix(in srgb,var(--bad) 25%,transparent)}
+.langs{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:3px}
+.langs button{background:none;border:0;color:var(--mute);padding:4px 12px;border-radius:99px;font:inherit;font-size:13px;font-weight:600}
+.langs button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--g1);outline-offset:2px}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.nav button{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);color:var(--mute);padding:9px 12px;border-radius:16px;font-weight:600;font-size:14px;text-align:left;line-height:1.25;transition:.15s}
+.nav button:hover{border-color:var(--t1)}
+.nav .chip{width:34px;height:34px;border-radius:11px;flex:none;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--t1),var(--t2))}
+.nav button.on{color:var(--text);border-color:var(--t1);background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 16%,var(--panel)),color-mix(in srgb,var(--t2) 10%,var(--panel)));box-shadow:0 8px 20px color-mix(in srgb,var(--t1) 28%,transparent)}
+@media (max-width:640px){.nav{gap:6px}.nav button{flex-direction:column;text-align:center;font-size:12px;padding:8px 4px;gap:6px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;margin-bottom:16px;overflow:hidden}
+.phead{display:flex;gap:14px;align-items:center;padding:16px 20px;background:linear-gradient(120deg,color-mix(in srgb,var(--g1) 17%,transparent),color-mix(in srgb,var(--g2) 9%,transparent));border-bottom:1px solid var(--line)}
+.pico{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.pico .ic{width:22px;height:22px}
+h2{margin:0;font-size:17px;font-weight:700}
+.phead p{margin:2px 0 0;color:var(--mute);font-size:13.5px}
+.setblock{padding:16px 20px}
+.setblock+.setblock{border-top:1px solid var(--line)}
+.lab{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:8px}
+.lab .ic{color:var(--g1)}
+.path{display:flex;gap:8px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.chip2{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:99px}
+.chip2.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.chip2.off{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.b,.g{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:8px 16px;font-weight:600;white-space:nowrap}
+.b{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border:0;box-shadow:0 4px 12px color-mix(in srgb,var(--g1) 30%,transparent)}
+.b:hover{filter:brightness(1.08)}
+.b:disabled{opacity:.55}
+.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.g:hover{border-color:var(--g1)}
+.g:disabled{opacity:.5}
+.dgr{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.dgr:hover{border-color:var(--bad)}
+input[type=text],input[type=number],select{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:14px;min-width:0}
+.switch{position:relative;width:50px;height:29px;flex:none}
+.switch input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.slider{position:absolute;inset:0;background:var(--field);border:1px solid var(--line);border-radius:99px;transition:.2s}
+.slider::before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;border-radius:50%;background:var(--mute);transition:.2s}
+.switch input:checked+.slider{background:linear-gradient(135deg,var(--ok),#14b8a6);border-color:transparent}
+.switch input:checked+.slider::before{transform:translateX(21px);background:#fff}
+.switch input:focus-visible+.slider{outline:2px solid var(--g1);outline-offset:2px}
+.pb{height:7px;background:var(--field);border-radius:99px;overflow:hidden;margin:0 0 14px}
+.pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g1),var(--g2));transition:width .3s}
+.err{color:var(--bad)}
+.upd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;margin-bottom:16px;border-radius:16px;background:linear-gradient(120deg,color-mix(in srgb,#10b981 20%,var(--panel)),color-mix(in srgb,#06b6d4 14%,var(--panel)));border:1px solid color-mix(in srgb,#10b981 55%,var(--line))}
+.upd div{flex:1;min-width:180px}.upd small{display:block;color:var(--mute);font-size:13px}
+.hero{padding:20px}
+.seg{display:inline-flex;background:var(--field);border-radius:14px;padding:4px;gap:2px;margin-bottom:18px}
+.seg button{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--mute);padding:8px 18px;border-radius:11px;font-weight:600}
+.seg button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--g1) 35%,transparent)}
+.split{display:flex;gap:clamp(14px,3vw,26px);align-items:center}
+@media (max-width:560px){.split{flex-direction:column;align-items:stretch}}
+.qrcol{width:clamp(150px,30vw,208px);aspect-ratio:1;flex:none;margin:0 auto}
+#qr{width:100%;height:100%;background:#fff;border-radius:16px;padding:10px;display:block;box-shadow:0 10px 28px color-mix(in srgb,var(--g1) 30%,transparent)}
+.ph{width:100%;height:100%;border:2px dashed var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--g1)}
+.ph .ic{width:56px;height:56px;stroke-width:1.6}
+.spin{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--g1);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+.info{flex:1;min-width:0}
+.info p{margin:4px 0 14px;color:var(--mute);font-size:14px}
+.row{display:flex;gap:8px;align-items:center;background:var(--field);border:1px solid var(--line);border-radius:13px;padding:6px 6px 6px 14px}
+.row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 14px ui-monospace,Consolas,monospace}
+.acts{display:flex;gap:8px;margin-top:10px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px 20px 20px}
+@media (max-width:700px){.steps{grid-template-columns:1fr}}
+.st{display:flex;gap:12px;align-items:flex-start}
+.st i{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font-style:normal;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--s1),var(--s2))}
+.st b{display:block;font-size:14.5px;line-height:1.35}
+.st small{color:var(--mute);font-size:13px;line-height:1.45;display:block;margin-top:2px}
+.stH{padding:14px 20px 0;font-weight:700}
+.item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.ico{width:40px;height:40px;border-radius:13px;flex:none;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--t1),var(--t2))}
+.itx{flex:1;min-width:0}
+.itx b{font-weight:650;display:block}
+.itx small{display:block;color:var(--mute);font-size:13px;line-height:1.45}
+.adv{display:flex;gap:10px;align-items:flex-end;padding:0 20px 18px}
+.adv>div{flex:1;min-width:0}.adv>div.fix{flex:0 0 110px}
+.adv label{display:block;font-size:12.5px;color:var(--mute);margin-bottom:5px}
+@media (max-width:480px){.adv{flex-wrap:wrap}.item{padding:14px}}
+.toast{z-index:70;max-width:90vw;text-align:center}
+.fnone .big{width:72px;height:72px;margin:0 auto;border-radius:22px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.fnone .big .ic{width:34px;height:34px}
+.fnone h3{font-weight:700}
+.dz svg{color:var(--g1)}
+.fhead h2{font-size:16px}
+.fcount{font-weight:600}
+.advd{margin:14px 0}.advd>summary{cursor:pointer;list-style:none;padding:14px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);font-weight:650;color:var(--mute)}.advd>summary::-webkit-details-marker{display:none}.advd[open]>summary{margin-bottom:14px;color:var(--text)}
+</style></head><body data-tab="connect">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><path d="M12 10v6M9 13h6"/></symbol><symbol id="i-folderopen" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.3 10H20a2 2 0 0 1 1.9 2.6l-1.6 6A2 2 0 0 1 18.4 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol><symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 13v8M8 17l4 4 4-4M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol><symbol id="i-tray" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol></defs></svg>
+<div class="wrap">
+<header>
+ <div class="brand"><div class="logo"><svg class="ic"><use href="#i-share"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
+ <div class="hr">
+  <div class="pill"><span class="dot" id="dot"></span><span id="status"></span></div>
+  <div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div>
+ </div>
+</header>
+<nav class="nav"><button data-t="connect" style="--t1:#3b82f6;--t2:#8b5cf6"><span class="chip"><svg class="ic"><use href="#i-phone"/></svg></span><span data-i="tConnect"></span></button><button data-t="recv" style="--t1:#10b981;--t2:#06b6d4"><span class="chip"><svg class="ic"><use href="#i-down"/></svg></span><span data-i="tRecv"></span></button><button data-t="files" style="--t1:#f97316;--t2:#ec4899"><span class="chip"><svg class="ic"><use href="#i-up"/></svg></span><span data-i="tShare"></span></button><button data-t="settings" style="--t1:#a855f7;--t2:#6366f1"><span class="chip"><svg class="ic"><use href="#i-sliders"/></svg></span><span data-i="tSet"></span></button></nav>
+<div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button></div>
+
+<div id="tc">
+ <div class="panel guide" id="gcard" hidden></div>
+ <div class="panel guide warn" id="hcard" hidden><div class="gh" data-i="hintT"></div><div class="gp" data-i="hintD"></div><div class="gact"><button class="b" id="hgo"><span data-i="gDo2"></span></button></div></div>
+ <div class="panel hero">
+  <div class="seg"><button data-m="lan"><svg class="ic"><use href="#i-wifi"/></svg><span data-i="modeLan"></span></button><button data-m="net"><svg class="ic"><use href="#i-globe"/></svg><span data-i="modeNet"></span></button></div>
+  <div class="split">
+   <div class="qrcol"><img id="qr" alt="QR code" hidden><div class="ph" id="ph"></div></div>
+   <div class="info">
+    <div id="lan">
+     <h2 data-i="scanH"></h2><p data-i="scanP"></p>
+     <div class="row"><span id="url"></span><button class="b" id="cp"><svg class="ic"><use href="#i-copy"/></svg><span data-i="copy"></span></button></div>
+     <div class="acts"><button class="g" id="renew2" hidden><svg class="ic"><use href="#i-refresh"/></svg><span data-i="newLink"></span></button></div>
+     <small id="mdnsl" hidden style="display:block;margin-top:8px;color:var(--mute)"></small>
+    </div>
+    <div id="net" hidden>
+     <div class="top"><h2 data-i="netH"></h2><label class="switch"><input type="checkbox" id="rt" data-al="netH"><span class="slider"></span></label></div>
+     <p id="rdesc"></p>
+     <div class="pb" id="rbar" hidden><i id="rfill"></i></div>
+     <div id="rlink" hidden>
+      <div class="row"><span id="nurl"></span><button class="b" id="cp2"><svg class="ic"><use href="#i-copy"/></svg><span data-i="copyLink"></span></button></div>
+      <div class="acts"><button class="g" id="renew"><svg class="ic"><use href="#i-refresh"/></svg><span data-i="newLink"></span></button></div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="panel" id="devp">
+  <div class="stH" data-i="devH"></div>
+  <div id="devl"></div>
+  <div class="fempty" id="devn" data-i="devNone"></div>
+ </div>
+ <div class="panel">
+  <div class="stH" data-i="howH"></div>
+  <div class="steps">
+   <div class="st" style="--s1:#3b82f6;--s2:#8b5cf6"><i>1</i><div><b data-i="s1t"></b><small data-i="s1d"></small></div></div>
+   <div class="st" style="--s1:#10b981;--s2:#06b6d4"><i>2</i><div><b data-i="s2t"></b><small data-i="s2d"></small></div></div>
+   <div class="st" style="--s1:#f97316;--s2:#ec4899"><i>3</i><div><b data-i="s3t"></b><small data-i="s3d"></small></div></div>
+  </div>
+ </div>
+</div>
+
+<div id="tf" hidden>
+ <div class="panel">
+  <div class="phead"><div class="pico" id="pico"><svg class="ic"><use href="#i-down"/></svg></div><div><h2 id="ptitle" data-i="recvT"></h2><p id="psub" data-i="recvS"></p></div></div>
+  <div class="setblock" id="setRecv">
+   <div class="lab"><svg class="ic"><use href="#i-folder"/></svg><span data-i="defRecv"></span></div>
+   <div class="path"><input type="text" id="recv" data-al="defRecv"><button class="g" id="br"><svg class="ic"><use href="#i-folderopen"/></svg><span data-i="change"></span></button></div>
+  </div>
+  <div class="setblock" id="setShare" hidden>
+   <div class="top" style="margin-bottom:14px"><div class="lab" style="margin:0"><svg class="ic"><use href="#i-phone"/></svg><span data-i="shSw"></span></div>
+    <div style="display:flex;align-items:center;gap:10px"><span class="chip2 off" id="shst"></span><label class="switch"><input type="checkbox" id="on" data-al="shSw"><span class="slider"></span></label></div></div>
+   <div class="lab"><svg class="ic"><use href="#i-folder"/></svg><span data-i="defShare"></span></div>
+   <div class="path"><input type="text" id="share" data-al="defShare"><button class="g" id="bs"><svg class="ic"><use href="#i-folderopen"/></svg><span data-i="change"></span></button></div>
+  </div>
+ </div>
+ <div class="panel fp">
+  <div class="fhead">
+   <div><h2 data-i="filesH"></h2></div>
+   <div class="facts">
+    <button class="g" id="fpaste" hidden><svg class="ic"><use href="#i-copy"/></svg><span id="fpt"></span></button>
+    <button class="g" id="fnew"><svg class="ic"><use href="#i-folderplus"/></svg><span data-i="newFolder"></span></button>
+    <button class="g" id="fopen"><svg class="ic"><use href="#i-folderopen"/></svg><span data-i="openFolder"></span></button>
+    <label class="b"><svg class="ic"><use href="#i-plus"/></svg><span data-i="addFiles"></span><input id="fin" type="file" multiple hidden></label>
+   </div>
+  </div>
+  <div class="fnone" id="fnone" hidden>
+   <div class="big"><svg class="ic"><use href="#i-folder"/></svg></div><h3 id="fnoneh" data-i="noneSH"></h3>
+   <p id="fnonep" data-i="noneSP"></p>
+   <button class="b" id="fchoose"><svg class="ic"><use href="#i-folderopen"/></svg><span id="fch" data-i="chooseF"></span></button>
+  </div>
+  <div id="fbody" hidden>
+   <div class="dz"><svg class="ic"><use href="#i-tray"/></svg><b data-i="dzH"></b>
+    <span><span data-i="dz1"></span> <kbd id="k1">Ctrl</kbd> + <kbd>V</kbd> <span data-i="dz2"></span></span>
+   </div>
+   <div class="fup" id="fup" hidden><b id="fupt"></b><small id="fupn"></small><div class="pb"><i id="fupf"></i></div></div>
+   <div class="nf" id="nf" hidden><input type="text" id="nfi" data-ph="folderName" data-al="folderName"><button class="b" id="nfok" data-i="create"></button><button class="g" id="nfx" data-i="cancel"></button></div>
+   <div class="crumbhead"><div class="crumbs" id="crumbs"></div><span class="fcount" id="fcount"></span></div>
+   <div class="fgrid" id="fgrid"></div>
+   <div class="fempty" id="fempty" data-i="emptyS" hidden></div>
+  </div>
+ </div>
+</div>
+
+<div id="ts" hidden>
+ <div class="panel"><div class="item"><div class="ico" style="--t1:#06b6d4;--t2:#3b82f6"><svg class="ic"><use href="#i-globe"/></svg></div><div class="itx"><b data-i="langT"></b><small data-i="langS"></small></div><div class="langs" role="group"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div><div class="item"><div class="ico" style="--t1:#f59e0b;--t2:#f97316"><svg class="ic"><use href="#i-login"/></svg></div><div class="itx"><b data-i="startT"></b><small data-i="startS"></small></div><label class="switch"><input type="checkbox" id="auto" data-al="startT"><span class="slider"></span></label></div><div class="item"><div class="ico" style="--t1:#10b981;--t2:#22c55e"><svg class="ic"><use href="#i-cloud"/></svg></div><div class="itx"><b data-i="updT"></b><small id="updsub"></small></div><label class="switch"><input type="checkbox" id="aupd" data-al="updT"><span class="slider"></span></label></div></div>
+
+ <details class="advd"><summary data-i="advT"></summary>
+ <div class="panel" id="secp">
+  <div class="item"><div class="ico" style="--t1:#ef4444;--t2:#f97316"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="itx"><b data-i="secH"></b><small data-i="secS"></small></div></div>
+  <div class="item"><div class="itx"><b data-i="apT"></b><small data-i="apS"></small></div><label class="switch"><input type="checkbox" id="apOn" data-al="apT"><span class="slider"></span></label></div>
+  <div class="item"><div class="itx"><b data-i="pwT"></b><small data-i="pwS"></small></div><label class="switch"><input type="checkbox" id="pwOn" data-al="pwT"><span class="slider"></span></label></div>
+  <div class="pwrow"><input type="password" id="pwIn" autocomplete="new-password" data-ph="pwPh"><button class="g" id="pwSave"><span data-i="pwSave"></span></button></div>
+  <div class="item"><div class="itx"><b data-i="indT"></b><small data-i="indS"></small></div><label class="switch"><input type="checkbox" id="indOn" data-al="indT"><span class="slider"></span></label></div>
+  <div class="warnb" id="secWarn" hidden></div>
+  <div class="subh" data-i="trH"></div>
+  <div id="trl"></div>
+  <div class="fempty" id="trn" data-i="trNone"></div>
+ </div>
+
+ <div class="panel" id="smp">
+  <div class="item"><div class="ico" style="--t1:#06b6d4;--t2:#3b82f6"><svg class="ic"><use href="#i-globe"/></svg></div><div class="itx"><b data-i="smT"></b><small data-i="smS"></small></div></div>
+  <div class="subh" data-i="wkT"></div>
+  <div class="pwrow"><input type="text" id="wkUrl" placeholder="https://name.workers.dev" autocomplete="off" spellcheck="false"><button class="g" id="wkSave"><span data-i="wkSave"></span></button></div>
+  <div style="padding:0 20px 14px"><span id="wkSt" class="chip2 off"></span><small style="display:block;color:var(--mute);margin-top:6px" data-i="wkS"></small></div>
+  <div class="item"><div class="itx"><b data-i="anT"></b><small data-i="anS"></small></div><label class="switch"><input type="checkbox" id="anOn" data-al="anT"><span class="slider"></span></label></div>
+  <div class="item"><div class="itx"><b data-i="ofT"></b><small data-i="ofS"></small></div><label class="switch"><input type="checkbox" id="ofOn" data-al="ofT"><span class="slider"></span></label></div>
+  <div class="subh" data-i="hsT"></div>
+  <div class="pwrow"><input type="text" id="hsSsid" data-ph="hsSsidPh" autocomplete="off"><input type="password" id="hsPass" data-ph="hsPassPh" autocomplete="new-password"><button class="g" id="hsSave"><span data-i="wkSave"></span></button></div>
+  <div style="padding:0 20px 14px"><small style="display:block;color:var(--mute)" data-i="hsS"></small></div>
+  <div class="item"><div class="itx"></div><button class="g dgr" id="wkReset"><span data-i="wkReset"></span></button></div>
+ </div>
+ <div class="panel">
+  <div class="item" style="border:0;padding-bottom:12px"><div class="ico" style="--t1:#6366f1;--t2:#8b5cf6"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="itx"><b data-i="netSet"></b><small data-i="netSetS"></small></div></div>
+  <div class="adv">
+   <div><label for="ip" data-i="ip"></label><select id="ip"></select></div>
+   <div class="fix"><label for="port" data-i="port"></label><input id="port" type="number" min="1024" max="65535"></div>
+   <button class="g" id="sp"><svg class="ic"><use href="#i-check"/></svg><span data-i="apply"></span></button>
+  </div>
+ </div>
+ </details>
+ <div class="panel">
+  <div class="item"><div class="ico" style="--t1:#f43f5e;--t2:#e11d48"><svg class="ic"><use href="#i-power"/></svg></div><div class="itx"><b data-i="quitT"></b><small data-i="quitS"></small></div><button class="g dgr" id="quit"><svg class="ic"><use href="#i-power"/></svg><span data-i="quitB"></span></button></div>
+ </div>
+</div>
+</div>
+<div class="dover" id="dover"><div><svg class="ic"><use href="#i-tray"/></svg><b id="dtitle"></b><span id="dname"></span></div></div>
+<div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><small id="mrI"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="b" id="mrA"><span data-i="allowOnce"></span></button><button class="b" id="mrT"><span data-i="allowTrust"></span></button><button class="g dgr" id="mrD"><span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const I={
+advT:["Advanced settings (not needed for normal use)","উন্নত সেটিং (সাধারণ ব্যবহারে লাগে না)"],
+scanPT:["Works on any network. The QR may change when shareUp restarts.","যেকোনো network-এ কাজ করবে।"],
+hintT:["Fixed QR is not on yet","Fixed QR এখনো চালু হয়নি"],hintD:["Add your Worker link once in Settings (see WORKER_SETUP.md) and one QR will work everywhere.","Settings-এ একবার Worker link দিন (WORKER_SETUP.md দেখুন), তারপর একটা QR সব জায়গায় কাজ করবে।"],
+scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
+scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
+gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone's Hotspot (the PC connects by itself)","Phone-এর Hotspot on করুন (PC নিজে connect হবে)"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
+gD1:["Offline mode is on","Offline mode চালু হয়েছে"],gD2:["Network connected","Network connected"],gDo1:["Turn on","চালু করুন"],gDo2:["Open Settings","Settings খুলুন"],
+gBack:["Internet is back","Internet ফিরে এসেছে"],gBackD:["Your old QR works again. Nothing else to do.","আগের QR আবার কাজ করবে। আর কিছু করতে হবে না।"],gDone:["Connected!","Connected!"],
+smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for Wi-Fi and internet.","একটা QR যা কখনো বদলায় না, WiFi আর internet দুটোতেই।"],
+wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","সেভ"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","সেভ হয়েছে"],
+anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link ready by itself (needs the fixed QR).","Internet link নিজে চালু রাখবে (fixed QR লাগবে)।"],
+ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
+hsT:["Phone Hotspot","Phone Hotspot"],hsS:["The PC connects to it by itself when there is no network.","কোনো network না থাকলে PC নিজে এতে connect হবে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Hotspot password","Hotspot-এর password"],
+wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
+devH:["Connected phones","কানেক্টেড ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
+secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
+apT:["Approval","Approval"],apS:["Ask on this PC before a new device connects.","নতুন device connect হওয়ার আগে এই PC-তে জিজ্ঞেস করবে।"],
+pwT:["Password","Password"],pwS:["Phones must enter the password to connect.","Connect করতে phone-এ password দিতে হবে।"],
+pwPh:["New password (min 4)","নতুন password (কমপক্ষে ৪)"],pwSave:["Save password","Password সেভ"],pwSaved:["Password saved","Password সেভ হয়েছে"],pwFirst:["Save a password first","আগে একটা password সেভ করুন"],
+indT:["Allow both on / both off","দুটো একসাথে on বা off রাখুন"],indS:["Normally turning one on switches the other off. Turn this on to control both yourself.","সাধারণত একটা on করলে অন্যটা নিজে off হয়। নিজে দুটো ঠিক করতে এটা on করুন।"],
+warnOpen:["Warning: with Approval and Password both off, anyone who scans the QR can connect.","সাবধান: Approval ও Password দুটোই off থাকলে QR স্ক্যান করা যে কেউ connect করতে পারবে।"],
+trH:["Always-allowed phones","সবসময় অনুমতি পাওয়া ফোন"],trNone:["None","কেউ নেই"],
+reqH:["Let this phone in?","এই ফোনকে ঢুকতে দেবেন?"],allowOnce:["Just this time","এইবারের জন্য"],allowTrust:["Always allow","সবসময়ের জন্য"],deny:["Don’t allow","না"],reqLeft:["Auto-deny in {0}s","{0} সেকেন্ডে নিজে “না” হয়ে যাবে"],
+kick:["Disconnect","Disconnect"],trust:["Always allow","সবসময় অনুমতি"],untrust:["Remove","সরান"],viaNet:["Internet","Internet"],viaLan:["Wi-Fi","WiFi"],online:["Online","Online"],lastSeen:["Last seen {0}","শেষ দেখা {0}"],
+tag:["Send files between phone and PC","ফোন ও পিসির মধ্যে ফাইল আদান-প্রদান"],
+running:["Running","চালু আছে"],nonet:["No network","নেটওয়ার্ক নেই"],
+tConnect:["Connect Phone","ফোন কানেক্ট"],tRecv:["From Phone","ফোন থেকে পাওয়া"],tShare:["Shared from PC","পিসি থেকে শেয়ার"],tSet:["Settings","সেটিংস"],
+modeLan:["Same Wi-Fi","একই ওয়াইফাই"],modeNet:["Internet","ইন্টারনেট"],
+scanH:["Scan to connect","কিউআর কোড স্ক্যান করুন"],
+scanP:["Point your phone camera at the code. Your phone and PC need to be on the same Wi-Fi.","ফোনের ক্যামেরা কোডটির দিকে ধরুন। ফোন ও পিসি একই ওয়াইফাইতে থাকতে হবে।"],
+copy:["Copy","কপি"],copyLink:["Copy link","লিংক কপি"],copied:["Copied","কপি হয়েছে"],
+netH:["Internet access","ইন্টারনেট অ্যাক্সেস"],newLink:["New link","নতুন লিংক"],newLinkDone:["New link created","নতুন লিংক তৈরি হয়েছে"],
+rOff:["Send files from any network, even mobile data. Off by default, and it switches off whenever shareUp restarts.","যেকোনো নেটওয়ার্ক বা মোবাইল ডেটা থেকে ফাইল পাঠানো যায়। ডিফল্টে বন্ধ থাকে, আর শেয়ারআপ রিস্টার্ট হলে নিজে থেকেই বন্ধ হয়ে যায়।"],
+rDown:["Downloading the connection helper (first time only)… {0}%","কানেকশন হেল্পার ডাউনলোড হচ্ছে (শুধু প্রথমবার)… {0}%"],
+rStart:["Connecting…","কানেক্ট হচ্ছে…"],
+rOn:["Scan with your phone on any network. Only people with this private link can connect. Make a new link to cut off the old one.","যেকোনো নেটওয়ার্কে ফোন দিয়ে স্ক্যান করুন। শুধু এই প্রাইভেট লিংক যাদের কাছে আছে তারাই কানেক্ট করতে পারবে। পুরোনো লিংক বন্ধ করতে নতুন লিংক বানান।"],
+retry:["Switch on to try again.","আবার চেষ্টা করতে চালু করুন।"],
+nonetfound:["No network found","কোনো নেটওয়ার্ক পাওয়া যায়নি"],
+howH:["How to use","ব্যবহারের নিয়ম"],
+s1t:["Scan the QR code","কিউআর কোড স্ক্যান করুন"],s1d:["Open your phone camera and point it at the code above.","ফোনের ক্যামেরা খুলে ওপরের কোডে ধরুন।"],
+s2t:["Send files to the PC","ফোন থেকে পিসিতে পাঠান"],s2d:["They arrive in the “From Phone” tab.","ফাইল আসবে “ফোন থেকে পাওয়া” ট্যাবে।"],
+s3t:["Get PC files on the phone","পিসির ফাইল ফোনে নিন"],s3d:["Put files in the “Shared from PC” tab and open them on your phone.","“পিসি থেকে শেয়ার” ট্যাবে ফাইল রাখুন, ফোনে খুলে নিন।"],
+recvT:["Files received from your phone","ফোন থেকে পাওয়া ফাইল"],recvS:["Everything you send from your phone is saved in this folder.","ফোন থেকে পাঠানো সব ফাইল এই ফোল্ডারে জমা হয়।"],
+shareT:["Files shared from this PC","এই পিসি থেকে শেয়ার করা ফাইল"],shareS:["Your phone can see and download whatever is in this folder.","এই ফোল্ডারের ফাইল ফোনে দেখা ও ডাউনলোড করা যাবে।"],
+defRecv:["Default save folder","ডিফল্ট সেভ ফোল্ডার"],defShare:["Default shared folder","ডিফল্ট শেয়ার ফোল্ডার"],
+change:["Change folder","ফোল্ডার বদলান"],
+shSw:["Let the phone see these files","ফোনকে ফাইল দেখতে দিন"],shOn:["On – phone can see files","চালু – ফোন দেখতে পাচ্ছে"],shOff:["Off – phone can’t see files","বন্ধ – ফোন দেখতে পাচ্ছে না"],
+sharingOn:["Sharing on","শেয়ারিং চালু হয়েছে"],sharingOff:["Sharing off","শেয়ারিং বন্ধ হয়েছে"],
+filesH:["Files in this folder","এই ফোল্ডারের ফাইল"],
+pasteHere:["Paste here","এখানে পেস্ট"],moveHere:["Move here","এখানে সরান"],
+newFolder:["New folder","নতুন ফোল্ডার"],openFolder:["Open folder","ফোল্ডার খুলুন"],addFiles:["Add files","ফাইল যোগ করুন"],
+noneRH:["Choose where phone files are saved","ফোনের ফাইল কোথায় জমবে বেছে নিন"],noneRP:["Files you send from your phone land in this folder.","ফোন থেকে পাঠানো ফাইল এই ফোল্ডারে সেভ হবে।"],chooseR:["Choose save folder","সেভ ফোল্ডার বাছুন"],
+noneSH:["Choose a folder to share","শেয়ার করার ফোল্ডার বেছে নিন"],noneSP:["Pick any folder. Whatever you put inside shows up on your phone.","যেকোনো ফোল্ডার বাছুন। ভেতরের ফাইল ফোনে দেখা যাবে।"],chooseF:["Choose folder","ফোল্ডার বাছুন"],
+dzH:["Drag files or folders here","ফাইল বা ফোল্ডার এখানে টেনে এনে ছাড়ুন"],
+dz1:["or press","অথবা কপি করা ফাইল ও স্ক্রিনশট পেস্ট করতে"],dz2:["to paste copied files and screenshots","চাপুন"],
+folderName:["Folder name","ফোল্ডারের নাম"],create:["Create","তৈরি করুন"],cancel:["Cancel","বাতিল"],
+emptyR:["Nothing received yet. Files you send from your phone show up here.","এখনো কিছু আসেনি। ফোন থেকে ফাইল পাঠালে এখানে দেখা যাবে।"],
+emptyS:["Nothing here yet. Drop files in to share them with your phone.","এখনো কিছু নেই। ফোনে দেখাতে চাইলে এখানে ফাইল ছেড়ে দিন।"],
+rootR:["Received","পাওয়া ফাইল"],rootS:["Shared folder","শেয়ার ফোল্ডার"],
+item1:["1 item","১টি আইটেম"],itemN:["{0} items","{0}টি আইটেম"],
+folder:["Folder","ফোল্ডার"],dbl:["Double-click to open","খুলতে ডাবল-ক্লিক করুন"],
+del:["Delete","মুছুন"],more:["More options for","আরও অপশন:"],
+delDir:["Delete the folder “{0}” and everything inside it from this PC?","ফোল্ডার “{0}” ও এর ভেতরের সবকিছু এই পিসি থেকে মুছে ফেলবেন?"],
+delOne:["Delete “{0}” from this PC?","“{0}” এই পিসি থেকে মুছে ফেলবেন?"],deleted:["Deleted","মুছে ফেলা হয়েছে"],
+open:["Open","খুলুন"],rename:["Rename","নাম বদলান"],copyM:["Copy","কপি"],cut:["Cut","কাট"],pasteInto:["Paste into folder","ফোল্ডারের ভেতরে পেস্ট"],
+newName:["New name","নতুন নাম"],renamed:["Renamed","নাম বদলানো হয়েছে"],
+clipCut:["Cut. Open a folder and choose Move here","কাট হয়েছে। কোনো ফোল্ডারে গিয়ে “এখানে সরান” চাপুন"],
+clipCopy:["Copied. Open a folder and choose Paste here","কপি হয়েছে। কোনো ফোল্ডারে গিয়ে “এখানে পেস্ট” চাপুন"],
+movedN:["Moved {0} items","{0}টি আইটেম সরানো হয়েছে"],copiedN:["Copied {0} items","{0}টি আইটেম কপি হয়েছে"],
+folderMade:["Folder created","ফোল্ডার তৈরি হয়েছে"],chooseFirst:["Choose a folder first","আগে একটি ফোল্ডার বাছুন"],
+adding:["Adding {0} of {1} files","{1}টির মধ্যে {0}টি ফাইল যোগ হচ্ছে"],addedN:["Added {0} files","{0}টি ফাইল যোগ হয়েছে"],addedFail:["{0} added, {1} failed","{0}টি যোগ হয়েছে, {1}টি ব্যর্থ"],
+dropR:["Drop to add to received files","ছেড়ে দিন – পাওয়া ফাইলে যোগ হবে"],dropS:["Drop to add to shared folder","ছেড়ে দিন – শেয়ার ফোল্ডারে যোগ হবে"],
+wrong:["Something went wrong","কিছু একটা সমস্যা হয়েছে"],
+langT:["Language","ভাষা"],langS:["Choose the language of the app","অ্যাপের ভাষা বেছে নিন"],
+startT:["Start when I sign in","কম্পিউটার চালু হলে নিজে থেকে চালু হোক"],
+startS:["Runs quietly in the system tray. Click the tray icon or open shareUp again to see this window.","সিস্টেম ট্রেতে চুপচাপ চলবে। ট্রে-র আইকনে ক্লিক করলে বা শেয়ারআপ আবার খুললে এই উইন্ডো দেখা যাবে।"],
+startOn:["Will start when you sign in","সাইন ইন করলে নিজে থেকে চালু হবে"],startOff:["Startup off","স্টার্টআপ বন্ধ"],
+updT:["Auto update","অটো আপডেট"],updS:["Checks GitHub for a new build and shows it here","গিটহাবে নতুন সংস্করণ আছে কিনা দেখে এখানে জানাবে"],
+updCheck:["Checking for updates…","আপডেট খোঁজা হচ্ছে…"],updReady:["New build {0} is ready (you have {1})","নতুন সংস্করণ {0} প্রস্তুত (আপনার কাছে {1})"],
+updOk:["Up to date ({0})","আপ টু ডেট ({0})"],updNone:["Up to date – no releases yet","আপ টু ডেট – এখনো কোনো রিলিজ নেই"],
+updInst:["Installing {0}…{1}","{0} ইনস্টল হচ্ছে…{1}"],updAvail:["New version {0} available","নতুন সংস্করণ {0} পাওয়া যাচ্ছে"],
+updHave:["You have {0}. shareUp will restart after updating.","আপনার কাছে {0} আছে। আপডেটের পর শেয়ারআপ রিস্টার্ট হবে।"],updNow:["Update now","এখনই আপডেট করুন"],
+autoOn:["Auto update on","অটো আপডেট চালু"],autoOff:["Auto update off","অটো আপডেট বন্ধ"],
+netSet:["Network (advanced)","নেটওয়ার্ক (উন্নত)"],netSetS:["Usually you don’t need to change these.","সাধারণত এগুলো বদলানোর দরকার হয় না।"],
+ip:["IP address","আইপি অ্যাড্রেস"],port:["Port","পোর্ট"],apply:["Apply","প্রয়োগ করুন"],
+quitT:["Stop shareUp","শেয়ারআপ বন্ধ করুন"],quitS:["Closes the app completely, including the tray icon.","অ্যাপটি ট্রে-র আইকনসহ পুরোপুরি বন্ধ হয়ে যাবে।"],quitB:["Quit","বন্ধ করুন"],
+quitC:["Stop shareUp?","শেয়ারআপ বন্ধ করবেন?"],quitD:["shareUp stopped. You can close this window.","শেয়ারআপ বন্ধ হয়েছে। এই উইন্ডোটি বন্ধ করতে পারেন।"]
+};
+let LANG='bn';try{LANG=localStorage.getItem('lang')||'bn'}catch(e){}
+const t=(k,...a)=>{const e=I[k];let s=e?e[LANG==='bn'?1:0]:k;a.forEach((v,i)=>{s=s.split('{'+i+'}').join(v)});return s};
+const ic=n=>'<svg class="ic"><use href="#i-'+n+'"/></svg>';
+function applyLang(){
+ document.documentElement.lang=LANG;
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+ document.querySelectorAll('[data-ph]').forEach(e=>e.placeholder=t(e.dataset.ph));
+ document.querySelectorAll('[data-al]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.al)));
+ document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
+}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste()}
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+
+const $=s=>document.querySelector(s);
+let mode='lan',curQ='',lastQ='',S=null,tab='connect',cur='',lastL='',lastDir=null;
+const inFiles=()=>tab==='files'||tab==='recv';
+const root=()=>tab==='recv'?'recv':'share';                       // which folder the file manager shows
+const rootDirOf=s=>s?(root()==='recv'?s.recvDir:s.shareDir):'';
+let toastT=0;
+function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1600)}
+async function api(p,b){
+ try{const r=await fetch(p,{method:'POST',body:b?JSON.stringify(b):null});
+  if(!r.ok){toast((await r.text()).trim()||t('wrong'),3200);return null}
+  return r.json()}catch(e){return null}
+}
+function setVal(sel,v){const e=$(sel);if(document.activeElement!==e)e.value=v}
+function copy(t){
+ return navigator.clipboard.writeText(t).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove()}).then(()=>toast(t('copied')));
+}
+function render(s){
+ if(!s)return;S=s;const r=s.remote;
+ $('#dot').classList.toggle('off',!s.url);
+ $('#status').textContent=s.url?t('running'):t('nonet');
+
+ const sm=s.smart||{},fx=!!sm.configured;
+ mode='lan';
+ document.querySelector('.hero .seg').hidden=true;
+ document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+ $('#lan').hidden=mode!=='lan';$('#net').hidden=mode!=='net';
+
+ let q='',ph='';
+ if(sm.online&&fx&&sm.fixedUrl)q=sm.fixedUrl;
+ else if(sm.online&&r.status==='on')q=r.link;
+ else if(sm.online&&sm.autoNet&&(r.status==='starting'||r.status==='downloading'))ph='spin';
+ else{q=s.url;if(!q)ph='wifi'}
+ if(q!==lastQ){lastQ=q;$('#qr').src=q?'/admin/qr.png?u='+encodeURIComponent(q):''}
+ $('#qr').hidden=!q;$('#ph').hidden=!!q;
+ $('#ph').innerHTML=ph==='spin'?'<div class="spin"></div>':(ph?ic(ph):'');
+
+ curQ=q;$('#url').textContent=q||t('nonetfound');
+ const kind=!sm.online?(fx?'O':''):(fx?'F':(r.status==='on'?'T':''));
+ const hk={F:'scanHF',O:'scanHO',T:'scanHF'}[kind]||'scanH',pk={F:'scanPF',O:'scanPO',T:'scanPT'}[kind]||'scanP';
+ [['h2',hk],['p',pk]].forEach(([el,k])=>{const e=$('#lan '+el);e.dataset.i=k;e.textContent=t(k)});
+ $('#renew2').hidden=!(kind==='T'&&q===r.link);
+ const ml=$('#mdnsl');ml.hidden=!(sm.online===false);ml.textContent=sm.mdns?('+ '+sm.mdns):'';
+ drawGuide(sm.guide);smRender(s);$('#hcard').hidden=true;
+ const busy=r.status==='downloading'||r.status==='starting';
+ $('#rt').checked=busy||r.status==='on';
+ const d=$('#rdesc');d.className='';
+ if(r.status==='off')d.textContent=t('rOff');
+ else if(r.status==='downloading')d.textContent=t('rDown',r.progress);
+ else if(r.status==='starting')d.textContent=t('rStart');
+ else if(r.status==='on')d.textContent=t('rOn');
+ else{d.textContent=r.error+' '+t('retry');d.className='err'}
+ $('#rbar').hidden=r.status!=='downloading';$('#rfill').style.width=r.progress+'%';
+ $('#rlink').hidden=r.status!=='on';$('#nurl').textContent=r.url||'';
+
+ renderUpd(s);filesHook(s);secRender(s);
+ setVal('#recv',s.recvDir);setVal('#share',s.shareDir);setVal('#port',s.port);
+ $('#on').checked=s.shareOn;$('#auto').checked=s.autostart;
+ const sh=$('#shst');sh.textContent=t(s.shareOn?'shOn':'shOff');sh.className='chip2 '+(s.shareOn?'ok':'off');
+ const ip=$('#ip'),key=s.ips.join();
+ if(ip.dataset.k!==key||ip.dataset.s!==s.ip){ip.dataset.k=key;ip.dataset.s=s.ip;ip.innerHTML='';
+  s.ips.forEach(i=>{const o=document.createElement('option');o.value=o.textContent=i;if(i==s.ip)o.selected=true;ip.append(o)})}
+}
+function filesHook(s){
+ const d=rootDirOf(s);
+ if(d!==lastDir){lastDir=d;cur='';lastL='';loadFiles()}
+ else if(S&&inFiles())loadFiles();
+}
+function renderUpd(s){
+ const u=s.update;if(!u)return;
+ $('#aupd').checked=u.enabled;
+ const b=$('#upd');
+ let sub=t('updS');
+ if(u.enabled){
+  if(u.status==='checking')sub=t('updCheck');
+  else if(u.status==='error')sub=u.error;
+  else if(u.available)sub=t('updReady',u.latest,u.current);
+  else if(u.status==='uptodate')sub=u.latest?t('updOk',u.current):t('updNone');
+ }
+ $('#updsub').textContent=sub;
+ const show=u.enabled&&(u.available||u.status==='installing');
+ b.hidden=!show;
+ if(show){
+  $('#updt').textContent=u.status==='installing'?t('updInst',u.latest,u.progress?' '+u.progress+'%':''):t('updAvail',u.latest);
+  $('#updd').textContent=u.status==='error'?u.error:t('updHave',u.current);
+  $('#updgo').disabled=u.status==='installing';
+ }
+}
+$('#aupd').onchange=async()=>{const s=await api('/admin/set',{autoUpdate:$('#aupd').checked});render(s||await api('/admin/state'));toast(t($('#aupd').checked?'autoOn':'autoOff'))};
+$('#updgo').onclick=async()=>render(await api('/admin/update',{install:true}));
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render(S)});
+$('#cp').onclick=()=>curQ&&copy(curQ);
+$('#cp2').onclick=()=>S&&S.remote.link&&copy(S.remote.link);
+$('#rt').onchange=async()=>render(await api('/admin/remote',{on:$('#rt').checked}));
+$('#renew2').onclick=$('#renew').onclick=async()=>{render(await api('/admin/remote',{renew:true}));toast(t('newLinkDone'))};
+$('#renew').onclick=async()=>{render(await api('/admin/remote',{renew:true}));toast(t('newLinkDone'))};
+$('#ip').onchange=async()=>render(await api('/admin/set',{ip:$('#ip').value}));
+$('#sp').onclick=async()=>{const s=await api('/admin/set',{port:parseInt($('#port').value)});if(s)location.href='http://localhost:'+s.port+'/admin'};
+$('#recv').onchange=async()=>render(await api('/admin/set',{recvDir:$('#recv').value}));
+$('#share').onchange=async()=>render(await api('/admin/set',{shareDir:$('#share').value}));
+$('#on').onchange=async()=>{render(await api('/admin/set',{shareOn:$('#on').checked}));toast(t($('#on').checked?'sharingOn':'sharingOff'))};
+$('#auto').onchange=async()=>{const s=await api('/admin/set',{autostart:$('#auto').checked});render(s||await api('/admin/state'));if(s)toast(t(s.autostart?'startOn':'startOff'))};
+$('#br').onclick=async()=>{const j=await api('/admin/browse');if(j&&j.path)render(await api('/admin/set',{recvDir:j.path}))};
+$('#bs').onclick=async()=>{const j=await api('/admin/browse');if(j&&j.path)render(await api('/admin/set',{shareDir:j.path}))};
+$('#quit').onclick=async()=>{if(!confirm(t('quitC')))return;await api('/admin/quit');document.body.innerHTML='<p style="text-align:center;margin-top:120px;font-family:system-ui;color:#999">'+t('quitD')+'</p>'};
+
+/* ---------- tabs ---------- */
+function setTab(tb){
+ const was=root();
+ tab=tb;document.body.dataset.tab=tb;
+ $('#tc').hidden=tb!=='connect';$('#tf').hidden=!inFiles();$('#ts').hidden=tb!=='settings';
+ if(inFiles()){
+  const r=root()==='recv';
+  $('#setRecv').hidden=!r;$('#setShare').hidden=r;
+  $('#ptitle').dataset.i=r?'recvT':'shareT';$('#psub').dataset.i=r?'recvS':'shareS';
+  $('#pico use').setAttribute('href',r?'#i-down':'#i-up');
+  $('#fnoneh').dataset.i=r?'noneRH':'noneSH';$('#fnonep').dataset.i=r?'noneRP':'noneSP';$('#fch').dataset.i=r?'chooseR':'chooseF';
+  $('#fempty').dataset.i=r?'emptyR':'emptyS';
+  if(root()!==was){cur='';lastDir=null}
+ }
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tb));
+ applyLang();
+ try{localStorage.setItem('tab',tb)}catch(e){}
+ if(inFiles()){lastL='';loadFiles()}
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+$('#k1').textContent=/Mac/.test(navigator.platform)?'⌘':'Ctrl';
+
+/* ---------- shared files ---------- */
+const IMG=['jpg','jpeg','png','gif','webp','bmp','avif'],VID=['mp4','webm','mov','m4v'];
+const GROUPS=[
+ [['pdf'],'#dc2626','PDF'],[['doc','docx','odt','rtf'],'#2563eb','DOC'],[['xls','xlsx','csv','ods'],'#16a34a','XLS'],
+ [['ppt','pptx','odp'],'#ea580c','PPT'],[['zip','rar','7z','tar','gz'],'#ca8a04','ZIP'],
+ [['mp3','wav','flac','m4a','aac','ogg'],'#9333ea','AUDIO'],[['mp4','mkv','avi','mov','webm'],'#db2777','VIDEO'],
+ [['apk','exe','msi','dmg'],'#475569','APP'],[['txt','md','log'],'#64748b','TXT'],
+ [['jpg','jpeg','png','gif','webp','bmp','svg','avif','heic'],'#0891b2','IMG']];
+const FOLDER='<svg class="fold" viewBox="0 0 24 20"><path d="M1 3a2 2 0 0 1 2-2h6l2 2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2z" fill="#d97706"/><path d="M1 7h22v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2z" fill="#fbbf24"/></svg>';
+const ENC=p=>p.split('/').map(encodeURIComponent).join('/');
+const extOf=n=>(n.includes('.')?n.split('.').pop():'').toLowerCase();
+const baseName=d=>(d||'').replace(/[\\/]+$/,'').split(/[\\/]/).pop();
+function sz(n){const u=['B','KB','MB','GB','TB'];let i=0;while(n>=1024&&i<4){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]}
+function badge(name){
+ const e=extOf(name);let c='#6b7280',l=(e||'FILE').toUpperCase().slice(0,4);
+ for(const g of GROUPS)if(g[0].includes(e)){c=g[1];l=g[2];break}
+ const b=document.createElement('div');b.className='fb';b.style.background=c;b.textContent=l;return b;
+}
+async function post(p,b){
+ try{const r=await fetch(p,{method:'POST',body:JSON.stringify(b||{})});
+  if(!r.ok){toast((await r.text()).trim()||t('wrong'),2800);return null}
+  return r.json()}catch(e){toast(t('wrong'),2800);return null}
+}
+const vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.src=e.target.dataset.src;vio.unobserve(e.target)}}),{rootMargin:'250px'});
+
+async function loadFiles(){
+ if(!inFiles()||renaming)return;
+ let j;try{j=await (await fetch('/admin/files?path='+encodeURIComponent(cur)+'&root='+root())).json()}catch(e){return}
+ const key=JSON.stringify(j);if(key===lastL)return;lastL=key;drawFiles(j);
+}
+function go(p){cur=p;lastL='';loadFiles()}
+function drawFiles(j){
+ const g=$('#fgrid'),cr=$('#crumbs');
+ g.textContent='';cr.textContent='';
+ updatePaste();
+ $('#fnone').hidden=!!j.set;$('#fbody').hidden=!j.set;
+ ['#fnew','#fopen'].forEach(x=>$(x).disabled=!j.set);
+ if(!j.set)return;
+ const rb=document.createElement('button');rb.textContent=baseName(j.dir)||t(root()==='recv'?'rootR':'rootS');rb.onclick=()=>go('');dropOn(rb,()=>'');cr.append(rb);
+ let acc='';
+ j.path.split('/').filter(Boolean).forEach(p=>{
+  acc=acc?acc+'/'+p:p;const a=acc;
+  const i=document.createElement('i');i.textContent='›';
+  const b=document.createElement('button');b.textContent=p;b.onclick=()=>go(a);dropOn(b,()=>a);cr.append(i,b);
+ });
+ const n=j.items.length;
+ $('#fcount').textContent=n?t(n===1?'item1':'itemN',n):'';
+ $('#fempty').hidden=n>0;
+ j.items.forEach(it=>g.append(ftile(it)));
+}
+function openIt(full){post('/admin/open',{path:full,root:root()})}
+function ftile(it){
+ const full=(cur?cur+'/':'')+it.name,enc=ENC(full),ext=extOf(it.name);
+ const el=document.createElement('div');el.className='ft';el.tabIndex=0;
+ el.title=it.dir?t('openFolder'):t('dbl');
+ if(clip&&clip.mode==='cut'&&clip.root===root()&&clip.paths.includes(full))el.classList.add('cut');
+ const th=document.createElement('div');th.className='fth';
+ const fall=()=>{th.textContent='';th.append(badge(it.name))};
+ if(it.dir)th.innerHTML=FOLDER;
+ else if(IMG.includes(ext)){
+  const im=document.createElement('img');im.loading='lazy';im.decoding='async';im.src='/admin/pv/'+enc+'?root='+root();im.onerror=fall;th.append(im);
+ }else if(VID.includes(ext)){
+  const v=document.createElement('video');v.muted=true;v.preload='metadata';v.playsInline=true;
+  v.dataset.src='/admin/pv/'+enc+'?root='+root()+'#t=0.1';v.onerror=fall;th.append(v);vio.observe(v);
+  const pl=document.createElement('span');pl.className='vi';th.append(pl);
+ }else th.append(badge(it.name));
+ const nm=document.createElement('div');nm.className='fn';nm.textContent=it.name;
+ const sm=document.createElement('div');sm.className='fs';sm.textContent=it.dir?t('folder'):sz(it.size);
+ const x=document.createElement('button');x.className='fx';x.textContent='×';x.title=t('del');x.setAttribute('aria-label',t('del')+' '+it.name);
+ x.onclick=e=>{e.stopPropagation();del(full,it)};
+ const m=document.createElement('button');m.className='fm';m.textContent='⋯';m.title=t('more');m.setAttribute('aria-label',t('more')+' '+it.name);
+ m.onclick=e=>{e.stopPropagation();const r=m.getBoundingClientRect();openMenu(r.left,r.bottom+4,full,it,el)};
+ el.oncontextmenu=e=>{e.preventDefault();openMenu(e.clientX,e.clientY,full,it,el)};
+ el.draggable=true;
+ el.ondragstart=e=>{e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:full}));e.dataTransfer.effectAllowed='copyMove'};
+ if(it.dir){el.onclick=()=>go(full);dropOn(el,()=>full)}else el.ondblclick=()=>openIt(full);
+ el.onkeydown=e=>{
+  if(e.target!==el)return;
+  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if(e.key==='Enter')it.dir?go(full):openIt(full);
+  else if(e.key==='Delete')del(full,it);
+  else if(e.key==='F2'){e.preventDefault();renameIt(full,it,el)}
+  else if(mod&&k==='c'){e.preventDefault();setClip('copy',full)}
+  else if(mod&&k==='x'){e.preventDefault();setClip('cut',full)}
+  else if(mod&&k==='v'&&clip){e.preventDefault();pasteTo(it.dir?full:cur)}
+ };
+ el.append(th,nm,sm,x,m);return el;
+}
+async function del(full,it){
+ const msg=it.dir?t('delDir',it.name):t('delOne',it.name);
+ if(!confirm(msg))return;
+ if(await post('/admin/del',{path:full,root:root(),recursive:!!it.dir})){toast(t('deleted'));lastL='';loadFiles()}
+}
+
+/* ---------- rename / copy / cut / paste / move ---------- */
+const DT='application/x-shareup';
+let clip=null,renaming=false;
+const cm=document.createElement('div');cm.className='cm';document.body.append(cm);
+function closeMenu(){cm.classList.remove('on')}
+function openMenu(x,y,full,it,el){
+ cm.textContent='';
+ const add=(label,fn,cls)=>{const b=document.createElement('button');b.textContent=label;if(cls)b.className=cls;b.onclick=()=>{closeMenu();fn()};cm.append(b)};
+ add(it.dir?t('openFolder'):t('open'),()=>it.dir?go(full):openIt(full));
+ add(t('rename'),()=>renameIt(full,it,el));
+ add(t('copyM'),()=>setClip('copy',full));
+ add(t('cut'),()=>setClip('cut',full));
+ if(clip&&it.dir)add(t('pasteInto'),()=>pasteTo(full));
+ cm.append(document.createElement('hr'));
+ add(t('del'),()=>del(full,it),'dg');
+ cm.classList.add('on');
+ const w=cm.offsetWidth,h=cm.offsetHeight;
+ cm.style.left=Math.max(6,Math.min(x,innerWidth-w-6))+'px';
+ cm.style.top=Math.max(6,Math.min(y,innerHeight-h-6))+'px';
+}
+document.addEventListener('click',e=>{if(!cm.contains(e.target))closeMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+window.addEventListener('scroll',closeMenu,true);
+
+function updatePaste(){
+ const b=$('#fpaste');
+ b.hidden=!(clip&&inFiles());
+ if(clip)$('#fpt').textContent=t(clip.mode==='cut'?'moveHere':'pasteHere');
+}
+function setClip(mode,full){
+ clip={mode,root:root(),paths:[full]};
+ toast(t(mode==='cut'?'clipCut':'clipCopy'),2200);
+ lastL='';loadFiles();updatePaste();
+}
+async function transfer(c,dest){
+ const move=c.mode==='cut'||c.mode==='move';
+ const j=await post('/admin/'+(move?'move':'copy'),{root:c.root,paths:c.paths,to:dest,toRoot:root()});
+ if(!j)return null;
+ if(j.error)toast(j.error,3200);
+ else toast(t(move?'movedN':'copiedN',j.done));
+ lastL='';loadFiles();return j;
+}
+async function pasteTo(dest){
+ if(!clip)return;
+ const c=clip,j=await transfer(c,dest);
+ if(j&&c.mode==='cut'&&j.done){clip=null;updatePaste()}
+}
+$('#fpaste').onclick=()=>pasteTo(cur);
+
+const isInt=e=>[...((e.dataTransfer&&e.dataTransfer.types)||[])].includes(DT);
+function dropOn(el,dest){
+ el.addEventListener('dragover',e=>{if(!isInt(e))return;e.preventDefault();e.dataTransfer.dropEffect=(e.ctrlKey||e.altKey)?'copy':'move';el.classList.add('dt')});
+ el.addEventListener('dragleave',()=>el.classList.remove('dt'));
+ el.addEventListener('drop',e=>{
+  if(!isInt(e))return;
+  e.preventDefault();e.stopPropagation();el.classList.remove('dt');
+  let d;try{d=JSON.parse(e.dataTransfer.getData(DT))}catch(x){return}
+  const to=dest();if(d.path===to)return;
+  transfer({mode:(e.ctrlKey||e.altKey)?'copy':'move',root:d.root,paths:[d.path]},to);
+ });
+}
+function renameIt(full,it,el){
+ if(renaming)return;
+ const fn=el.querySelector('.fn');if(!fn)return;
+ renaming=true;el.draggable=false;
+ const inp=document.createElement('input');inp.className='ren';inp.value=it.name;inp.setAttribute('aria-label',t('newName'));
+ fn.replaceWith(inp);inp.focus();
+ const dot=it.dir?-1:it.name.lastIndexOf('.');
+ inp.setSelectionRange(0,dot>0?dot:it.name.length);
+ let done=false;
+ const end=async ok=>{
+  if(done)return;done=true;
+  const v=inp.value.trim();
+  if(ok&&v&&v!==it.name){if(await post('/admin/rename',{path:full,name:v,root:root()}))toast(t('renamed'))}
+  renaming=false;lastL='';loadFiles();
+ };
+ inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')end(true);else if(e.key==='Escape')end(false)};
+ inp.onclick=e=>e.stopPropagation();inp.ondblclick=e=>e.stopPropagation();
+ inp.onblur=()=>end(true);
+}
+$('#fopen').onclick=()=>openIt(cur);
+$('#fchoose').onclick=()=>$(root()==='recv'?'#br':'#bs').click();
+$('#fin').onchange=e=>{const fs=[...e.target.files];e.target.value='';enqueue(fs.map(f=>({f,sub:''})))};
+
+/* new folder (inline, no popup) */
+const nfShow=on=>{$('#nf').hidden=!on;if(on){$('#nfi').value='';$('#nfi').focus()}};
+$('#fnew').onclick=()=>nfShow($('#nf').hidden);
+$('#nfx').onclick=()=>nfShow(false);
+async function mk(){
+ const name=$('#nfi').value.trim();if(!name)return;
+ if(await post('/admin/mkdir',{path:cur,name,root:root()})){nfShow(false);lastL='';loadFiles();toast(t('folderMade'))}
+}
+$('#nfok').onclick=mk;
+$('#nfi').onkeydown=e=>{if(e.key==='Enter')mk();else if(e.key==='Escape')nfShow(false)};
+
+/* ---------- adding files: queue with 3 parallel uploads ---------- */
+let Q=[],act=0,tot=0,doneB=0,nAll=0,nOk=0,nBad=0,seq=0,live={},curName='';
+function enqueue(list){
+ if(!list.length)return;
+ if(!rootDirOf(S)){toast(t('chooseFirst'),2600);return}
+ list.forEach(x=>{x.id=++seq;x.dir=cur;x.root=root();Q.push(x);tot+=x.f.size;nAll++});
+ pump();
+}
+function pump(){
+ while(act<3&&Q.length){const x=Q.shift();act++;send(x).then(()=>{act--;pump()})}
+ if(!act&&!Q.length)finish();else paint();
+}
+function send(x){return new Promise(res=>{
+ const sub=[x.dir,x.sub].filter(Boolean).join('/');
+ const xr=new XMLHttpRequest();
+ xr.open('POST','/admin/put?root='+x.root+'&path='+encodeURIComponent(sub)+'&name='+encodeURIComponent(x.f.name));
+ curName=x.f.name;
+ xr.upload.onprogress=e=>{live[x.id]=e.loaded;paint()};
+ const end=ok=>{delete live[x.id];doneB+=x.f.size;ok?nOk++:nBad++;res()};
+ xr.onload=()=>end(xr.status===200);
+ xr.onerror=()=>end(false);
+ xr.send(x.f);
+})}
+function paint(){
+ const got=doneB+Object.values(live).reduce((a,b)=>a+b,0);
+ const pct=tot?Math.min(100,Math.round(got/tot*100)):100;
+ $('#fup').hidden=false;
+ $('#fupt').textContent=t('adding',Math.min(nAll,nOk+nBad+1),nAll);
+ $('#fupn').textContent=curName;$('#fupf').style.width=pct+'%';
+}
+function finish(){
+ if(!nAll)return;
+ toast(nBad?t('addedFail',nOk,nBad):t('addedN',nOk),nBad?3200:2000);
+ Q=[];tot=doneB=nAll=nOk=nBad=0;live={};
+ setTimeout(()=>{if(!act&&!Q.length)$('#fup').hidden=true},700);
+ lastL='';loadFiles();
+}
+
+/* ---------- drag & drop (files and whole folders) ---------- */
+const hasFiles=e=>[...((e.dataTransfer&&e.dataTransfer.types)||[])].includes('Files');
+function over(on){
+ const d=$('#dover');
+ if(on){
+  const dir=rootDirOf(S),ok=!!dir;
+  $('#dtitle').textContent=ok?t(root()==='recv'?'dropR':'dropS'):t('chooseFirst');
+  $('#dname').textContent=ok?baseName(dir)+(cur&&inFiles()?' / '+cur.split('/').join(' / '):''):'';
+ }
+ d.classList.toggle('on',on);
+}
+document.addEventListener('dragover',e=>{if(!hasFiles(e))return;e.preventDefault();e.dataTransfer.dropEffect='copy';over(true)});
+document.addEventListener('dragleave',e=>{if(!e.relatedTarget)over(false)});
+document.addEventListener('dragend',()=>over(false));
+document.addEventListener('drop',e=>{
+ if(!hasFiles(e))return;
+ e.preventDefault();over(false);
+ const dt=e.dataTransfer;
+ const ents=[...(dt.items||[])].filter(i=>i.kind==='file').map(i=>i.webkitGetAsEntry&&i.webkitGetAsEntry()).filter(Boolean);
+ const files=[...(dt.files||[])];
+ if(!inFiles())setTab('files');
+ if(!ents.length){enqueue(files.map(f=>({f,sub:''})));return}
+ (async()=>{const out=[];for(const en of ents)await walk(en,'',out);enqueue(out)})();
+});
+async function walk(en,prefix,out){
+ if(en.isFile){await new Promise(res=>en.file(f=>{out.push({f,sub:prefix});res()},()=>res()))}
+ else if(en.isDirectory){
+  const sub=prefix?prefix+'/'+en.name:en.name,rd=en.createReader();
+  while(true){
+   const batch=await new Promise(res=>rd.readEntries(res,()=>res([])));
+   if(!batch.length)break;
+   for(const c of batch)await walk(c,sub,out);
+  }
+ }
+}
+
+/* ---------- paste (Ctrl+V) ---------- */
+const two=n=>String(n).padStart(2,'0');
+function stamp(){const d=new Date();return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+' '+two(d.getHours())+'.'+two(d.getMinutes())+'.'+two(d.getSeconds())}
+document.addEventListener('paste',e=>{
+ const cd=e.clipboardData;
+ if(!cd||!cd.files||!cd.files.length){
+  if(clip&&inFiles()&&!/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'')){e.preventDefault();pasteTo(cur)}
+  return;
+ }
+ e.preventDefault();
+ const list=[...cd.files].map(f=>{
+  if(!f.name||/^image\.(png|jpe?g|gif|webp)$/i.test(f.name)){
+   const ext=((f.type.split('/')[1])||'png').replace('jpeg','jpg');
+   return{f:new File([f],'Pasted '+stamp()+'.'+ext,{type:f.type}),sub:''};
+  }
+  return{f,sub:''};
+ });
+ if(!inFiles())setTab('files');
+ enqueue(list);
+});
+
+
+// ---- devices & security ----
+let DV=null,reqId='';
+const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/60));return m<1?'now':m<60?m+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' d'};
+async function devAct(op,id,trust){const j=await api('/admin/dev',{op,id,trust:!!trust});if(j){DV=j;drawDev()}}
+function drawDev(){
+ if(!DV)return;
+ const sl=$('#devl');sl.innerHTML='';
+ DV.sessions.forEach(d=>{
+  const e=document.createElement('div');e.className='dev';
+  e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+'</small></div>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>devAct(b.dataset.a,d.id));sl.append(e)});
+ $('#devn').hidden=DV.sessions.length>0;
+ const tl=$('#trl');tl.innerHTML='';
+ DV.trusted.forEach(d=>{
+  const e=document.createElement('div');e.className='dev';
+  e.innerHTML='<span class="dd'+(d.online?'':' off')+'"></span><div class="dx"><b>'+esc(d.name)+'</b><small>'+(d.online?t('online'):t('lastSeen',ago(d.lastSeen)))+'</small></div><button class="g dgr">'+t('untrust')+'</button>';
+  e.querySelector('button').onclick=()=>devAct('untrust',d.id);tl.append(e)});
+ $('#trn').hidden=DV.trusted.length>0;
+ const p=DV.pending[0],m=$('#mreq');
+ if(p){m.hidden=false;reqId=p.id;$('#mrN').textContent=p.name;$('#mrI').textContent=p.ip+' · '+t(p.remote?'viaNet':'viaLan');
+  $('#mrM').textContent=t('reqLeft',p.left);$('#mrF').style.width=Math.max(0,Math.min(100,p.left/60*100))+'%'}
+ else{m.hidden=true;reqId=''}
+}
+async function pollDev(){try{DV=await (await fetch('/admin/devices',{method:'POST'})).json();drawDev()}catch(e){}}
+$('#mrA').onclick=()=>reqId&&devAct('allow',reqId,false);
+$('#mrT').onclick=()=>reqId&&devAct('allow',reqId,true);
+$('#mrD').onclick=()=>reqId&&devAct('deny',reqId);
+function secRender(s){
+ $('#apOn').checked=!!s.approvalOn;$('#pwOn').checked=!!s.pwdOn;$('#indOn').checked=!!s.independent;
+ const w=$('#secWarn');w.hidden=!(!s.approvalOn&&!s.pwdOn&&s.remote&&(s.remote.status==='on'||s.remote.status==='starting'));w.textContent=t('warnOpen');
+}
+$('#apOn').onchange=async e=>{const j=await api('/admin/set',{approvalOn:e.target.checked});if(j)render(j)};
+$('#pwOn').onchange=async e=>{if(e.target.checked&&S&&!S.pwdSet){e.target.checked=false;toast(t('pwFirst'),2600);return}const j=await api('/admin/set',{pwdOn:e.target.checked});if(j)render(j)};
+$('#indOn').onchange=async e=>{const j=await api('/admin/set',{independent:e.target.checked});if(j)render(j)};
+$('#pwSave').onclick=async()=>{const v=$('#pwIn').value;if(v.length<4){toast(t('pwPh'),2200);return}const j=await api('/admin/set',{password:v});if(j){$('#pwIn').value='';toast(t('pwSaved'));render(j)}};
+pollDev();setInterval(()=>{if(!document.hidden||reqId)pollDev()},1500);
+
+// ---- smart connection ----
+function drawGuide(g){
+ const c=$('#gcard');
+ if(!g||!g.kind){c.hidden=true;c.innerHTML='';return}
+ let h='';
+ if(g.kind==='offline'){
+  c.className='panel guide warn';
+  const cur=[t('gS1'),t(g.hotSet?'gS2':'gS2s'),t('gS3')][g.step-1];
+  const prev=g.step>1?[t('gD1'),t('gD2')][g.step-2]:'';
+  h='<div class="gh">⚠️ '+t('gNoNet')+'</div>';
+  if(prev)h+='<div class="gr ok"><i>✅</i><span>'+esc(prev)+'</span></div>';
+  h+='<div class="gr cur"><i class="gspin"></i><span>'+esc(cur)+'</span></div>';
+  if(g.err)h+='<div class="gr bad"><i>❌</i><span>'+esc(g.err)+'</span></div>';
+  if(g.step===1)h+='<div class="gact"><button class="b" data-act="off">'+t('gDo1')+'</button></div>';
+  if(g.step===2&&!g.hotSet)h+='<div class="gact"><button class="b" data-act="set">'+t('gDo2')+'</button></div>';
+ }else if(g.kind==='back'){
+  c.className='panel guide good';h='<div class="gh">✅ '+t('gBack')+'</div><div class="gp">'+t('gBackD')+'</div>';
+ }else{
+  c.className='panel guide good';h='<div class="gh">✅ '+t('gDone')+'</div>';
+ }
+ if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}
+ c.hidden=false;
+}
+$('#hgo').onclick=()=>setTab('settings');
+$('#gcard').onclick=async e=>{const b=e.target.closest('[data-act]');if(!b)return;
+ if(b.dataset.act==='off'){const j=await api('/admin/set',{offlineOn:true});if(j)render(j)}
+ else if(b.dataset.act==='set')setTab('settings')};
+function smRender(s){
+ const sm=s.smart;if(!sm)return;
+ setVal('#wkUrl',sm.workerUrl||'');setVal('#hsSsid',sm.hotSsid||'');
+ $('#anOn').checked=!!sm.autoNet;$('#ofOn').checked=!!sm.offlineOn;
+ const e=$('#wkSt');
+ if(!sm.configured){e.textContent=t('wkNone');e.className='chip2 off'}
+ else if(sm.registered){e.textContent=t('wkReady');e.className='chip2 ok'}
+ else{e.textContent=sm.regErr||t('wkWait');e.className='chip2'+(sm.regErr?' off':'')}
+}
+$('#wkSave').onclick=async()=>{const j=await api('/admin/set',{workerUrl:$('#wkUrl').value.trim()});if(j){toast(t('smSaved'));render(j)}};
+$('#hsSave').onclick=async()=>{const b={hotSsid:$('#hsSsid').value.trim()};const p=$('#hsPass').value;if(p)b.hotPass=p;const j=await api('/admin/set',b);if(j){$('#hsPass').value='';toast(t('smSaved'));render(j)}};
+$('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.checked});if(j)render(j)};
+$('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
+$('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
+
+(async()=>{render(await api('/admin/state'));
+ setInterval(async()=>{if(document.hidden)return;try{render(await (await fetch('/admin/state',{method:'POST'})).json())}catch(e){}},2000)
+ try{const t0=localStorage.getItem('tab');setTab(['files','recv','settings'].includes(t0)?t0:'connect')}catch(e){setTab('connect')}
+})();
+</script></body></html>
