@@ -40,13 +40,23 @@ func cleanSub(sub string) string {
 	return strings.Join(parts, "/")
 }
 
-// shareResolve maps a path relative to the shared folder to a real path (never outside it).
-func shareResolve(sub string) (base, full string, ok bool) {
+// rootDir picks which folder the desktop file manager is working on:
+// "recv" = files received from the phone, anything else = the shared folder.
+func rootDir(root string) string {
 	c := get()
-	if c.ShareDir == "" {
+	if root == "recv" {
+		return c.RecvDir
+	}
+	return c.ShareDir
+}
+
+// rootResolve maps a path relative to the chosen folder to a real path (never outside it).
+func rootResolve(root, sub string) (base, full string, ok bool) {
+	d := rootDir(root)
+	if d == "" {
 		return "", "", false
 	}
-	base = filepath.Clean(c.ShareDir)
+	base = filepath.Clean(d)
 	sub = strings.Trim(filepath.ToSlash(sub), "/")
 	full = filepath.Join(base, filepath.FromSlash(sub))
 	rel, err := filepath.Rel(base, full)
@@ -60,7 +70,8 @@ func adminReadJSON(r *http.Request, v any) bool {
 	return json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(v) == nil
 }
 
-// GET /admin/files?path=sub  ->  what is inside the shared folder (works even if phone sharing is off)
+// GET /admin/files?path=sub&root=share|recv  ->  what is inside the shared folder, or the folder the phone sends to
+// (works even if phone sharing is off)
 func adminFiles(w http.ResponseWriter, r *http.Request) {
 	type item struct {
 		Name string `json:"name"`
@@ -70,9 +81,10 @@ func adminFiles(w http.ResponseWriter, r *http.Request) {
 	}
 	out := []item{}
 	sub := strings.Trim(filepath.ToSlash(r.URL.Query().Get("path")), "/")
-	base, full, ok := shareResolve(sub)
+	root := r.URL.Query().Get("root")
+	base, full, ok := rootResolve(root, sub)
 	if !ok {
-		writeJSON(w, map[string]any{"set": get().ShareDir != "", "dir": "", "path": "", "items": out})
+		writeJSON(w, map[string]any{"set": rootDir(root) != "", "dir": "", "path": "", "items": out})
 		return
 	}
 	entries, _ := os.ReadDir(full)
@@ -102,9 +114,9 @@ func adminPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	q := r.URL.Query()
-	_, dir, ok := shareResolve(cleanSub(q.Get("path")))
+	_, dir, ok := rootResolve(q.Get("root"), cleanSub(q.Get("path")))
 	if !ok {
-		http.Error(w, "Choose a shared folder first", 400)
+		http.Error(w, "Choose a folder first", 400)
 		return
 	}
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -132,15 +144,15 @@ func adminMkdir(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
-	var b struct{ Path, Name string }
+	var b struct{ Path, Name, Root string }
 	if !adminReadJSON(r, &b) {
 		http.Error(w, "bad request", 400)
 		return
 	}
 	sub := cleanSub(b.Path + "/" + cleanName(b.Name))
-	_, full, ok := shareResolve(sub)
+	_, full, ok := rootResolve(b.Root, sub)
 	if !ok || sub == "" {
-		http.Error(w, "Choose a shared folder first", 400)
+		http.Error(w, "Choose a folder first", 400)
 		return
 	}
 	if err := os.MkdirAll(full, 0755); err != nil {
@@ -156,13 +168,13 @@ func adminDel(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
-	var b struct{ Path string }
+	var b struct{ Path, Root string }
 	if !adminReadJSON(r, &b) {
 		http.Error(w, "bad request", 400)
 		return
 	}
 	sub := cleanSub(b.Path)
-	base, full, ok := shareResolve(sub)
+	base, full, ok := rootResolve(b.Root, sub)
 	if !ok || sub == "" || filepath.Clean(full) == base {
 		http.Error(w, "forbidden", 403)
 		return
@@ -184,14 +196,14 @@ func adminOpen(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
-	var b struct{ Path string }
+	var b struct{ Path, Root string }
 	if !adminReadJSON(r, &b) {
 		http.Error(w, "bad request", 400)
 		return
 	}
-	_, full, ok := shareResolve(cleanSub(b.Path))
+	_, full, ok := rootResolve(b.Root, cleanSub(b.Path))
 	if !ok {
-		http.Error(w, "Choose a shared folder first", 400)
+		http.Error(w, "Choose a folder first", 400)
 		return
 	}
 	if _, err := os.Stat(full); err != nil {
@@ -206,7 +218,7 @@ func adminOpen(w http.ResponseWriter, r *http.Request) {
 
 // GET /admin/pv/<path>  ->  inline image/video for the thumbnails in the desktop window
 func adminPreview(w http.ResponseWriter, r *http.Request) {
-	_, full, ok := shareResolve(strings.TrimPrefix(r.URL.Path, "/admin/pv/"))
+	_, full, ok := rootResolve(r.URL.Query().Get("root"), strings.TrimPrefix(r.URL.Path, "/admin/pv/"))
 	if !ok {
 		http.NotFound(w, r)
 		return
