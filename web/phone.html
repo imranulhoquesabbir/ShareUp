@@ -139,7 +139,21 @@ header{justify-content:space-between;flex-wrap:wrap}
 .tabs button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-color:transparent}
 .tile{border:1px solid var(--line);background:var(--card2)}
 .empty{display:flex;flex-direction:column;align-items:center;gap:8px}
-</style></head><body><div class="wrap">
+
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#gate[hidden]{display:none}
+.gbox{width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.gic{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-size:40px;color:#fff;font-weight:700}
+.gic.ok{background:var(--ok)}.gic.bad{background:var(--bad)}.gic.lock{background:linear-gradient(135deg,var(--acc),var(--acc2))}.gic.wait{background:var(--card2)}
+.gsp{width:38px;height:38px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--acc);animation:gspin 1s linear infinite}
+@keyframes gspin{to{transform:rotate(360deg)}}
+#gate h2{margin:0;font-size:22px}#gate p{margin:0;color:var(--mute);font-size:15px;line-height:1.5}
+#gate input{width:100%;box-sizing:border-box;font:inherit;font-size:17px;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);text-align:center}
+#gate .gb{width:100%;border:0;border-radius:14px;padding:13px;font:inherit;font-size:16px;font-weight:650;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.gbar{width:100%;height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
+.gbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width 1.5s linear}
+.gerr{color:var(--bad)!important;font-weight:600}
+</style></head><body><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
 <header>
  <div class="hb"><div class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
  <div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div>
@@ -201,6 +215,14 @@ header{justify-content:space-between;flex-wrap:wrap}
 const $=s=>document.querySelector(s);
 
 const I={
+gChk:["Connecting…","Connect হচ্ছে…"],
+gPwT:["Enter password","Password দিন"],gPwD:["This PC is password protected.","এই PC password দিয়ে সুরক্ষিত।"],gPwBad:["Wrong password. Try again.","Password ভুল। আবার চেষ্টা করুন।"],gPh:["Password","Password"],gGo:["Continue","চালিয়ে যান"],
+gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষায়"],gWaitD:["Press Allow on the PC screen. {0}s left.","PC-র screen-এ Allow চাপুন। আর {0} সেকেন্ড।"],
+gDenyT:["Not allowed","Allow করা হয়নি"],gDenyD:["The PC did not allow this device.","PC এই device-কে Allow করেনি।"],gTry:["Try again","আবার চেষ্টা করুন"],
+gOkT:["Connected!","Connected!"],
+gLockT:["Too many tries","অনেকবার ভুল হয়েছে"],gLockD:["Wait {0} seconds, then try again.","{0} সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন।"],
+gGoneT:["Disconnected","Connection শেষ হয়েছে"],gGoneD:["Tap Reconnect to continue.","চালিয়ে যেতে Reconnect চাপুন।"],gRe:["Reconnect","Reconnect"],
+gNetT:["Can't reach the PC","PC-র সাথে যোগাযোগ হচ্ছে না"],gNetD:["Check your Wi-Fi or internet. Trying again…","WiFi বা internet দেখুন। আবার চেষ্টা হচ্ছে…"],
 tag:["Phone ⇄ PC","ফোন ⇄ পিসি"],
 sendH:["Send to PC","পিসিতে পাঠান"],sendS:["Pick photos or files from your phone","ফোন থেকে ছবি বা ফাইল বেছে নিন"],
 openGal:["Open gallery","গ্যালারি খুলুন"],pv:["Photos & videos","ছবি ও ভিডিও"],browse:["Browse files","ফাইল বাছুন"],anyType:["Any file type","যেকোনো ধরনের ফাইল"],
@@ -226,7 +248,7 @@ function applyLang(){
  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch(e){}applyLang();refreshAll();if(!$('#gal').hidden){drawGal();updBar()}});
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch(e){}applyLang();gateRender();if(authed){refreshAll();if(!$('#gal').hidden){drawGal();updBar()}}});
 let toastT=0;
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1800)}
 
@@ -522,5 +544,44 @@ async function refreshAll(){
  if(!$('#gal').hidden)drawGal();
  load();
 }
-$('#rf').onclick=refreshAll;applyLang();refreshAll();
+
+// ---- access gate: password / PC approval / heartbeat ----
+try{const m=location.hash.match(/^#d=([A-Za-z0-9]{16,64})$/);if(m){localStorage.setItem('su_dev',m[1]);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+let authed=false,hb=0,gpoll=0,gs=null;
+function devId(){let v='';try{v=localStorage.getItem('su_dev')||''}catch(e){}
+ if(!/^[A-Za-z0-9]{16,64}$/.test(v)){const a=new Uint8Array(16);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(let i=0;i<16;i++)a[i]=Math.random()*256;
+  v=Array.from(a,x=>('0'+x.toString(16)).slice(-2)).join('');try{localStorage.setItem('su_dev',v)}catch(e){}}
+ return v}
+function gateShow(st,j){gs={st,j:j||{}};gateRender()}
+function gateRender(){
+ if(!gs)return;const{st,j}=gs;const ic=$('#gic');
+ const set=(cls,html,t,d,err)=>{ic.className='gic '+cls;ic.innerHTML=html;$('#gt').textContent=tr(t);const p=$('#gd');p.textContent=d;p.className=err?'gerr':''};
+ $('#gbar').hidden=st!=='pending';$('#gpw').hidden=st!=='password';$('#gre').hidden=!(st==='denied'||st==='gone');
+ $('#gin').placeholder=tr('gPh');$('#gok').textContent=tr('gGo');$('#gre').textContent=tr(st==='gone'?'gRe':'gTry');
+ if(st==='check'||st==='net')set('wait','<div class="gsp"></div>',st==='net'?'gNetT':'gChk',st==='net'?tr('gNetD'):'');
+ else if(st==='password')set('lock','🔒','gPwT',j.bad?tr('gPwBad'):tr('gPwD'),j.bad);
+ else if(st==='pending'){set('wait','<div class="gsp"></div>','gWaitT',tr('gWaitD',j.left));$('#gfill').style.width=Math.max(0,Math.min(100,(j.left||0)/60*100))+'%'}
+ else if(st==='denied')set('bad','✕','gDenyT',tr('gDenyD'));
+ else if(st==='locked')set('bad','✕','gLockT',tr('gLockD',j.wait));
+ else if(st==='gone')set('wait','⏻','gGoneT',tr('gGoneD'));
+ else if(st==='ok')set('ok','✓','gOkT','');
+}
+async function gateCheck(pw){
+ clearTimeout(gpoll);let j;
+ try{const r=await fetch('/api/session',{method:'POST',body:JSON.stringify({id:devId(),pw:pw||''})});if(!r.ok)throw 0;j=await r.json()}
+ catch(e){gateShow('net');gpoll=setTimeout(()=>gateCheck(),3000);return}
+ if(j.status==='ok'){gateShow('ok');setTimeout(()=>{$('#gate').hidden=true;authed=true;beat();refreshAll()},700);return}
+ gateShow(j.status,j);
+ if(j.status==='pending')gpoll=setTimeout(()=>gateCheck(),1500);
+ if(j.status==='locked')gpoll=setTimeout(()=>gateShow('password',{}),(j.wait||5)*1000);
+}
+function lost(){authed=false;clearInterval(hb);gateShow('gone');$('#gate').hidden=false}
+function ping(){fetch('/api/ping',{method:'POST'}).then(r=>{if(r.status===401)lost()}).catch(()=>{})}
+function beat(){clearInterval(hb);hb=setInterval(ping,20000)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&authed)ping()});
+addEventListener('pagehide',e=>{if(authed&&!e.persisted&&navigator.sendBeacon)navigator.sendBeacon('/api/bye')});
+$('#gok').onclick=()=>{const v=$('#gin').value;if(v){$('#gin').value='';gateShow('check');gateCheck(v)}};
+$('#gin').onkeydown=e=>{if(e.key==='Enter')$('#gok').click()};
+$('#gre').onclick=()=>{gateShow('check');gateCheck()};
+$('#rf').onclick=refreshAll;applyLang();gateShow('check');gateCheck();
 </script></body></html>

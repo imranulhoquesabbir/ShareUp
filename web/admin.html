@@ -65,6 +65,29 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
 .dover svg{width:46px;height:46px;color:var(--g1)}
 .dover b{display:block;font-size:20px;margin-top:8px}
 .dover span{display:block;font-size:14px;opacity:.75;margin-top:2px;word-break:break-all}
+
+.mback{position:fixed;inset:0;z-index:90;background:rgba(5,8,20,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+.mback[hidden]{display:none}
+.mbox{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mbox .mic{width:70px;height:70px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:32px;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.mbox h2{margin:0 0 4px;font-size:20px}.mbox .mn{font-weight:650;font-size:17px}.mbox small{display:block;color:var(--mute);margin-top:4px}
+.mbar{height:6px;border-radius:99px;background:var(--field);overflow:hidden;margin:16px 0}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--g1),var(--g2));transition:width 1s linear}
+.mbtn{display:flex;flex-direction:column;gap:9px}.mbtn .b,.mbtn .g{width:100%}
+.dev{display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line)}
+.dev .dd{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}.dev .dd.off{background:var(--mute)}
+.dev .dx{flex:1;min-width:0}.dev .dx b{display:block;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dev .dx small{color:var(--mute);font-size:12.5px}
+.dev .g,.dev .b{padding:6px 12px;font-size:13px}
+.pwrow{display:flex;gap:10px;padding:0 20px 16px}.pwrow input{flex:1;min-width:0}
+input[type=password]{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:14px;min-width:0}
+.warnb{margin:0 20px 16px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad);font-size:13.5px;font-weight:600}
+.subh{padding:14px 20px 6px;font-weight:700;font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.guide{padding:16px 20px}.guide.warn{border-color:color-mix(in srgb,#f59e0b 60%,var(--line))}.guide.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 8%,var(--panel))}
+.gh{font-weight:700;font-size:17px;margin-bottom:8px}.gp{color:var(--mute);font-size:14px}
+.gr{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:15px}.gr i{font-style:normal;width:26px;text-align:center;font-size:18px;flex:none}
+.gr.ok{color:var(--ok)}.gr.bad{color:var(--bad)}.gr.cur{font-weight:650}
+.gspin{width:18px;height:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--g1);animation:gsp 1s linear infinite}
+@keyframes gsp{to{transform:rotate(360deg)}}
+.gact{margin-top:6px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:9px 18px;border-radius:99px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -195,6 +218,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 <div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button></div>
 
 <div id="tc">
+ <div class="panel guide" id="gcard" hidden></div>
  <div class="panel hero">
   <div class="seg"><button data-m="lan"><svg class="ic"><use href="#i-wifi"/></svg><span data-i="modeLan"></span></button><button data-m="net"><svg class="ic"><use href="#i-globe"/></svg><span data-i="modeNet"></span></button></div>
   <div class="split">
@@ -203,6 +227,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
     <div id="lan">
      <h2 data-i="scanH"></h2><p data-i="scanP"></p>
      <div class="row"><span id="url"></span><button class="b" id="cp"><svg class="ic"><use href="#i-copy"/></svg><span data-i="copy"></span></button></div>
+     <small id="mdnsl" hidden style="display:block;margin-top:8px;color:var(--mute)"></small>
     </div>
     <div id="net" hidden>
      <div class="top"><h2 data-i="netH"></h2><label class="switch"><input type="checkbox" id="rt" data-al="netH"><span class="slider"></span></label></div>
@@ -215,6 +240,12 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
     </div>
    </div>
   </div>
+ </div>
+
+ <div class="panel" id="devp">
+  <div class="stH" data-i="devH"></div>
+  <div id="devl"></div>
+  <div class="fempty" id="devn" data-i="devNone"></div>
  </div>
  <div class="panel">
   <div class="stH" data-i="howH"></div>
@@ -270,6 +301,31 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 
 <div id="ts" hidden>
  <div class="panel"><div class="item"><div class="ico" style="--t1:#06b6d4;--t2:#3b82f6"><svg class="ic"><use href="#i-globe"/></svg></div><div class="itx"><b data-i="langT"></b><small data-i="langS"></small></div><div class="langs" role="group"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div><div class="item"><div class="ico" style="--t1:#f59e0b;--t2:#f97316"><svg class="ic"><use href="#i-login"/></svg></div><div class="itx"><b data-i="startT"></b><small data-i="startS"></small></div><label class="switch"><input type="checkbox" id="auto" data-al="startT"><span class="slider"></span></label></div><div class="item"><div class="ico" style="--t1:#10b981;--t2:#22c55e"><svg class="ic"><use href="#i-cloud"/></svg></div><div class="itx"><b data-i="updT"></b><small id="updsub"></small></div><label class="switch"><input type="checkbox" id="aupd" data-al="updT"><span class="slider"></span></label></div></div>
+
+ <div class="panel" id="secp">
+  <div class="item"><div class="ico" style="--t1:#ef4444;--t2:#f97316"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="itx"><b data-i="secH"></b><small data-i="secS"></small></div></div>
+  <div class="item"><div class="itx"><b data-i="apT"></b><small data-i="apS"></small></div><label class="switch"><input type="checkbox" id="apOn" data-al="apT"><span class="slider"></span></label></div>
+  <div class="item"><div class="itx"><b data-i="pwT"></b><small data-i="pwS"></small></div><label class="switch"><input type="checkbox" id="pwOn" data-al="pwT"><span class="slider"></span></label></div>
+  <div class="pwrow"><input type="password" id="pwIn" autocomplete="new-password" data-ph="pwPh"><button class="g" id="pwSave"><span data-i="pwSave"></span></button></div>
+  <div class="item"><div class="itx"><b data-i="indT"></b><small data-i="indS"></small></div><label class="switch"><input type="checkbox" id="indOn" data-al="indT"><span class="slider"></span></label></div>
+  <div class="warnb" id="secWarn" hidden></div>
+  <div class="subh" data-i="trH"></div>
+  <div id="trl"></div>
+  <div class="fempty" id="trn" data-i="trNone"></div>
+ </div>
+
+ <div class="panel" id="smp">
+  <div class="item"><div class="ico" style="--t1:#06b6d4;--t2:#3b82f6"><svg class="ic"><use href="#i-globe"/></svg></div><div class="itx"><b data-i="smT"></b><small data-i="smS"></small></div></div>
+  <div class="subh" data-i="wkT"></div>
+  <div class="pwrow"><input type="text" id="wkUrl" placeholder="https://name.workers.dev" autocomplete="off" spellcheck="false"><button class="g" id="wkSave"><span data-i="wkSave"></span></button></div>
+  <div style="padding:0 20px 14px"><span id="wkSt" class="chip2 off"></span><small style="display:block;color:var(--mute);margin-top:6px" data-i="wkS"></small></div>
+  <div class="item"><div class="itx"><b data-i="anT"></b><small data-i="anS"></small></div><label class="switch"><input type="checkbox" id="anOn" data-al="anT"><span class="slider"></span></label></div>
+  <div class="item"><div class="itx"><b data-i="ofT"></b><small data-i="ofS"></small></div><label class="switch"><input type="checkbox" id="ofOn" data-al="ofT"><span class="slider"></span></label></div>
+  <div class="subh" data-i="hsT"></div>
+  <div class="pwrow"><input type="text" id="hsSsid" data-ph="hsSsidPh" autocomplete="off"><input type="password" id="hsPass" data-ph="hsPassPh" autocomplete="new-password"><button class="g" id="hsSave"><span data-i="wkSave"></span></button></div>
+  <div style="padding:0 20px 14px"><small style="display:block;color:var(--mute)" data-i="hsS"></small></div>
+  <div class="item"><div class="itx"></div><button class="g dgr" id="wkReset"><span data-i="wkReset"></span></button></div>
+ </div>
  <div class="panel">
   <div class="item" style="border:0;padding-bottom:12px"><div class="ico" style="--t1:#6366f1;--t2:#8b5cf6"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="itx"><b data-i="netSet"></b><small data-i="netSetS"></small></div></div>
   <div class="adv">
@@ -284,10 +340,32 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 </div>
 </div>
 <div class="dover" id="dover"><div><svg class="ic"><use href="#i-tray"/></svg><b id="dtitle"></b><span id="dname"></span></div></div>
+<div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><small id="mrI"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="b" id="mrA"><span data-i="allowOnce"></span></button><button class="b" id="mrT"><span data-i="allowTrust"></span></button><button class="g dgr" id="mrD"><span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const I={
+scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
+scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
+gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone's Hotspot (the PC connects by itself)","Phone-এর Hotspot on করুন (PC নিজে connect হবে)"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
+gD1:["Offline mode is on","Offline mode চালু হয়েছে"],gD2:["Network connected","Network connected"],gDo1:["Turn on","চালু করুন"],gDo2:["Open Settings","Settings খুলুন"],
+gBack:["Internet is back","Internet ফিরে এসেছে"],gBackD:["Your old QR works again. Nothing else to do.","আগের QR আবার কাজ করবে। আর কিছু করতে হবে না।"],gDone:["Connected!","Connected!"],
+smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for Wi-Fi and internet.","একটা QR যা কখনো বদলায় না, WiFi আর internet দুটোতেই।"],
+wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","সেভ"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","সেভ হয়েছে"],
+anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link ready by itself (needs the fixed QR).","Internet link নিজে চালু রাখবে (fixed QR লাগবে)।"],
+ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
+hsT:["Phone Hotspot","Phone Hotspot"],hsS:["The PC connects to it by itself when there is no network.","কোনো network না থাকলে PC নিজে এতে connect হবে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Hotspot password","Hotspot-এর password"],
+wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
+devH:["Connected devices","Connected devices"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
+secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
+apT:["Approval","Approval"],apS:["Ask on this PC before a new device connects.","নতুন device connect হওয়ার আগে এই PC-তে জিজ্ঞেস করবে।"],
+pwT:["Password","Password"],pwS:["Phones must enter the password to connect.","Connect করতে phone-এ password দিতে হবে।"],
+pwPh:["New password (min 4)","নতুন password (কমপক্ষে ৪)"],pwSave:["Save password","Password সেভ"],pwSaved:["Password saved","Password সেভ হয়েছে"],pwFirst:["Save a password first","আগে একটা password সেভ করুন"],
+indT:["Allow both on / both off","দুটো একসাথে on বা off রাখুন"],indS:["Normally turning one on switches the other off. Turn this on to control both yourself.","সাধারণত একটা on করলে অন্যটা নিজে off হয়। নিজে দুটো ঠিক করতে এটা on করুন।"],
+warnOpen:["Warning: with Approval and Password both off, anyone who scans the QR can connect.","সাবধান: Approval ও Password দুটোই off থাকলে QR স্ক্যান করা যে কেউ connect করতে পারবে।"],
+trH:["Trusted devices","Trusted devices"],trNone:["No trusted devices","কোনো trusted device নেই"],
+reqH:["Allow this device?","এই device-কে Allow করবেন?"],allowOnce:["Allow once","একবার Allow"],allowTrust:["Allow & Trust","Allow ও Trust"],deny:["Deny","Deny"],reqLeft:["Auto-deny in {0}s","{0} সেকেন্ডে নিজে Deny হবে"],
+kick:["Disconnect","Disconnect"],trust:["Trust","Trust"],untrust:["Remove","সরান"],viaNet:["Internet","Internet"],viaLan:["Wi-Fi","WiFi"],online:["Online","Online"],lastSeen:["Last seen {0}","শেষ দেখা {0}"],
 tag:["Send files between phone and PC","ফোন ও পিসির মধ্যে ফাইল আদান-প্রদান"],
 running:["Running","চালু আছে"],nonet:["No network","নেটওয়ার্ক নেই"],
 tConnect:["Connect Phone","ফোন কানেক্ট"],tRecv:["From Phone","ফোন থেকে পাওয়া"],tShare:["Shared from PC","পিসি থেকে শেয়ার"],tSet:["Settings","সেটিংস"],
@@ -362,7 +440,7 @@ function applyLang(){
  document.querySelectorAll('[data-al]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.al)));
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);lastL='';loadFiles();updatePaste()}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste()}
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 
 const $=s=>document.querySelector(s);
@@ -386,18 +464,25 @@ function render(s){
  $('#dot').classList.toggle('off',!s.url);
  $('#status').textContent=s.url?t('running'):t('nonet');
 
+ const sm=s.smart||{},fx=!!sm.configured;
+ if(fx)mode='lan';
+ document.querySelector('.hero .seg').hidden=fx;
  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
  $('#lan').hidden=mode!=='lan';$('#net').hidden=mode!=='net';
 
  let q='',ph='';
- if(mode==='lan'){q=s.url;if(!q)ph='wifi'}
+ if(mode==='lan'){q=(fx&&sm.online&&sm.fixedUrl)?sm.fixedUrl:s.url;if(!q)ph='wifi'}
  else if(r.status==='on')q=r.link;
  else ph=r.status==='error'?'alert':r.status==='off'?'globe':'spin';
  if(q!==lastQ){lastQ=q;$('#qr').src=q?'/admin/qr.png?u='+encodeURIComponent(q):''}
  $('#qr').hidden=!q;$('#ph').hidden=!!q;
  $('#ph').innerHTML=ph==='spin'?'<div class="spin"></div>':(ph?ic(ph):'');
 
- $('#url').textContent=s.url||t('nonetfound');
+ $('#url').textContent=(mode==='lan'?q:s.url)||t('nonetfound');
+ const lk=fx?(sm.online?'F':'O'):'';
+ [['h2','scanH'],['p','scanP']].forEach(([el,k])=>{const e=$('#lan '+el);e.dataset.i=k+lk;e.textContent=t(k+lk)});
+ const ml=$('#mdnsl');ml.hidden=!(fx&&!sm.online);ml.textContent=sm.mdns?('+ '+sm.mdns):'';
+ drawGuide(sm.guide);smRender(s);
  const busy=r.status==='downloading'||r.status==='starting';
  $('#rt').checked=busy||r.status==='on';
  const d=$('#rdesc');d.className='';
@@ -409,7 +494,7 @@ function render(s){
  $('#rbar').hidden=r.status!=='downloading';$('#rfill').style.width=r.progress+'%';
  $('#rlink').hidden=r.status!=='on';$('#nurl').textContent=r.url||'';
 
- renderUpd(s);filesHook(s);
+ renderUpd(s);filesHook(s);secRender(s);
  setVal('#recv',s.recvDir);setVal('#share',s.shareDir);setVal('#port',s.port);
  $('#on').checked=s.shareOn;$('#auto').checked=s.autostart;
  const sh=$('#shst');sh.textContent=t(s.shareOn?'shOn':'shOff');sh.className='chip2 '+(s.shareOn?'ok':'off');
@@ -764,6 +849,86 @@ document.addEventListener('paste',e=>{
  if(!inFiles())setTab('files');
  enqueue(list);
 });
+
+
+// ---- devices & security ----
+let DV=null,reqId='';
+const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/60));return m<1?'now':m<60?m+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' d'};
+async function devAct(op,id,trust){const j=await api('/admin/dev',{op,id,trust:!!trust});if(j){DV=j;drawDev()}}
+function drawDev(){
+ if(!DV)return;
+ const sl=$('#devl');sl.innerHTML='';
+ DV.sessions.forEach(d=>{
+  const e=document.createElement('div');e.className='dev';
+  e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+'</small></div>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>devAct(b.dataset.a,d.id));sl.append(e)});
+ $('#devn').hidden=DV.sessions.length>0;
+ const tl=$('#trl');tl.innerHTML='';
+ DV.trusted.forEach(d=>{
+  const e=document.createElement('div');e.className='dev';
+  e.innerHTML='<span class="dd'+(d.online?'':' off')+'"></span><div class="dx"><b>'+esc(d.name)+'</b><small>'+(d.online?t('online'):t('lastSeen',ago(d.lastSeen)))+'</small></div><button class="g dgr">'+t('untrust')+'</button>';
+  e.querySelector('button').onclick=()=>devAct('untrust',d.id);tl.append(e)});
+ $('#trn').hidden=DV.trusted.length>0;
+ const p=DV.pending[0],m=$('#mreq');
+ if(p){m.hidden=false;reqId=p.id;$('#mrN').textContent=p.name;$('#mrI').textContent=p.ip+' · '+t(p.remote?'viaNet':'viaLan');
+  $('#mrM').textContent=t('reqLeft',p.left);$('#mrF').style.width=Math.max(0,Math.min(100,p.left/60*100))+'%'}
+ else{m.hidden=true;reqId=''}
+}
+async function pollDev(){try{DV=await (await fetch('/admin/devices',{method:'POST'})).json();drawDev()}catch(e){}}
+$('#mrA').onclick=()=>reqId&&devAct('allow',reqId,false);
+$('#mrT').onclick=()=>reqId&&devAct('allow',reqId,true);
+$('#mrD').onclick=()=>reqId&&devAct('deny',reqId);
+function secRender(s){
+ $('#apOn').checked=!!s.approvalOn;$('#pwOn').checked=!!s.pwdOn;$('#indOn').checked=!!s.independent;
+ const w=$('#secWarn');w.hidden=!(!s.approvalOn&&!s.pwdOn&&s.remote&&(s.remote.status==='on'||s.remote.status==='starting'));w.textContent=t('warnOpen');
+}
+$('#apOn').onchange=async e=>{const j=await api('/admin/set',{approvalOn:e.target.checked});if(j)render(j)};
+$('#pwOn').onchange=async e=>{if(e.target.checked&&S&&!S.pwdSet){e.target.checked=false;toast(t('pwFirst'),2600);return}const j=await api('/admin/set',{pwdOn:e.target.checked});if(j)render(j)};
+$('#indOn').onchange=async e=>{const j=await api('/admin/set',{independent:e.target.checked});if(j)render(j)};
+$('#pwSave').onclick=async()=>{const v=$('#pwIn').value;if(v.length<4){toast(t('pwPh'),2200);return}const j=await api('/admin/set',{password:v});if(j){$('#pwIn').value='';toast(t('pwSaved'));render(j)}};
+pollDev();setInterval(()=>{if(!document.hidden||reqId)pollDev()},1500);
+
+// ---- smart connection ----
+function drawGuide(g){
+ const c=$('#gcard');
+ if(!g||!g.kind){c.hidden=true;c.innerHTML='';return}
+ let h='';
+ if(g.kind==='offline'){
+  c.className='panel guide warn';
+  const cur=[t('gS1'),t(g.hotSet?'gS2':'gS2s'),t('gS3')][g.step-1];
+  const prev=g.step>1?[t('gD1'),t('gD2')][g.step-2]:'';
+  h='<div class="gh">⚠️ '+t('gNoNet')+'</div>';
+  if(prev)h+='<div class="gr ok"><i>✅</i><span>'+esc(prev)+'</span></div>';
+  h+='<div class="gr cur"><i class="gspin"></i><span>'+esc(cur)+'</span></div>';
+  if(g.err)h+='<div class="gr bad"><i>❌</i><span>'+esc(g.err)+'</span></div>';
+  if(g.step===1)h+='<div class="gact"><button class="b" data-act="off">'+t('gDo1')+'</button></div>';
+  if(g.step===2&&!g.hotSet)h+='<div class="gact"><button class="b" data-act="set">'+t('gDo2')+'</button></div>';
+ }else if(g.kind==='back'){
+  c.className='panel guide good';h='<div class="gh">✅ '+t('gBack')+'</div><div class="gp">'+t('gBackD')+'</div>';
+ }else{
+  c.className='panel guide good';h='<div class="gh">✅ '+t('gDone')+'</div>';
+ }
+ if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}
+ c.hidden=false;
+}
+$('#gcard').onclick=async e=>{const b=e.target.closest('[data-act]');if(!b)return;
+ if(b.dataset.act==='off'){const j=await api('/admin/set',{offlineOn:true});if(j)render(j)}
+ else if(b.dataset.act==='set')setTab('settings')};
+function smRender(s){
+ const sm=s.smart;if(!sm)return;
+ setVal('#wkUrl',sm.workerUrl||'');setVal('#hsSsid',sm.hotSsid||'');
+ $('#anOn').checked=!!sm.autoNet;$('#ofOn').checked=!!sm.offlineOn;
+ const e=$('#wkSt');
+ if(!sm.configured){e.textContent=t('wkNone');e.className='chip2 off'}
+ else if(sm.registered){e.textContent=t('wkReady');e.className='chip2 ok'}
+ else{e.textContent=sm.regErr||t('wkWait');e.className='chip2'+(sm.regErr?' off':'')}
+}
+$('#wkSave').onclick=async()=>{const j=await api('/admin/set',{workerUrl:$('#wkUrl').value.trim()});if(j){toast(t('smSaved'));render(j)}};
+$('#hsSave').onclick=async()=>{const b={hotSsid:$('#hsSsid').value.trim()};const p=$('#hsPass').value;if(p)b.hotPass=p;const j=await api('/admin/set',b);if(j){$('#hsPass').value='';toast(t('smSaved'));render(j)}};
+$('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.checked});if(j)render(j)};
+$('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
+$('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
 
 (async()=>{render(await api('/admin/state'));
  setInterval(async()=>{if(document.hidden)return;try{render(await (await fetch('/admin/state',{method:'POST'})).json())}catch(e){}},2000)
