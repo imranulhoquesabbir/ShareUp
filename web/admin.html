@@ -219,6 +219,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 
 <div id="tc">
  <div class="panel guide" id="gcard" hidden></div>
+ <div class="panel guide warn" id="hcard" hidden><div class="gh" data-i="hintT"></div><div class="gp" data-i="hintD"></div><div class="gact"><button class="b" id="hgo"><span data-i="gDo2"></span></button></div></div>
  <div class="panel hero">
   <div class="seg"><button data-m="lan"><svg class="ic"><use href="#i-wifi"/></svg><span data-i="modeLan"></span></button><button data-m="net"><svg class="ic"><use href="#i-globe"/></svg><span data-i="modeNet"></span></button></div>
   <div class="split">
@@ -227,6 +228,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
     <div id="lan">
      <h2 data-i="scanH"></h2><p data-i="scanP"></p>
      <div class="row"><span id="url"></span><button class="b" id="cp"><svg class="ic"><use href="#i-copy"/></svg><span data-i="copy"></span></button></div>
+     <div class="acts"><button class="g" id="renew2" hidden><svg class="ic"><use href="#i-refresh"/></svg><span data-i="newLink"></span></button></div>
      <small id="mdnsl" hidden style="display:block;margin-top:8px;color:var(--mute)"></small>
     </div>
     <div id="net" hidden>
@@ -345,6 +347,8 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 
 <script>
 const I={
+scanPT:["Works on any network. The QR changes when shareUp restarts (add a Worker link in Settings to keep it fixed).","যেকোনো network-এ কাজ করবে। shareUp রিস্টার্ট হলে QR বদলাবে (fixed রাখতে Settings-এ Worker link দিন)।"],
+hintT:["Fixed QR is not on yet","Fixed QR এখনো চালু হয়নি"],hintD:["Add your Worker link once in Settings (see WORKER_SETUP.md) and one QR will work everywhere.","Settings-এ একবার Worker link দিন (WORKER_SETUP.md দেখুন), তারপর একটা QR সব জায়গায় কাজ করবে।"],
 scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
 scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
 gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone's Hotspot (the PC connects by itself)","Phone-এর Hotspot on করুন (PC নিজে connect হবে)"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
@@ -444,7 +448,7 @@ function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLan
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 
 const $=s=>document.querySelector(s);
-let mode='lan',lastQ='',S=null,tab='connect',cur='',lastL='',lastDir=null;
+let mode='lan',curQ='',lastQ='',S=null,tab='connect',cur='',lastL='',lastDir=null;
 const inFiles=()=>tab==='files'||tab==='recv';
 const root=()=>tab==='recv'?'recv':'share';                       // which folder the file manager shows
 const rootDirOf=s=>s?(root()==='recv'?s.recvDir:s.shareDir):'';
@@ -465,24 +469,27 @@ function render(s){
  $('#status').textContent=s.url?t('running'):t('nonet');
 
  const sm=s.smart||{},fx=!!sm.configured;
- if(fx)mode='lan';
- document.querySelector('.hero .seg').hidden=fx;
+ mode='lan';
+ document.querySelector('.hero .seg').hidden=true;
  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
  $('#lan').hidden=mode!=='lan';$('#net').hidden=mode!=='net';
 
  let q='',ph='';
- if(mode==='lan'){q=(fx&&sm.online&&sm.fixedUrl)?sm.fixedUrl:s.url;if(!q)ph='wifi'}
- else if(r.status==='on')q=r.link;
- else ph=r.status==='error'?'alert':r.status==='off'?'globe':'spin';
+ if(sm.online&&fx&&sm.fixedUrl)q=sm.fixedUrl;
+ else if(sm.online&&r.status==='on')q=r.link;
+ else if(sm.online&&sm.autoNet&&(r.status==='starting'||r.status==='downloading'))ph='spin';
+ else{q=s.url;if(!q)ph='wifi'}
  if(q!==lastQ){lastQ=q;$('#qr').src=q?'/admin/qr.png?u='+encodeURIComponent(q):''}
  $('#qr').hidden=!q;$('#ph').hidden=!!q;
  $('#ph').innerHTML=ph==='spin'?'<div class="spin"></div>':(ph?ic(ph):'');
 
- $('#url').textContent=(mode==='lan'?q:s.url)||t('nonetfound');
- const lk=fx?(sm.online?'F':'O'):'';
- [['h2','scanH'],['p','scanP']].forEach(([el,k])=>{const e=$('#lan '+el);e.dataset.i=k+lk;e.textContent=t(k+lk)});
- const ml=$('#mdnsl');ml.hidden=!(fx&&!sm.online);ml.textContent=sm.mdns?('+ '+sm.mdns):'';
- drawGuide(sm.guide);smRender(s);
+ curQ=q;$('#url').textContent=q||t('nonetfound');
+ const kind=!sm.online?(fx?'O':''):(fx?'F':(r.status==='on'?'T':''));
+ const hk={F:'scanHF',O:'scanHO',T:'scanHF'}[kind]||'scanH',pk={F:'scanPF',O:'scanPO',T:'scanPT'}[kind]||'scanP';
+ [['h2',hk],['p',pk]].forEach(([el,k])=>{const e=$('#lan '+el);e.dataset.i=k;e.textContent=t(k)});
+ $('#renew2').hidden=!(kind==='T'&&q===r.link);
+ const ml=$('#mdnsl');ml.hidden=!(sm.online===false);ml.textContent=sm.mdns?('+ '+sm.mdns):'';
+ drawGuide(sm.guide);smRender(s);$('#hcard').hidden=!(sm.online&&!fx);
  const busy=r.status==='downloading'||r.status==='starting';
  $('#rt').checked=busy||r.status==='on';
  const d=$('#rdesc');d.className='';
@@ -530,9 +537,10 @@ function renderUpd(s){
 $('#aupd').onchange=async()=>{const s=await api('/admin/set',{autoUpdate:$('#aupd').checked});render(s||await api('/admin/state'));toast(t($('#aupd').checked?'autoOn':'autoOff'))};
 $('#updgo').onclick=async()=>render(await api('/admin/update',{install:true}));
 document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render(S)});
-$('#cp').onclick=()=>S&&S.url&&copy(S.url);
+$('#cp').onclick=()=>curQ&&copy(curQ);
 $('#cp2').onclick=()=>S&&S.remote.link&&copy(S.remote.link);
 $('#rt').onchange=async()=>render(await api('/admin/remote',{on:$('#rt').checked}));
+$('#renew2').onclick=$('#renew').onclick=async()=>{render(await api('/admin/remote',{renew:true}));toast(t('newLinkDone'))};
 $('#renew').onclick=async()=>{render(await api('/admin/remote',{renew:true}));toast(t('newLinkDone'))};
 $('#ip').onchange=async()=>render(await api('/admin/set',{ip:$('#ip').value}));
 $('#sp').onclick=async()=>{const s=await api('/admin/set',{port:parseInt($('#port').value)});if(s)location.href='http://localhost:'+s.port+'/admin'};
@@ -912,6 +920,7 @@ function drawGuide(g){
  if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}
  c.hidden=false;
 }
+$('#hgo').onclick=()=>setTab('settings');
 $('#gcard').onclick=async e=>{const b=e.target.closest('[data-act]');if(!b)return;
  if(b.dataset.act==='off'){const j=await api('/admin/set',{offlineOn:true});if(j)render(j)}
  else if(b.dataset.act==='set')setTab('settings')};
