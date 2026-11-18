@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
@@ -492,6 +493,60 @@ func list(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"shareOn": on, "path": sub, "items": out})
 }
 
+// media: every photo and video under the shared folder (sub-folders included),
+// newest first, so the phone can show a gallery without browsing folder by folder.
+func media(w http.ResponseWriter, r *http.Request) {
+	c := get()
+	type item struct {
+		Path string `json:"path"`
+		Size int64  `json:"size"`
+		T    int64  `json:"t"`
+		V    bool   `json:"v"`
+	}
+	out := []item{}
+	on := c.ShareOn && c.ShareDir != ""
+	if on {
+		base := filepath.Clean(c.ShareDir)
+		filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return nil
+			}
+			if p != base && strings.HasPrefix(d.Name(), ".") {
+				if d.IsDir() {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			rel, err := filepath.Rel(base, p)
+			if err != nil {
+				return nil
+			}
+			rel = filepath.ToSlash(rel)
+			if d.IsDir() {
+				if rel != "." && strings.Count(rel, "/") >= 6 {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			ct := previewTypes[strings.ToLower(filepath.Ext(d.Name()))]
+			if ct == "" || ct == "image/svg+xml" {
+				return nil
+			}
+			info, err := d.Info()
+			if err != nil {
+				return nil
+			}
+			out = append(out, item{rel, info.Size(), info.ModTime().Unix(), strings.HasPrefix(ct, "video/")})
+			if len(out) >= 5000 {
+				return filepath.SkipAll
+			}
+			return nil
+		})
+		sort.Slice(out, func(i, j int) bool { return out[i].T > out[j].T })
+	}
+	writeJSON(w, map[string]any{"shareOn": on, "items": out})
+}
+
 // resolve opens a shared file safely (no path escape, no directories).
 func resolve(w http.ResponseWriter, r *http.Request, prefix string) (*os.File, os.FileInfo, bool) {
 	c := get()
@@ -607,6 +662,7 @@ func phoneRoutes(mux *http.ServeMux) {
 	})
 	mux.HandleFunc("/upload", upload)
 	mux.HandleFunc("/api/list", list)
+	mux.HandleFunc("/api/media", media)
 	mux.HandleFunc("/dl/", download)
 	mux.HandleFunc("/pv/", preview)
 }
@@ -647,6 +703,12 @@ func main() {
 	mux.HandleFunc("/admin/browse", local(adminBrowse))
 	mux.HandleFunc("/admin/qr.png", local(adminQR))
 	mux.HandleFunc("/admin/update", local(adminUpdate))
+	mux.HandleFunc("/admin/files", local(adminFiles))
+	mux.HandleFunc("/admin/put", local(adminPut))
+	mux.HandleFunc("/admin/mkdir", local(adminMkdir))
+	mux.HandleFunc("/admin/del", local(adminDel))
+	mux.HandleFunc("/admin/open", local(adminOpen))
+	mux.HandleFunc("/admin/pv/", local(adminPreview))
 	mux.HandleFunc("/admin/show", local(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{"ok": true})
 		uiShow()
