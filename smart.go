@@ -46,7 +46,7 @@ func randID(n int) string {
 
 // defaultWorker is baked into the build (-X main.defaultWorker=https://...) so users of the
 // released app need no setup. A URL saved in Settings overrides it.
-var defaultWorker = ""
+var defaultWorker = "https://shareup.imranul-hoque-sabbir.workers.dev"
 
 func workerBase(c Config) string {
 	u := strings.TrimRight(strings.TrimSpace(c.WorkerURL), "/")
