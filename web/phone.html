@@ -160,7 +160,14 @@ function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show')
 
 /* ================= send to PC (auto-upload as soon as you press OK) ================= */
 const ups=$('#ups');
-for(const id of['g','f']){const el=$('#'+id);el.onchange=async()=>{const fs=[...el.files];el.value='';for(const f of fs)await up(f)}}
+async function sendPicked(el){
+ const fs=[...el.files];
+ if(!fs.length)return;
+ toast('Sending '+fs.length+(fs.length>1?' files':' file')+'…',1500);
+ for(const f of fs){try{await up(f)}catch(e){toast('Could not send '+f.name,2500)}}
+ try{el.value=''}catch(e){}   // clear only AFTER everything is sent (Android hands over content:// files that must stay readable)
+}
+for(const id of['g','f']){const el=$('#'+id);el.onchange=()=>sendPicked(el);el.oninput=null}
 const CHUNK=16*1024*1024; // small pieces so big files also work over the internet link
 const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 function sendChunk(url,blob,onp){return new Promise(res=>{
