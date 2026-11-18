@@ -36,6 +36,23 @@ type Config struct {
 
 	AutoUpdate bool   `json:"autoUpdate"`
 	UpdateRepo string `json:"updateRepo,omitempty"` // optional override of the auto-detected repo
+
+	// Access control (see devices.go)
+	ApprovalOn  bool         `json:"approvalOn"`
+	PwdOn       bool         `json:"pwdOn"`
+	Independent bool         `json:"independent"` // false: turning one of password/approval on switches the other off
+	PwdSalt     string       `json:"pwdSalt,omitempty"`
+	PwdHash     string       `json:"pwdHash,omitempty"`
+	Trusted     []TrustedDev `json:"trusted,omitempty"`
+
+	// Smart connection (see smart.go)
+	WorkerURL string `json:"workerUrl,omitempty"`
+	PubID     string `json:"pubId,omitempty"`  // public id inside the fixed QR
+	DevKey    string `json:"devKey,omitempty"` // private key that lets this PC update the Worker
+	AutoNet   bool   `json:"autoNet"`
+	OfflineOn bool   `json:"offlineOn"`
+	HotSSID   string `json:"hotSsid,omitempty"`
+	HotPass   string `json:"hotPass,omitempty"`
 }
 
 var (
@@ -58,12 +75,16 @@ func loadConfig() {
 	exe, _ := os.Executable()
 	cfgPath = filepath.Join(filepath.Dir(exe), "shareUp.json")
 	home, _ := os.UserHomeDir()
-	cfg = Config{Port: 8080, RecvDir: filepath.Join(home, "Downloads", "shareUp"), AutoUpdate: true}
+	cfg = Config{Port: 8080, RecvDir: filepath.Join(home, "Downloads", "shareUp"), AutoUpdate: true, ApprovalOn: true, AutoNet: true}
 	if b, err := os.ReadFile(cfgPath); err == nil {
 		_ = json.Unmarshal(b, &cfg)
 	}
 	if cfg.Port < 1 || cfg.Port > 65535 {
 		cfg.Port = 8080
+	}
+	if cfg.PubID == "" || cfg.DevKey == "" {
+		cfg.PubID, cfg.DevKey = randID(12), randID(32)
+		saveLocked()
 	}
 }
 
@@ -111,6 +132,13 @@ func pickIP(c Config, ips []string) string {
 	for _, ip := range ips {
 		if ip == c.IP {
 			return ip
+		}
+	}
+	if r := routeIP(); r != "" { // prefer the adapter that really reaches the network
+		for _, ip := range ips {
+			if ip == r {
+				return r
+			}
 		}
 	}
 	if len(ips) > 0 {
@@ -174,7 +202,7 @@ func adminState(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, map[string]any{"port": curPort.Load(), "recvDir": c.RecvDir,
 		"shareDir": c.ShareDir, "shareOn": c.ShareOn, "ip": ip, "ips": ips, "url": u,
-		"autostart": autoOn.Load(), "remote": remoteSnapshot(), "update": updateSnapshot(), "version": version})
+		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version})
 }
 
 func adminSet(w http.ResponseWriter, r *http.Request) {
@@ -186,11 +214,52 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		IP        *string `json:"ip"`
 		Autostart *bool   `json:"autostart"`
 		AutoUpd   *bool   `json:"autoUpdate"`
+
+		ApprovalOn  *bool   `json:"approvalOn"`
+		PwdOn       *bool   `json:"pwdOn"`
+		Independent *bool   `json:"independent"`
+		Password    *string `json:"password"`
+
+		WorkerURL  *string `json:"workerUrl"`
+		AutoNet    *bool   `json:"autoNet"`
+		OfflineOn  *bool   `json:"offlineOn"`
+		HotSSID    *string `json:"hotSsid"`
+		HotPass    *string `json:"hotPass"`
+		ResetFixed *bool   `json:"resetFixed"`
 	}
 	if json.NewDecoder(r.Body).Decode(&q) != nil {
 		http.Error(w, "bad request", 400)
 		return
 	}
+	if q.Password != nil {
+		if len(*q.Password) < 4 {
+			http.Error(w, "Password must be at least 4 characters", 400)
+			return
+		}
+		setPassword(*q.Password)
+	}
+	if q.PwdOn != nil && *q.PwdOn && get().PwdHash == "" {
+		http.Error(w, "Set a password first", 400)
+		return
+	}
+	mu.Lock()
+	if q.Independent != nil {
+		cfg.Independent = *q.Independent
+	}
+	if q.PwdOn != nil {
+		cfg.PwdOn = *q.PwdOn
+		if *q.PwdOn && q.ApprovalOn == nil && !cfg.Independent {
+			cfg.ApprovalOn = false
+		}
+	}
+	if q.ApprovalOn != nil {
+		cfg.ApprovalOn = *q.ApprovalOn
+		if *q.ApprovalOn && q.PwdOn == nil && !cfg.Independent {
+			cfg.PwdOn = false
+		}
+	}
+	saveLocked()
+	mu.Unlock()
 	if q.Autostart != nil {
 		if err := setAutostart(*q.Autostart); err != nil {
 			http.Error(w, "Could not change startup setting: "+err.Error(), 500)
@@ -220,6 +289,48 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		if *q.AutoUpd {
 			go checkUpdate() // show a new build immediately
 		}
+	}
+	if q.WorkerURL != nil {
+		u := strings.TrimRight(strings.TrimSpace(*q.WorkerURL), "/")
+		if u != "" && (!strings.HasPrefix(u, "https://") || strings.ContainsAny(u, " \t?#")) {
+			http.Error(w, "Worker URL must look like https://name.workers.dev", 400)
+			return
+		}
+		mu.Lock()
+		cfg.WorkerURL = u
+		saveLocked()
+		mu.Unlock()
+		smartReset()
+	}
+	if q.HotPass != nil && *q.HotPass != "" && (len(*q.HotPass) < 8 || len(*q.HotPass) > 63) {
+		http.Error(w, "Hotspot password must be 8-63 characters", 400)
+		return
+	}
+	stopNet := false
+	mu.Lock()
+	if q.AutoNet != nil {
+		stopNet = cfg.AutoNet && !*q.AutoNet
+		cfg.AutoNet = *q.AutoNet
+	}
+	if q.OfflineOn != nil {
+		cfg.OfflineOn = *q.OfflineOn
+	}
+	if q.HotSSID != nil {
+		cfg.HotSSID = strings.TrimSpace(*q.HotSSID)
+	}
+	if q.HotPass != nil {
+		cfg.HotPass = *q.HotPass
+	}
+	if q.ResetFixed != nil && *q.ResetFixed {
+		cfg.PubID, cfg.DevKey = randID(12), randID(32)
+	}
+	saveLocked()
+	mu.Unlock()
+	if stopNet {
+		go remoteStop()
+	}
+	if q.ResetFixed != nil && *q.ResetFixed {
+		smartReset()
 	}
 	mu.Lock()
 	if q.RecvDir != nil {
@@ -660,11 +771,14 @@ func phoneRoutes(mux *http.ServeMux) {
 		}
 		page("phone.html")(w, r)
 	})
-	mux.HandleFunc("/upload", upload)
-	mux.HandleFunc("/api/list", list)
-	mux.HandleFunc("/api/media", media)
-	mux.HandleFunc("/dl/", download)
-	mux.HandleFunc("/pv/", preview)
+	mux.HandleFunc("/api/session", apiSession)
+	mux.HandleFunc("/api/ping", apiPing)
+	mux.HandleFunc("/api/bye", apiBye)
+	mux.HandleFunc("/upload", gate(upload))
+	mux.HandleFunc("/api/list", gate(list))
+	mux.HandleFunc("/api/media", gate(media))
+	mux.HandleFunc("/dl/", gate(download))
+	mux.HandleFunc("/pv/", gate(preview))
 }
 
 func main() {
@@ -702,6 +816,8 @@ func main() {
 	mux.HandleFunc("/admin/remote", local(adminRemote))
 	mux.HandleFunc("/admin/browse", local(adminBrowse))
 	mux.HandleFunc("/admin/qr.png", local(adminQR))
+	mux.HandleFunc("/admin/devices", local(adminDevices))
+	mux.HandleFunc("/admin/dev", local(adminDev))
 	mux.HandleFunc("/admin/update", local(adminUpdate))
 	mux.HandleFunc("/admin/files", local(adminFiles))
 	mux.HandleFunc("/admin/put", local(adminPut))
@@ -726,6 +842,8 @@ func main() {
 		fmt.Println("Internet mode unavailable:", err)
 	}
 	go janitor()
+	go devJanitor()
+	go smartStart()
 	go updateLoop()
 
 	p, err := start(get().Port)
