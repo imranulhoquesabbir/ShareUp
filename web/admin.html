@@ -205,6 +205,8 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 .fhead h2{font-size:16px}
 .fcount{font-weight:600}
 .advd{margin:14px 0}.advd>summary{cursor:pointer;list-style:none;padding:14px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);font-weight:650;color:var(--mute)}.advd>summary::-webkit-details-marker{display:none}.advd[open]>summary{margin-bottom:14px;color:var(--text)}
+.ft.sel{border-color:var(--g1);background:color-mix(in srgb,var(--g1) 24%,var(--field))}.selbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;margin-bottom:12px;border-radius:12px;background:color-mix(in srgb,var(--g1) 16%,var(--field));border:1px solid var(--g1)}.selbar b{margin-right:auto}
+.wl button{display:block;width:100%;margin:8px 0;text-align:left;padding:12px 14px}.mbox .wp{width:100%;box-sizing:border-box;margin:14px 0 6px}.mbox .wk{display:block;margin:10px auto 0;background:none;border:0;color:var(--mute);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}.mbox .wbad{color:var(--bad);font-size:13.5px;margin-top:6px}.mbox .spin{margin:16px auto}
 </style></head><body data-tab="connect">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><path d="M12 10v6M9 13h6"/></symbol><symbol id="i-folderopen" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.3 10H20a2 2 0 0 1 1.9 2.6l-1.6 6A2 2 0 0 1 18.4 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol><symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 13v8M8 17l4 4 4-4M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol><symbol id="i-tray" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol></defs></svg>
 <div class="wrap">
@@ -278,6 +280,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
   <div class="fhead">
    <div><h2 data-i="filesH"></h2></div>
    <div class="facts">
+    <button class="g" id="fall"><span data-i="selAll"></span></button>
     <button class="g" id="fpaste" hidden><svg class="ic"><use href="#i-copy"/></svg><span id="fpt"></span></button>
     <button class="g" id="fnew"><svg class="ic"><use href="#i-folderplus"/></svg><span data-i="newFolder"></span></button>
     <button class="g" id="fopen"><svg class="ic"><use href="#i-folderopen"/></svg><span data-i="openFolder"></span></button>
@@ -295,6 +298,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
    </div>
    <div class="fup" id="fup" hidden><b id="fupt"></b><small id="fupn"></small><div class="pb"><i id="fupf"></i></div></div>
    <div class="nf" id="nf" hidden><input type="text" id="nfi" data-ph="folderName" data-al="folderName"><button class="b" id="nfok" data-i="create"></button><button class="g" id="nfx" data-i="cancel"></button></div>
+   <div class="selbar" id="selbar" hidden><b id="selc"></b><button class="g" id="sbCopy"><span data-i="copyM"></span></button><button class="g" id="sbCut"><span data-i="cut"></span></button><button class="g dgr" id="sbDel"><span data-i="del"></span></button><button class="g" id="sbX" data-i="cancel"></button></div>
    <div class="crumbhead"><div class="crumbs" id="crumbs"></div><span class="fcount" id="fcount"></span></div>
    <div class="fgrid" id="fgrid"></div>
    <div class="fempty" id="fempty" data-i="emptyS" hidden></div>
@@ -324,7 +328,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
   <div class="pwrow"><input type="text" id="wkUrl" placeholder="https://name.workers.dev" autocomplete="off" spellcheck="false"><button class="g" id="wkSave"><span data-i="wkSave"></span></button></div>
   <div style="padding:0 20px 14px"><span id="wkSt" class="chip2 off"></span><small style="display:block;color:var(--mute);margin-top:6px" data-i="wkS"></small></div>
   <div class="item"><div class="itx"><b data-i="anT"></b><small data-i="anS"></small></div><label class="switch"><input type="checkbox" id="anOn" data-al="anT"><span class="slider"></span></label></div>
-  <div class="item"><div class="itx"><b data-i="ofT"></b><small data-i="ofS"></small></div><label class="switch"><input type="checkbox" id="ofOn" data-al="ofT"><span class="slider"></span></label></div>
+  <div class="item" hidden><div class="itx"><b data-i="ofT"></b><small data-i="ofS"></small></div><label class="switch"><input type="checkbox" id="ofOn" data-al="ofT"><span class="slider"></span></label></div>
   <div class="subh" data-i="hsT"></div>
   <div class="pwrow"><input type="text" id="hsSsid" data-ph="hsSsidPh" autocomplete="off"><input type="password" id="hsPass" data-ph="hsPassPh" autocomplete="new-password"><button class="g" id="hsSave"><span data-i="wkSave"></span></button></div>
   <div style="padding:0 20px 14px"><small style="display:block;color:var(--mute)" data-i="hsS"></small></div>
@@ -346,23 +350,38 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 </div>
 <div class="dover" id="dover"><div><svg class="ic"><use href="#i-tray"/></svg><b id="dtitle"></b><span id="dname"></span></div></div>
 <div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><small id="mrI"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="b" id="mrA"><span data-i="allowOnce"></span></button><button class="b" id="mrT"><span data-i="allowTrust"></span></button><button class="g dgr" id="mrD"><span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
+<div class="mback" id="gm" hidden><div class="mbox" id="gmb"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const I={
+hsJoinedD:["Now scan the QR code with your phone.","এবার ফোন দিয়ে QR কোডটা scan করুন।"],
+hsJoined:["Hotspot connected","Hotspot connect হয়েছে"],
+hs4T:["Connecting…","Connect হচ্ছে…"],
+hsWrong:["That password did not work. Try again.","Password মেলেনি। আবার দিন।"],
+hsOther:["Use a different Hotspot","অন্য Hotspot বেছে নিন"],
+hsConn:["Connect","Connect করুন"],
+hs3T:["Enter the Hotspot password","Hotspot-এর password দিন"],
+hs2P:["Tap the name of your phone.","আপনার ফোনের নামটিতে চাপুন।"],
+hs2T:["Choose your phone’s Hotspot","আপনার ফোনের Hotspot বেছে নিন"],
+hsAll:["Can’t see it? Show all Wi-Fi","দেখা যাচ্ছে না? সব WiFi দেখান"],
+hs1P:["Open Settings on your phone and switch Hotspot on. We will find it here by ourselves.","ফোনের Settings থেকে Hotspot চালু করুন। আমরা এখানে নিজেই খুঁজে নেব।"],
+hs1T:["Turn on your phone’s Hotspot","ফোনের Hotspot on করুন"],
+gS2n:["First time only: join your phone’s Hotspot once from the PC’s Wi-Fi list. After that it is automatic.","প্রথমবার শুধু: PC-র WiFi list থেকে ফোনের Hotspot-এ একবার connect করুন। এরপর সব নিজে নিজে হবে।"],
+selN:["{0} selected","{0}টি বাছা হয়েছে"],selAll:["Select all","সব বাছুন"],delN:["Delete {0} items from this PC?","{0}টি আইটেম এই পিসি থেকে মুছে ফেলবেন?"],deletedN:["Deleted {0} items","{0}টি মুছে ফেলা হয়েছে"],
 advT:["Advanced settings (not needed for normal use)","উন্নত সেটিং (সাধারণ ব্যবহারে লাগে না)"],
 scanPT:["Works on any network. The QR may change when shareUp restarts.","যেকোনো network-এ কাজ করবে।"],
 hintT:["Fixed QR is not on yet","Fixed QR এখনো চালু হয়নি"],hintD:["Add your Worker link once in Settings (see WORKER_SETUP.md) and one QR will work everywhere.","Settings-এ একবার Worker link দিন (WORKER_SETUP.md দেখুন), তারপর একটা QR সব জায়গায় কাজ করবে।"],
 scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
 scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
-gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone's Hotspot (the PC connects by itself)","Phone-এর Hotspot on করুন (PC নিজে connect হবে)"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
+gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone’s Hotspot. The PC joins it by itself.","ফোনের Hotspot on করুন। PC নিজেই connect হয়ে যাবে।"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
 gD1:["Offline mode is on","Offline mode চালু হয়েছে"],gD2:["Network connected","Network connected"],gDo1:["Turn on","চালু করুন"],gDo2:["Open Settings","Settings খুলুন"],
 gBack:["Internet is back","Internet ফিরে এসেছে"],gBackD:["Your old QR works again. Nothing else to do.","আগের QR আবার কাজ করবে। আর কিছু করতে হবে না।"],gDone:["Connected!","Connected!"],
 smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for Wi-Fi and internet.","একটা QR যা কখনো বদলায় না, WiFi আর internet দুটোতেই।"],
 wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","সেভ"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","সেভ হয়েছে"],
 anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link ready by itself (needs the fixed QR).","Internet link নিজে চালু রাখবে (fixed QR লাগবে)।"],
 ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
-hsT:["Phone Hotspot","Phone Hotspot"],hsS:["The PC connects to it by itself when there is no network.","কোনো network না থাকলে PC নিজে এতে connect হবে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Hotspot password","Hotspot-এর password"],
+hsT:["Phone Hotspot","Phone Hotspot"],hsS:["Optional. Normally not needed: the PC finds and joins your phone’s Hotspot by itself.","ঐচ্ছিক। সাধারণত লাগে না: PC নিজেই ফোনের Hotspot খুঁজে connect করে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Password","Password"],
 wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
 devH:["Connected phones","কানেক্টেড ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
 secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
@@ -448,7 +467,7 @@ function applyLang(){
  document.querySelectorAll('[data-al]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.al)));
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste()}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste();paintSel()}
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 
 const $=s=>document.querySelector(s);
@@ -483,6 +502,7 @@ function render(s){
  else if(sm.online&&r.status==='on')q=r.link;
  else if(sm.online&&sm.autoNet&&(r.status==='starting'||r.status==='downloading'))ph='spin';
  else{q=s.url;if(!q)ph='wifi'}
+ if(sm.busy&&lastQ)q=lastQ;
  if(q!==lastQ){lastQ=q;$('#qr').src=q?'/admin/qr.png?u='+encodeURIComponent(q):''}
  $('#qr').hidden=!q;$('#ph').hidden=!!q;
  $('#ph').innerHTML=ph==='spin'?'<div class="spin"></div>':(ph?ic(ph):'');
@@ -568,7 +588,7 @@ function setTab(tb){
   $('#pico use').setAttribute('href',r?'#i-down':'#i-up');
   $('#fnoneh').dataset.i=r?'noneRH':'noneSH';$('#fnonep').dataset.i=r?'noneRP':'noneSP';$('#fch').dataset.i=r?'chooseR':'chooseF';
   $('#fempty').dataset.i=r?'emptyR':'emptyS';
-  if(root()!==was){cur='';lastDir=null}
+  if(root()!==was){cur='';lastDir=null;SEL.clear();anchor=null}
  }
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tb));
  applyLang();
@@ -608,7 +628,24 @@ async function loadFiles(){
  let j;try{j=await (await fetch('/admin/files?path='+encodeURIComponent(cur)+'&root='+root())).json()}catch(e){return}
  const key=JSON.stringify(j);if(key===lastL)return;lastL=key;drawFiles(j);
 }
-function go(p){cur=p;lastL='';loadFiles()}
+const SEL=new Set();let ITEMS=new Map(),ORDER=[],anchor=null;
+function paintSel(){
+ document.querySelectorAll('#fgrid .ft').forEach(el=>el.classList.toggle('sel',SEL.has(el.dataset.p)));
+ const n=SEL.size;$('#selbar').hidden=!n;if(n)$('#selc').textContent=t('selN',n);
+}
+function selectAll(){SEL.clear();ORDER.forEach(p=>SEL.add(p));paintSel()}
+function clearSel(){SEL.clear();anchor=null;paintSel()}
+function clickSel(full,e){
+ if(e.shiftKey&&anchor&&ORDER.includes(anchor)){
+  const a=ORDER.indexOf(anchor),b=ORDER.indexOf(full),[x,y]=a<b?[a,b]:[b,a];
+  if(!(e.ctrlKey||e.metaKey))SEL.clear();
+  for(let i=x;i<=y;i++)SEL.add(ORDER[i]);
+ }else if(e.ctrlKey||e.metaKey){
+  SEL.has(full)?SEL.delete(full):SEL.add(full);anchor=full;
+ }else{SEL.clear();SEL.add(full);anchor=full}
+ paintSel();
+}
+function go(p){cur=p;SEL.clear();anchor=null;lastL='';loadFiles()}
 function drawFiles(j){
  const g=$('#fgrid'),cr=$('#crumbs');
  g.textContent='';cr.textContent='';
@@ -623,15 +660,18 @@ function drawFiles(j){
   const i=document.createElement('i');i.textContent='›';
   const b=document.createElement('button');b.textContent=p;b.onclick=()=>go(a);dropOn(b,()=>a);cr.append(i,b);
  });
+ ITEMS=new Map(j.items.map(it=>[(cur?cur+'/':'')+it.name,it]));ORDER=[...ITEMS.keys()];
+ [...SEL].forEach(p=>{if(!ITEMS.has(p))SEL.delete(p)});
  const n=j.items.length;
  $('#fcount').textContent=n?t(n===1?'item1':'itemN',n):'';
  $('#fempty').hidden=n>0;
  j.items.forEach(it=>g.append(ftile(it)));
+ paintSel();
 }
 function openIt(full){post('/admin/open',{path:full,root:root()})}
 function ftile(it){
  const full=(cur?cur+'/':'')+it.name,enc=ENC(full),ext=extOf(it.name);
- const el=document.createElement('div');el.className='ft';el.tabIndex=0;
+ const el=document.createElement('div');el.className='ft';el.tabIndex=0;el.dataset.p=full;if(SEL.has(full))el.classList.add('sel');
  el.title=it.dir?t('openFolder'):t('dbl');
  if(clip&&clip.mode==='cut'&&clip.root===root()&&clip.paths.includes(full))el.classList.add('cut');
  const th=document.createElement('div');th.className='fth';
@@ -647,24 +687,24 @@ function ftile(it){
  const nm=document.createElement('div');nm.className='fn';nm.textContent=it.name;
  const sm=document.createElement('div');sm.className='fs';sm.textContent=it.dir?t('folder'):sz(it.size);
  const x=document.createElement('button');x.className='fx';x.textContent='×';x.title=t('del');x.setAttribute('aria-label',t('del')+' '+it.name);
- x.onclick=e=>{e.stopPropagation();del(full,it)};
+ x.onclick=e=>{e.stopPropagation();SEL.clear();SEL.add(full);paintSel();delMany([full])};
  const m=document.createElement('button');m.className='fm';m.textContent='⋯';m.title=t('more');m.setAttribute('aria-label',t('more')+' '+it.name);
  m.onclick=e=>{e.stopPropagation();const r=m.getBoundingClientRect();openMenu(r.left,r.bottom+4,full,it,el)};
  el.oncontextmenu=e=>{e.preventDefault();openMenu(e.clientX,e.clientY,full,it,el)};
  el.draggable=true;
- el.ondragstart=e=>{e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:full}));e.dataTransfer.effectAllowed='copyMove'};
- if(it.dir){el.onclick=()=>go(full);dropOn(el,()=>full)}else el.ondblclick=()=>openIt(full);
- el.onkeydown=e=>{
-  if(e.target!==el)return;
-  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
-  if(e.key==='Enter')it.dir?go(full):openIt(full);
-  else if(e.key==='Delete')del(full,it);
-  else if(e.key==='F2'){e.preventDefault();renameIt(full,it,el)}
-  else if(mod&&k==='c'){e.preventDefault();setClip('copy',full)}
-  else if(mod&&k==='x'){e.preventDefault();setClip('cut',full)}
-  else if(mod&&k==='v'&&clip){e.preventDefault();pasteTo(it.dir?full:cur)}
- };
+ el.ondragstart=e=>{if(!SEL.has(full)){SEL.clear();SEL.add(full);anchor=full;paintSel()}const ps=[...SEL];e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:ps[0],paths:ps}));e.dataTransfer.effectAllowed='copyMove'};
+ el.onclick=e=>{e.stopPropagation();clickSel(full,e)};
+ el.ondblclick=()=>it.dir?go(full):openIt(full);
+ if(it.dir)dropOn(el,()=>full);
  el.append(th,nm,sm,x,m);return el;
+}
+async function delMany(paths){
+ if(!paths.length)return;
+ if(paths.length===1){const it=ITEMS.get(paths[0]);if(it)return del(paths[0],it)}
+ if(!confirm(t('delN',paths.length)))return;
+ let ok=0;
+ for(const p of paths){const it=ITEMS.get(p);if(await post('/admin/del',{path:p,root:root(),recursive:!!(it&&it.dir)}))ok++}
+ SEL.clear();anchor=null;toast(t('deletedN',ok));lastL='';loadFiles();
 }
 async function del(full,it){
  const msg=it.dir?t('delDir',it.name):t('delOne',it.name);
@@ -678,22 +718,45 @@ let clip=null,renaming=false;
 const cm=document.createElement('div');cm.className='cm';document.body.append(cm);
 function closeMenu(){cm.classList.remove('on')}
 function openMenu(x,y,full,it,el){
+ if(!SEL.has(full)){SEL.clear();SEL.add(full);anchor=full;paintSel()}
  cm.textContent='';
  const add=(label,fn,cls)=>{const b=document.createElement('button');b.textContent=label;if(cls)b.className=cls;b.onclick=()=>{closeMenu();fn()};cm.append(b)};
- add(it.dir?t('openFolder'):t('open'),()=>it.dir?go(full):openIt(full));
- add(t('rename'),()=>renameIt(full,it,el));
- add(t('copyM'),()=>setClip('copy',full));
- add(t('cut'),()=>setClip('cut',full));
- if(clip&&it.dir)add(t('pasteInto'),()=>pasteTo(full));
- cm.append(document.createElement('hr'));
- add(t('del'),()=>del(full,it),'dg');
+ if(SEL.size>1){
+  add(t('copyM'),()=>setClip('copy',[...SEL]));
+  add(t('cut'),()=>setClip('cut',[...SEL]));
+  cm.append(document.createElement('hr'));
+  add(t('del')+' ('+SEL.size+')',()=>delMany([...SEL]),'dg');
+ }else{
+  add(it.dir?t('openFolder'):t('open'),()=>it.dir?go(full):openIt(full));
+  add(t('rename'),()=>renameIt(full,it,el));
+  add(t('copyM'),()=>setClip('copy',[full]));
+  add(t('cut'),()=>setClip('cut',[full]));
+  if(clip&&it.dir)add(t('pasteInto'),()=>pasteTo(full));
+  cm.append(document.createElement('hr'));
+  add(t('del'),()=>delMany([full]),'dg');
+ }
  cm.classList.add('on');
  const w=cm.offsetWidth,h=cm.offsetHeight;
  cm.style.left=Math.max(6,Math.min(x,innerWidth-w-6))+'px';
  cm.style.top=Math.max(6,Math.min(y,innerHeight-h-6))+'px';
 }
 document.addEventListener('click',e=>{if(!cm.contains(e.target))closeMenu()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){closeMenu();if(inFiles()&&SEL.size)clearSel();return}
+ if(!inFiles()||renaming)return;
+ const tg=(e.target&&e.target.tagName)||'';if(/INPUT|TEXTAREA|SELECT/.test(tg))return;
+ if(!$('#mreq').hidden)return;
+ const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+ if(mod&&k==='a'){e.preventDefault();selectAll()}
+ else if(e.key==='Delete'&&SEL.size){e.preventDefault();delMany([...SEL])}
+ else if(mod&&k==='c'&&SEL.size){e.preventDefault();setClip('copy',[...SEL])}
+ else if(mod&&k==='x'&&SEL.size){e.preventDefault();setClip('cut',[...SEL])}
+ else if(e.key==='F2'&&SEL.size===1){const p=[...SEL][0],it=ITEMS.get(p),el=document.querySelector('#fgrid .ft[data-p="'+CSS.escape(p)+'"]');if(it&&el){e.preventDefault();renameIt(p,it,el)}}
+ else if(e.key==='Enter'&&SEL.size===1){const p=[...SEL][0],it=ITEMS.get(p);if(it)it.dir?go(p):openIt(p)}
+});
+$('#fall').onclick=selectAll;$('#sbX').onclick=clearSel;
+$('#sbCopy').onclick=()=>setClip('copy',[...SEL]);$('#sbCut').onclick=()=>setClip('cut',[...SEL]);$('#sbDel').onclick=()=>delMany([...SEL]);
+$('#fgrid').addEventListener('click',e=>{if(e.target===$('#fgrid'))clearSel()});
 window.addEventListener('scroll',closeMenu,true);
 
 function updatePaste(){
@@ -701,8 +764,8 @@ function updatePaste(){
  b.hidden=!(clip&&inFiles());
  if(clip)$('#fpt').textContent=t(clip.mode==='cut'?'moveHere':'pasteHere');
 }
-function setClip(mode,full){
- clip={mode,root:root(),paths:[full]};
+function setClip(mode,paths){
+ clip={mode,root:root(),paths:[].concat(paths)};
  toast(t(mode==='cut'?'clipCut':'clipCopy'),2200);
  lastL='';loadFiles();updatePaste();
 }
@@ -729,8 +792,8 @@ function dropOn(el,dest){
   if(!isInt(e))return;
   e.preventDefault();e.stopPropagation();el.classList.remove('dt');
   let d;try{d=JSON.parse(e.dataTransfer.getData(DT))}catch(x){return}
-  const to=dest();if(d.path===to)return;
-  transfer({mode:(e.ctrlKey||e.altKey)?'copy':'move',root:d.root,paths:[d.path]},to);
+  const to=dest(),ps=d.paths||[d.path];if(ps.includes(to))return;
+  transfer({mode:(e.ctrlKey||e.altKey)?'copy':'move',root:d.root,paths:ps},to);
  });
 }
 function renameIt(full,it,el){
@@ -875,7 +938,7 @@ function drawDev(){
   const e=document.createElement('div');e.className='dev';
   e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+'</small></div>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
   e.querySelectorAll('button').forEach(b=>b.onclick=()=>devAct(b.dataset.a,d.id));sl.append(e)});
- $('#devn').hidden=DV.sessions.length>0;
+ $('#devn').hidden=true;$('#devp').hidden=DV.sessions.length===0;
  const tl=$('#trl');tl.innerHTML='';
  DV.trusted.forEach(d=>{
   const e=document.createElement('div');e.className='dev';
@@ -902,29 +965,50 @@ $('#pwSave').onclick=async()=>{const v=$('#pwIn').value;if(v.length<4){toast(t('
 pollDev();setInterval(()=>{if(!document.hidden||reqId)pollDev()},1500);
 
 // ---- smart connection ----
+let gmKey='';
 function drawGuide(g){
- const c=$('#gcard');
+ const c=$('#gcard'),gm=$('#gm'),gb=$('#gmb');
+ if(g&&g.kind==='offline'){
+  c.hidden=true;c.innerHTML='';c.dataset.h='';
+  let k=JSON.stringify(g)+LANG,s='';
+  if(k!==gmKey){
+   gmKey=k;
+   if(g.step===1){
+    s='<div class="mic">📱</div><h2>'+t('hs1T')+'</h2><small>'+t('hs1P')+'</small><div class="spin"></div><button class="wk" data-w="all">'+t('hsAll')+'</button>';
+   }else if(g.step===2){
+    s='<div class="mic">📶</div><h2>'+t('hs2T')+'</h2><small>'+t('hs2P')+'</small><div class="wl">'+(g.nets||[]).map((n,i)=>'<button class="g" data-w="pick" data-i="'+i+'">📶 '+esc(n)+'</button>').join('')+'</div><button class="wk" data-w="all">'+t('hsAll')+'</button>';
+   }else if(g.step===3){
+    s='<div class="mic">🔑</div><h2>'+t('hs3T')+'</h2><small>'+esc(g.sel)+'</small><input type="password" class="wp" id="wpw" autocomplete="off" placeholder="'+t('hsPassPh')+'">'+(g.err==='wrongpass'?'<div class="wbad">'+t('hsWrong')+'</div>':'')+'<div class="mbtn"><button class="b" data-w="pass">'+t('hsConn')+'</button></div><button class="wk" data-w="back">'+t('hsOther')+'</button>';
+   }else{
+    s='<div class="mic">📶</div><h2>'+t('hs4T')+'</h2><small>'+esc(g.sel)+'</small><div class="spin"></div>';
+   }
+   gb.innerHTML=s;gb._g=g;
+   const pw=$('#wpw');if(pw)setTimeout(()=>pw.focus(),50);
+  }
+  gm.hidden=false;return;
+ }
+ gm.hidden=true;gmKey='';
  if(!g||!g.kind){c.hidden=true;c.innerHTML='';return}
  let h='';
- if(g.kind==='offline'){
-  c.className='panel guide warn';
-  const cur=[t('gS1'),t(g.hotSet?'gS2':'gS2s'),t('gS3')][g.step-1];
-  const prev=g.step>1?[t('gD1'),t('gD2')][g.step-2]:'';
-  h='<div class="gh">⚠️ '+t('gNoNet')+'</div>';
-  if(prev)h+='<div class="gr ok"><i>✅</i><span>'+esc(prev)+'</span></div>';
-  h+='<div class="gr cur"><i class="gspin"></i><span>'+esc(cur)+'</span></div>';
-  if(g.err)h+='<div class="gr bad"><i>❌</i><span>'+esc(g.err)+'</span></div>';
-  if(g.step===1)h+='<div class="gact"><button class="b" data-act="off">'+t('gDo1')+'</button></div>';
-  if(g.step===2&&!g.hotSet)h+='<div class="gact"><button class="b" data-act="set">'+t('gDo2')+'</button></div>';
- }else if(g.kind==='back'){
+ if(g.kind==='back'){
   c.className='panel guide good';h='<div class="gh">✅ '+t('gBack')+'</div><div class="gp">'+t('gBackD')+'</div>';
+ }else if(g.kind==='joined'){
+  c.className='panel guide good';h='<div class="gh">✅ '+t('hsJoined')+'</div><div class="gp">'+t('hsJoinedD')+'</div>';
  }else{
   c.className='panel guide good';h='<div class="gh">✅ '+t('gDone')+'</div>';
  }
  if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}
  c.hidden=false;
 }
-$('#hgo').onclick=()=>setTab('settings');
+$('#gmb').addEventListener('click',async e=>{
+ const b=e.target.closest('[data-w]');if(!b)return;
+ const g=$('#gmb')._g||{},op=b.dataset.w;
+ if(op==='pick'){await api('/admin/wifi',{op,ssid:(g.nets||[])[+b.dataset.i]})}
+ else if(op==='pass'){const v=$('#wpw').value;if(!v){$('#wpw').focus();return}gmKey='';await api('/admin/wifi',{op,pass:v})}
+ else await api('/admin/wifi',{op});
+ gmKey='';
+});
+$('#gmb').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='wpw'){e.preventDefault();$('#gmb').querySelector('[data-w="pass"]').click()}});
 $('#gcard').onclick=async e=>{const b=e.target.closest('[data-act]');if(!b)return;
  if(b.dataset.act==='off'){const j=await api('/admin/set',{offlineOn:true});if(j)render(j)}
  else if(b.dataset.act==='set')setTab('settings')};
@@ -945,6 +1029,6 @@ $('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await 
 
 (async()=>{render(await api('/admin/state'));
  setInterval(async()=>{if(document.hidden)return;try{render(await (await fetch('/admin/state',{method:'POST'})).json())}catch(e){}},2000)
- try{const t0=localStorage.getItem('tab');setTab(['files','recv','settings'].includes(t0)?t0:'connect')}catch(e){setTab('connect')}
+ setTab('connect')
 })();
 </script></body></html>
