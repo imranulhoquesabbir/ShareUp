@@ -774,10 +774,10 @@ func phoneRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/session", apiSession)
 	mux.HandleFunc("/api/ping", apiPing)
 	mux.HandleFunc("/api/bye", apiBye)
-	mux.HandleFunc("/upload", gate(upload))
+	mux.HandleFunc("/upload", gate(trackXfer(upload)))
 	mux.HandleFunc("/api/list", gate(list))
 	mux.HandleFunc("/api/media", gate(media))
-	mux.HandleFunc("/dl/", gate(download))
+	mux.HandleFunc("/dl/", gate(trackXfer(download)))
 	mux.HandleFunc("/pv/", gate(preview))
 }
 
@@ -816,6 +816,7 @@ func main() {
 	mux.HandleFunc("/admin/remote", local(adminRemote))
 	mux.HandleFunc("/admin/browse", local(adminBrowse))
 	mux.HandleFunc("/admin/qr.png", local(adminQR))
+	mux.HandleFunc("/admin/wifi", local(adminWifi))
 	mux.HandleFunc("/admin/devices", local(adminDevices))
 	mux.HandleFunc("/admin/dev", local(adminDev))
 	mux.HandleFunc("/admin/update", local(adminUpdate))

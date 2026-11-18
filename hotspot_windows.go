@@ -43,3 +43,53 @@ func hotspotConnect(ssid, pass string) error {
 	con.Run()
 	return nil
 }
+
+func netshOut(args ...string) string {
+	c := exec.Command("netsh", args...)
+	hideWindow(c)
+	b, _ := c.CombinedOutput()
+	return string(b)
+}
+
+// wifiScan lists the Wi-Fi names in range, and which of them this PC has already saved
+// (so no password is needed for those).
+func wifiScan() ([]string, map[string]bool) {
+	saved := map[string]bool{}
+	for _, ln := range strings.Split(netshOut("wlan", "show", "profiles"), "\n") {
+		i := strings.Index(ln, ":")
+		if i < 0 {
+			continue
+		}
+		key := strings.ToLower(strings.TrimSpace(ln[:i]))
+		val := strings.TrimSpace(ln[i+1:])
+		if val != "" && strings.Contains(key, "profile") {
+			saved[val] = true
+		}
+	}
+	var vis []string
+	seen := map[string]bool{}
+	for _, ln := range strings.Split(netshOut("wlan", "show", "networks"), "\n") {
+		i := strings.Index(ln, ":")
+		if i < 0 {
+			continue
+		}
+		key := strings.ToLower(strings.TrimSpace(ln[:i]))
+		val := strings.TrimSpace(ln[i+1:])
+		if val == "" || !strings.HasPrefix(key, "ssid") || seen[val] {
+			continue
+		}
+		seen[val] = true
+		vis = append(vis, val)
+	}
+	return vis, saved
+}
+
+// wifiConnect asks Windows to join a Wi-Fi it already has a saved profile for.
+func wifiConnect(name string) error {
+	con := exec.Command("netsh", "wlan", "connect", "name="+name)
+	hideWindow(con)
+	if out, err := con.CombinedOutput(); err != nil {
+		return fmt.Errorf("Wi-Fi: %s", strings.TrimSpace(string(out)))
+	}
+	return nil
+}

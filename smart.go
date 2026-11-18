@@ -20,6 +20,33 @@ import (
 //   - the PC tells the Worker its current addresses (register loop) and keeps the internet tunnel up
 //   - when the internet is gone: step-by-step guide, Offline mode, phone-hotspot auto connect
 
+// Transfers in progress. The app never changes the PC's network (hotspot) or restarts the
+// internet link while a file is being sent, so nothing is cut in half.
+var (
+	xferActive atomic.Int32
+	xferLast   atomic.Int64 // unix nano of the last upload/download activity
+)
+
+func transferBusy() bool {
+	if xferActive.Load() > 0 {
+		return true
+	}
+	t := xferLast.Load()
+	return t != 0 && time.Now().UnixNano()-t < int64(20*time.Second)
+}
+
+func trackXfer(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		xferActive.Add(1)
+		xferLast.Store(time.Now().UnixNano())
+		defer func() {
+			xferActive.Add(-1)
+			xferLast.Store(time.Now().UnixNano())
+		}()
+		next(w, r)
+	}
+}
+
 var (
 	onlineNow  atomic.Bool
 	wasOffline atomic.Bool
@@ -30,6 +57,13 @@ var (
 	hotState string // "" | trying | error
 	hotErr   string
 	hotLast  time.Time
+	hotSel   string          // hotspot the person picked
+	hotAll   bool            // list every Wi-Fi, not only likely phone hotspots
+	hotNets  []string        // hotspots shown to pick from
+	hotBase  map[string]bool // Wi-Fi names already in range when the network was lost
+	hotJoin  time.Time       // when we last tried to join (zero = not joining)
+	hotBad   bool            // the last join did not work (wrong password)
+	hotOKAt  atomic.Int64    // unix nano: hotspot joined
 
 	regMu   sync.Mutex
 	regOK   bool
@@ -150,7 +184,7 @@ func smartLoop() {
 		}
 		if c.AutoNet { // keep the internet link ready by itself
 			st := remoteSnapshot().Status
-			if (st == "off" || st == "error") && time.Since(tunTry) > 30*time.Second {
+			if (st == "off" || st == "error") && time.Since(tunTry) > 30*time.Second && !transferBusy() {
 				tunTry = time.Now()
 				remoteStart()
 			}
@@ -205,42 +239,161 @@ func registerWorker(c Config, base, lan, tunnel, sig string) {
 	}
 }
 
-func maybeHotspot(c Config, up bool) {
-	if !c.OfflineOn || up || c.HotSSID == "" || hasNetwork() {
-		hotMu.Lock()
-		hotState, hotErr = "", ""
-		hotMu.Unlock()
-		return
-	}
-	hotMu.Lock()
-	if time.Since(hotLast) < 20*time.Second {
-		hotMu.Unlock()
-		return
-	}
-	hotLast = time.Now()
-	hotState = "trying"
-	hotMu.Unlock()
-	err := hotspotConnect(c.HotSSID, c.HotPass)
-	hotMu.Lock()
-	if err != nil {
-		msg := err.Error()
-		if len(msg) > 120 {
-			msg = msg[:120]
+var phoneHints = []string{"iphone", "android", "galaxy", "samsung", "redmi", "xiaomi", "poco", "pixel", "oppo", "vivo",
+	"realme", "infinix", "tecno", "itel", "oneplus", "huawei", "honor", "motorola", "nokia", "symphony", "walton", "hotspot"}
+
+func looksLikePhone(name string) bool {
+	n := strings.ToLower(name)
+	for _, h := range phoneHints {
+		if strings.Contains(n, h) {
+			return true
 		}
-		hotState, hotErr = "error", msg
-	} else {
-		hotState, hotErr = "trying", ""
 	}
+	return false
+}
+
+func hotReset() {
+	hotMu.Lock()
+	if hotSel != "" {
+		hotOKAt.Store(time.Now().UnixNano())
+	}
+	hotSel, hotAll, hotNets, hotBase, hotBad = "", false, nil, nil, false
+	hotJoin = time.Time{}
+	hotState, hotErr = "", ""
 	hotMu.Unlock()
+}
+
+// maybeHotspot runs every few seconds. With no network at all it looks for a phone hotspot,
+// joins one the PC already knows by itself, and otherwise lets the guide ask the person
+// one small thing at a time (turn it on, pick it, type the password).
+func maybeHotspot(c Config, up bool) {
+	if up || hasNetwork() {
+		hotReset()
+		return
+	}
+	if sessionCount() > 0 || transferBusy() {
+		return
+	}
+	if c.HotSSID != "" { // optional manual override (Advanced settings)
+		hotMu.Lock()
+		due := time.Since(hotLast) >= 20*time.Second
+		if due {
+			hotLast = time.Now()
+		}
+		hotMu.Unlock()
+		if due {
+			hotspotConnect(c.HotSSID, c.HotPass)
+		}
+		return
+	}
+	vis, saved := wifiScan()
+	hotMu.Lock()
+	if hotBase == nil {
+		hotBase = map[string]bool{}
+		for _, v := range vis {
+			hotBase[v] = true
+		}
+	}
+	if !hotJoin.IsZero() && time.Since(hotJoin) > 20*time.Second {
+		hotBad, hotJoin = true, time.Time{} // joined but still no network: password was wrong
+	}
+	var phones, others []string
+	for _, v := range vis {
+		if looksLikePhone(v) {
+			phones = append(phones, v)
+		} else if hotAll || !hotBase[v] { // a new name appeared: most likely the hotspot just turned on
+			others = append(others, v)
+		}
+	}
+	hotNets = append(phones, others...)
+	busy := hotSel != ""
+	nets := hotNets
+	hotMu.Unlock()
+	if busy {
+		return
+	}
+	for _, v := range nets { // a hotspot this PC has joined before: no questions
+		if saved[v] {
+			hotMu.Lock()
+			hotSel, hotJoin, hotBad = v, time.Now(), false
+			hotMu.Unlock()
+			wifiConnect(v)
+			return
+		}
+	}
+}
+
+type wifiReq struct {
+	Op   string `json:"op"`
+	SSID string `json:"ssid"`
+	Pass string `json:"pass"`
+}
+
+// adminWifi: the answers the person gives to the hotspot popups.
+func adminWifi(w http.ResponseWriter, r *http.Request) {
+	var q wifiReq
+	json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&q)
+	switch q.Op {
+	case "all":
+		hotMu.Lock()
+		hotAll = true
+		hotMu.Unlock()
+	case "back":
+		hotMu.Lock()
+		hotSel, hotBad, hotJoin = "", false, time.Time{}
+		hotMu.Unlock()
+	case "pick":
+		q.SSID = strings.TrimSpace(q.SSID)
+		if q.SSID == "" || len(q.SSID) > 64 {
+			http.Error(w, "bad name", 400)
+			return
+		}
+		_, saved := wifiScan()
+		hotMu.Lock()
+		hotSel, hotBad, hotJoin = q.SSID, false, time.Time{}
+		if saved[q.SSID] {
+			hotJoin = time.Now()
+		}
+		hotMu.Unlock()
+		if saved[q.SSID] {
+			wifiConnect(q.SSID)
+		}
+	case "pass":
+		hotMu.Lock()
+		sel := hotSel
+		hotMu.Unlock()
+		if sel == "" {
+			http.Error(w, "no hotspot", 400)
+			return
+		}
+		if len(q.Pass) > 63 {
+			http.Error(w, "password too long", 400)
+			return
+		}
+		if err := hotspotConnect(sel, q.Pass); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		hotMu.Lock()
+		hotJoin, hotBad = time.Now(), false
+		hotMu.Unlock()
+	default:
+		http.Error(w, "bad request", 400)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{}"))
 }
 
 // ---------- guide shown on the PC ----------
 
 type guideInfo struct {
-	Kind   string `json:"kind"` // "" | offline | back | done
-	Step   int    `json:"step"` // offline: 1 offline mode, 2 network/hotspot, 3 scan
+	Kind   string `json:"kind"` // "" | offline | back | done | joined
+	Step   int    `json:"step"` // offline: 1 turn hotspot on, 2 pick it, 3 password, 4 connecting
 	Err    string `json:"err,omitempty"`
 	HotSet bool   `json:"hotSet"`
+	Nets   []string `json:"nets,omitempty"`
+	Sel    string   `json:"sel,omitempty"`
 }
 
 func guide(c Config) guideInfo {
@@ -257,20 +410,26 @@ func guide(c Config) guideInfo {
 	if sessionCount() > 0 {
 		return guideInfo{}
 	}
-	g := guideInfo{Kind: "offline", HotSet: c.HotSSID != ""}
-	switch {
-	case !c.OfflineOn:
-		g.Step = 1
-	case !hasNetwork():
-		g.Step = 2
-		hotMu.Lock()
-		if hotState == "error" {
-			g.Err = hotErr
+	if hasNetwork() {
+		if t := hotOKAt.Load(); t != 0 && now-t < int64(8*time.Second) {
+			return guideInfo{Kind: "joined"}
 		}
-		hotMu.Unlock()
-	default:
-		g.Step = 3
+		return guideInfo{} // same Wi-Fi / hotspot: the normal QR just works
 	}
+	g := guideInfo{Kind: "offline", Step: 1, HotSet: c.HotSSID != ""}
+	hotMu.Lock()
+	switch {
+	case hotSel != "" && !hotJoin.IsZero():
+		g.Step, g.Sel = 4, hotSel
+	case hotSel != "":
+		g.Step, g.Sel = 3, hotSel
+		if hotBad {
+			g.Err = "wrongpass"
+		}
+	case len(hotNets) > 0:
+		g.Step, g.Nets = 2, append([]string(nil), hotNets...)
+	}
+	hotMu.Unlock()
 	return g
 }
 
@@ -292,6 +451,7 @@ func smartSnapshot(c Config) map[string]any {
 		"mdns":       fmt.Sprintf("shareup.local:%d", curPort.Load()),
 		"tunnel":     remoteSnapshot().Status,
 		"guide":      guide(c),
+		"busy":       transferBusy(),
 	}
 }
 
