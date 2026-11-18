@@ -146,6 +146,7 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
 <div class="nav">
  <button data-t="connect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>Connect phone</button>
  <button data-t="files"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Shared files</button>
+ <button data-t="recv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>From phone</button>
 </div>
 
 <div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo">Update now</button></div>
@@ -217,7 +218,7 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
 <div id="tf" hidden>
 <div class="panel fp">
  <div class="fhead">
-  <div><h2>Shared folder</h2><div class="fpath" id="fpath"></div></div>
+  <div><h2 id="ftitle">Shared folder</h2><div class="fpath" id="fpath"></div></div>
   <div class="facts">
    <button class="g" id="fnew">New folder</button>
    <button class="g" id="fopen">Open folder</button>
@@ -226,8 +227,8 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
  </div>
  <div class="note" id="fwarn" hidden><span>Sharing is off, so your phone can't see these files yet.</span><button class="b" id="fon">Turn on</button></div>
  <div class="fnone" id="fnone" hidden>
-  <div class="big">📂</div><h3>Choose a folder to share</h3>
-  <p>Pick any folder. Whatever you put inside shows up on your phone.</p>
+  <div class="big">📂</div><h3 id="fnoneh">Choose a folder to share</h3>
+  <p id="fnonep">Pick any folder. Whatever you put inside shows up on your phone.</p>
   <button class="b" id="fchoose">Choose folder</button>
  </div>
  <div id="fbody" hidden>
@@ -240,7 +241,7 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
   <div class="nf" id="nf" hidden><input type="text" id="nfi" placeholder="Folder name" aria-label="Folder name"><button class="b" id="nfok">Create</button><button class="g" id="nfx">Cancel</button></div>
   <div class="crumbhead"><div class="crumbs" id="crumbs"></div><span class="fcount" id="fcount"></span></div>
   <div class="fgrid" id="fgrid"></div>
-  <div class="fempty" id="fempty" hidden>Nothing here yet. Drop files in to share them with your phone.</div>
+  <div class="fempty" id="fempty" hidden>Nothing here yet.</div>
  </div>
 </div>
 </div>
@@ -254,6 +255,9 @@ kbd{background:var(--field);border:1px solid var(--line);border-bottom-width:2px
 <script>
 const $=s=>document.querySelector(s);
 let mode='lan',lastQ='',S=null,tab='connect',cur='',lastL='',lastDir=null;
+const inFiles=()=>tab==='files'||tab==='recv';
+const root=()=>tab==='recv'?'recv':'share';                       // which folder the file manager shows
+const rootDirOf=s=>s?(root()==='recv'?s.recvDir:s.shareDir):'';
 let toastT=0;
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1600)}
 async function api(p,b){
@@ -301,9 +305,10 @@ function render(s){
   s.ips.forEach(i=>{const o=document.createElement('option');o.value=o.textContent=i;if(i==s.ip)o.selected=true;ip.append(o)})}
 }
 function filesHook(s){
- $('#fwarn').hidden=!(s.shareDir&&!s.shareOn);
- if(s.shareDir!==lastDir){lastDir=s.shareDir;cur='';lastL='';loadFiles()}
- else if(S&&tab==='files')loadFiles();
+ $('#fwarn').hidden=!(root()==='share'&&s.shareDir&&!s.shareOn);
+ const d=rootDirOf(s);
+ if(d!==lastDir){lastDir=d;cur='';lastL='';loadFiles()}
+ else if(S&&inFiles())loadFiles();
 }
 function renderUpd(s){
  const u=s.update;if(!u)return;
@@ -344,10 +349,21 @@ $('#quit').onclick=async()=>{if(!confirm('Stop shareUp?'))return;await api('/adm
 
 /* ---------- tabs ---------- */
 function setTab(t){
- tab=t;$('#tc').hidden=t!=='connect';$('#tf').hidden=t!=='files';
+ const was=root();
+ tab=t;$('#tc').hidden=t!=='connect';$('#tf').hidden=!inFiles();
+ if(inFiles()){
+  const r=root()==='recv';
+  $('#ftitle').textContent=r?'Received from your phone':'Shared folder';
+  $('#fnoneh').textContent=r?'Choose where phone files are saved':'Choose a folder to share';
+  $('#fnonep').textContent=r?'Files you send from your phone land in this folder.':'Pick any folder. Whatever you put inside shows up on your phone.';
+  $('#fempty').textContent=r?'Nothing received yet. Files you send from your phone show up here.':'Nothing here yet. Drop files in to share them with your phone.';
+  $('#fchoose').textContent=r?'Choose save folder':'Choose folder';
+  $('#fwarn').hidden=!(!r&&S&&S.shareDir&&!S.shareOn);
+  if(root()!==was){cur='';lastDir=null}
+ }
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
  try{localStorage.setItem('tab',t)}catch(e){}
- if(t==='files'){lastL='';loadFiles()}
+ if(inFiles()){lastL='';loadFiles()}
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 $('#k1').textContent=/Mac/.test(navigator.platform)?'⌘':'Ctrl';
@@ -378,8 +394,8 @@ async function post(p,b){
 const vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.src=e.target.dataset.src;vio.unobserve(e.target)}}),{rootMargin:'250px'});
 
 async function loadFiles(){
- if(tab!=='files')return;
- let j;try{j=await (await fetch('/admin/files?path='+encodeURIComponent(cur))).json()}catch(e){return}
+ if(!inFiles())return;
+ let j;try{j=await (await fetch('/admin/files?path='+encodeURIComponent(cur)+'&root='+root())).json()}catch(e){return}
  const key=JSON.stringify(j);if(key===lastL)return;lastL=key;drawFiles(j);
 }
 function go(p){cur=p;lastL='';loadFiles()}
@@ -390,7 +406,7 @@ function drawFiles(j){
  $('#fnone').hidden=!!j.set;$('#fbody').hidden=!j.set;
  ['#fnew','#fopen'].forEach(x=>$(x).disabled=!j.set);
  if(!j.set)return;
- const root=document.createElement('button');root.textContent=baseName(j.dir)||'Shared folder';root.onclick=()=>go('');cr.append(root);
+ const rb=document.createElement('button');rb.textContent=baseName(j.dir)||(root()==='recv'?'Received':'Shared folder');rb.onclick=()=>go('');cr.append(rb);
  let acc='';
  j.path.split('/').filter(Boolean).forEach(p=>{
   acc=acc?acc+'/'+p:p;const a=acc;
@@ -402,7 +418,7 @@ function drawFiles(j){
  $('#fempty').hidden=n>0;
  j.items.forEach(it=>g.append(ftile(it)));
 }
-function openIt(full){post('/admin/open',{path:full})}
+function openIt(full){post('/admin/open',{path:full,root:root()})}
 function ftile(it){
  const full=(cur?cur+'/':'')+it.name,enc=ENC(full),ext=extOf(it.name);
  const el=document.createElement('div');el.className='ft';el.tabIndex=0;
@@ -411,10 +427,10 @@ function ftile(it){
  const fall=()=>{th.textContent='';th.append(badge(it.name))};
  if(it.dir)th.innerHTML=FOLDER;
  else if(IMG.includes(ext)){
-  const im=document.createElement('img');im.loading='lazy';im.decoding='async';im.src='/admin/pv/'+enc;im.onerror=fall;th.append(im);
+  const im=document.createElement('img');im.loading='lazy';im.decoding='async';im.src='/admin/pv/'+enc+'?root='+root();im.onerror=fall;th.append(im);
  }else if(VID.includes(ext)){
   const v=document.createElement('video');v.muted=true;v.preload='metadata';v.playsInline=true;
-  v.dataset.src='/admin/pv/'+enc+'#t=0.1';v.onerror=fall;th.append(v);vio.observe(v);
+  v.dataset.src='/admin/pv/'+enc+'?root='+root()+'#t=0.1';v.onerror=fall;th.append(v);vio.observe(v);
   const pl=document.createElement('span');pl.className='vi';th.append(pl);
  }else th.append(badge(it.name));
  const nm=document.createElement('div');nm.className='fn';nm.textContent=it.name;
@@ -430,10 +446,10 @@ function ftile(it){
 }
 async function del(full,it){
  if(!confirm('Delete "'+it.name+'" from this PC?'))return;
- if(await post('/admin/del',{path:full})){toast('Deleted');lastL='';loadFiles()}
+ if(await post('/admin/del',{path:full,root:root()})){toast('Deleted');lastL='';loadFiles()}
 }
 $('#fopen').onclick=()=>openIt(cur);
-$('#fchoose').onclick=()=>$('#bs').click();
+$('#fchoose').onclick=()=>$(root()==='recv'?'#br':'#bs').click();
 $('#fon').onclick=async()=>{render(await api('/admin/set',{shareOn:true}));toast('Sharing on')};
 $('#fin').onchange=e=>{const fs=[...e.target.files];e.target.value='';enqueue(fs.map(f=>({f,sub:''})))};
 
@@ -443,7 +459,7 @@ $('#fnew').onclick=()=>nfShow($('#nf').hidden);
 $('#nfx').onclick=()=>nfShow(false);
 async function mk(){
  const name=$('#nfi').value.trim();if(!name)return;
- if(await post('/admin/mkdir',{path:cur,name})){nfShow(false);lastL='';loadFiles();toast('Folder created')}
+ if(await post('/admin/mkdir',{path:cur,name,root:root()})){nfShow(false);lastL='';loadFiles();toast('Folder created')}
 }
 $('#nfok').onclick=mk;
 $('#nfi').onkeydown=e=>{if(e.key==='Enter')mk();else if(e.key==='Escape')nfShow(false)};
@@ -452,8 +468,8 @@ $('#nfi').onkeydown=e=>{if(e.key==='Enter')mk();else if(e.key==='Escape')nfShow(
 let Q=[],act=0,tot=0,doneB=0,nAll=0,nOk=0,nBad=0,seq=0,live={},curName='';
 function enqueue(list){
  if(!list.length)return;
- if(!S||!S.shareDir){toast('Choose a shared folder first',2600);return}
- list.forEach(x=>{x.id=++seq;x.dir=cur;Q.push(x);tot+=x.f.size;nAll++});
+ if(!rootDirOf(S)){toast('Choose a folder first',2600);return}
+ list.forEach(x=>{x.id=++seq;x.dir=cur;x.root=root();Q.push(x);tot+=x.f.size;nAll++});
  pump();
 }
 function pump(){
@@ -463,7 +479,7 @@ function pump(){
 function send(x){return new Promise(res=>{
  const sub=[x.dir,x.sub].filter(Boolean).join('/');
  const xr=new XMLHttpRequest();
- xr.open('POST','/admin/put?path='+encodeURIComponent(sub)+'&name='+encodeURIComponent(x.f.name));
+ xr.open('POST','/admin/put?root='+x.root+'&path='+encodeURIComponent(sub)+'&name='+encodeURIComponent(x.f.name));
  curName=x.f.name;
  xr.upload.onprogress=e=>{live[x.id]=e.loaded;paint()};
  const end=ok=>{delete live[x.id];doneB+=x.f.size;ok?nOk++:nBad++;res()};
@@ -491,9 +507,9 @@ const hasFiles=e=>[...((e.dataTransfer&&e.dataTransfer.types)||[])].includes('Fi
 function over(on){
  const d=$('#dover');
  if(on){
-  const ok=S&&S.shareDir;
-  $('#dtitle').textContent=ok?'Drop to add to shared folder':'Choose a shared folder first';
-  $('#dname').textContent=ok?baseName(S.shareDir)+(cur&&tab==='files'?' / '+cur.split('/').join(' / '):''):'';
+  const dir=rootDirOf(S),ok=!!dir;
+  $('#dtitle').textContent=ok?(root()==='recv'?'Drop to add to received files':'Drop to add to shared folder'):'Choose a folder first';
+  $('#dname').textContent=ok?baseName(dir)+(cur&&inFiles()?' / '+cur.split('/').join(' / '):''):'';
  }
  d.classList.toggle('on',on);
 }
@@ -506,7 +522,7 @@ document.addEventListener('drop',e=>{
  const dt=e.dataTransfer;
  const ents=[...(dt.items||[])].filter(i=>i.kind==='file').map(i=>i.webkitGetAsEntry&&i.webkitGetAsEntry()).filter(Boolean);
  const files=[...(dt.files||[])];
- if(tab!=='files')setTab('files');
+ if(!inFiles())setTab('files');
  if(!ents.length){enqueue(files.map(f=>({f,sub:''})));return}
  (async()=>{const out=[];for(const en of ents)await walk(en,'',out);enqueue(out)})();
 });
@@ -536,12 +552,12 @@ document.addEventListener('paste',e=>{
   }
   return{f,sub:''};
  });
- if(tab!=='files')setTab('files');
+ if(!inFiles())setTab('files');
  enqueue(list);
 });
 
 (async()=>{render(await api('/admin/state'));
  setInterval(async()=>{if(document.hidden)return;try{render(await (await fetch('/admin/state',{method:'POST'})).json())}catch(e){}},2000)
- try{if(localStorage.getItem('tab')==='files')setTab('files');else setTab('connect')}catch(e){setTab('connect')}
+ try{const t0=localStorage.getItem('tab');setTab(t0==='files'||t0==='recv'?t0:'connect')}catch(e){setTab('connect')}
 })();
 </script></body></html>
