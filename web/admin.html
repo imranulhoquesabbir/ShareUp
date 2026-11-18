@@ -204,6 +204,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 .dz svg{color:var(--g1)}
 .fhead h2{font-size:16px}
 .fcount{font-weight:600}
+.advd{margin:14px 0}.advd>summary{cursor:pointer;list-style:none;padding:14px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);font-weight:650;color:var(--mute)}.advd>summary::-webkit-details-marker{display:none}.advd[open]>summary{margin-bottom:14px;color:var(--text)}
 </style></head><body data-tab="connect">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><path d="M12 10v6M9 13h6"/></symbol><symbol id="i-folderopen" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.3 10H20a2 2 0 0 1 1.9 2.6l-1.6 6A2 2 0 0 1 18.4 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol><symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 13v8M8 17l4 4 4-4M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol><symbol id="i-tray" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol></defs></svg>
 <div class="wrap">
@@ -304,6 +305,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 <div id="ts" hidden>
  <div class="panel"><div class="item"><div class="ico" style="--t1:#06b6d4;--t2:#3b82f6"><svg class="ic"><use href="#i-globe"/></svg></div><div class="itx"><b data-i="langT"></b><small data-i="langS"></small></div><div class="langs" role="group"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div><div class="item"><div class="ico" style="--t1:#f59e0b;--t2:#f97316"><svg class="ic"><use href="#i-login"/></svg></div><div class="itx"><b data-i="startT"></b><small data-i="startS"></small></div><label class="switch"><input type="checkbox" id="auto" data-al="startT"><span class="slider"></span></label></div><div class="item"><div class="ico" style="--t1:#10b981;--t2:#22c55e"><svg class="ic"><use href="#i-cloud"/></svg></div><div class="itx"><b data-i="updT"></b><small id="updsub"></small></div><label class="switch"><input type="checkbox" id="aupd" data-al="updT"><span class="slider"></span></label></div></div>
 
+ <details class="advd"><summary data-i="advT"></summary>
  <div class="panel" id="secp">
   <div class="item"><div class="ico" style="--t1:#ef4444;--t2:#f97316"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="itx"><b data-i="secH"></b><small data-i="secS"></small></div></div>
   <div class="item"><div class="itx"><b data-i="apT"></b><small data-i="apS"></small></div><label class="switch"><input type="checkbox" id="apOn" data-al="apT"><span class="slider"></span></label></div>
@@ -336,6 +338,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
    <button class="g" id="sp"><svg class="ic"><use href="#i-check"/></svg><span data-i="apply"></span></button>
   </div>
  </div>
+ </details>
  <div class="panel">
   <div class="item"><div class="ico" style="--t1:#f43f5e;--t2:#e11d48"><svg class="ic"><use href="#i-power"/></svg></div><div class="itx"><b data-i="quitT"></b><small data-i="quitS"></small></div><button class="g dgr" id="quit"><svg class="ic"><use href="#i-power"/></svg><span data-i="quitB"></span></button></div>
  </div>
@@ -347,7 +350,8 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 
 <script>
 const I={
-scanPT:["Works on any network. The QR changes when shareUp restarts (add a Worker link in Settings to keep it fixed).","যেকোনো network-এ কাজ করবে। shareUp রিস্টার্ট হলে QR বদলাবে (fixed রাখতে Settings-এ Worker link দিন)।"],
+advT:["Advanced settings (not needed for normal use)","উন্নত সেটিং (সাধারণ ব্যবহারে লাগে না)"],
+scanPT:["Works on any network. The QR may change when shareUp restarts.","যেকোনো network-এ কাজ করবে।"],
 hintT:["Fixed QR is not on yet","Fixed QR এখনো চালু হয়নি"],hintD:["Add your Worker link once in Settings (see WORKER_SETUP.md) and one QR will work everywhere.","Settings-এ একবার Worker link দিন (WORKER_SETUP.md দেখুন), তারপর একটা QR সব জায়গায় কাজ করবে।"],
 scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
 scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
@@ -360,16 +364,16 @@ anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link re
 ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
 hsT:["Phone Hotspot","Phone Hotspot"],hsS:["The PC connects to it by itself when there is no network.","কোনো network না থাকলে PC নিজে এতে connect হবে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Hotspot password","Hotspot-এর password"],
 wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
-devH:["Connected devices","Connected devices"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
+devH:["Connected phones","কানেক্টেড ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
 secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
 apT:["Approval","Approval"],apS:["Ask on this PC before a new device connects.","নতুন device connect হওয়ার আগে এই PC-তে জিজ্ঞেস করবে।"],
 pwT:["Password","Password"],pwS:["Phones must enter the password to connect.","Connect করতে phone-এ password দিতে হবে।"],
 pwPh:["New password (min 4)","নতুন password (কমপক্ষে ৪)"],pwSave:["Save password","Password সেভ"],pwSaved:["Password saved","Password সেভ হয়েছে"],pwFirst:["Save a password first","আগে একটা password সেভ করুন"],
 indT:["Allow both on / both off","দুটো একসাথে on বা off রাখুন"],indS:["Normally turning one on switches the other off. Turn this on to control both yourself.","সাধারণত একটা on করলে অন্যটা নিজে off হয়। নিজে দুটো ঠিক করতে এটা on করুন।"],
 warnOpen:["Warning: with Approval and Password both off, anyone who scans the QR can connect.","সাবধান: Approval ও Password দুটোই off থাকলে QR স্ক্যান করা যে কেউ connect করতে পারবে।"],
-trH:["Trusted devices","Trusted devices"],trNone:["No trusted devices","কোনো trusted device নেই"],
-reqH:["Allow this device?","এই device-কে Allow করবেন?"],allowOnce:["Allow once","একবার Allow"],allowTrust:["Allow & Trust","Allow ও Trust"],deny:["Deny","Deny"],reqLeft:["Auto-deny in {0}s","{0} সেকেন্ডে নিজে Deny হবে"],
-kick:["Disconnect","Disconnect"],trust:["Trust","Trust"],untrust:["Remove","সরান"],viaNet:["Internet","Internet"],viaLan:["Wi-Fi","WiFi"],online:["Online","Online"],lastSeen:["Last seen {0}","শেষ দেখা {0}"],
+trH:["Always-allowed phones","সবসময় অনুমতি পাওয়া ফোন"],trNone:["None","কেউ নেই"],
+reqH:["Let this phone in?","এই ফোনকে ঢুকতে দেবেন?"],allowOnce:["Just this time","এইবারের জন্য"],allowTrust:["Always allow","সবসময়ের জন্য"],deny:["Don’t allow","না"],reqLeft:["Auto-deny in {0}s","{0} সেকেন্ডে নিজে “না” হয়ে যাবে"],
+kick:["Disconnect","Disconnect"],trust:["Always allow","সবসময় অনুমতি"],untrust:["Remove","সরান"],viaNet:["Internet","Internet"],viaLan:["Wi-Fi","WiFi"],online:["Online","Online"],lastSeen:["Last seen {0}","শেষ দেখা {0}"],
 tag:["Send files between phone and PC","ফোন ও পিসির মধ্যে ফাইল আদান-প্রদান"],
 running:["Running","চালু আছে"],nonet:["No network","নেটওয়ার্ক নেই"],
 tConnect:["Connect Phone","ফোন কানেক্ট"],tRecv:["From Phone","ফোন থেকে পাওয়া"],tShare:["Shared from PC","পিসি থেকে শেয়ার"],tSet:["Settings","সেটিংস"],
@@ -489,7 +493,7 @@ function render(s){
  [['h2',hk],['p',pk]].forEach(([el,k])=>{const e=$('#lan '+el);e.dataset.i=k;e.textContent=t(k)});
  $('#renew2').hidden=!(kind==='T'&&q===r.link);
  const ml=$('#mdnsl');ml.hidden=!(sm.online===false);ml.textContent=sm.mdns?('+ '+sm.mdns):'';
- drawGuide(sm.guide);smRender(s);$('#hcard').hidden=!(sm.online&&!fx);
+ drawGuide(sm.guide);smRender(s);$('#hcard').hidden=true;
  const busy=r.status==='downloading'||r.status==='starting';
  $('#rt').checked=busy||r.status==='on';
  const d=$('#rdesc');d.className='';
