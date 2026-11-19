@@ -149,6 +149,33 @@ h2{margin:0;font-size:17px;font-weight:700}
 .g:disabled{opacity:.5}
 .dgr{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
 .dgr:hover{border-color:var(--bad)}
+.cb{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:9px 16px;font-weight:700;white-space:nowrap;border:2px solid transparent;color:#fff;cursor:pointer}
+.cb:hover{filter:brightness(1.1)}.cb:active{transform:scale(.98)}.cb:disabled{opacity:.55}
+.cb-ok{background:#16a34a;border-color:#15803d}                         /* green  = allow / yes / go */
+.cb-blue{background:#2563eb;border-color:#1d4ed8}                       /* blue   = normal action   */
+.cb-red{background:#dc2626;border-color:#b91c1c}                        /* red    = delete / deny / stop */
+.cb-amb{background:transparent;color:#d97706;border-color:#f59e0b}      /* amber  = later / not now */
+.cb-gry{background:var(--field);color:var(--text);border-color:var(--line)}/* grey   = cancel */
+.mbox{border-top-width:6px;border-top-color:var(--ac,#3b82f6)}
+.mbox .mic{background:var(--ac,#3b82f6)}
+#mreq .mbox{--ac:#2563eb}
+#gm .mbox{--ac:#0891b2}
+#cdlg .mbox{--ac:#2563eb}
+#cdlg .mbox.danger{--ac:#dc2626}#cdlg .mbox.warn{--ac:#f59e0b}
+#mreq .mcode{display:inline-block;margin:6px 0 2px;padding:5px 12px;border-radius:10px;background:color-mix(in srgb,#f59e0b 18%,transparent);color:#f59e0b;font-weight:700}
+#mreq .mcode b{font-size:18px;letter-spacing:.12em}
+#mreq .mbar i{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+#mreq .mbtn #mrD{margin-top:10px}
+#gm .hl li::marker{color:#0891b2;font-weight:700}
+.mbtn.row{flex-direction:row}.mbtn.row .cb{flex:1}
+#cdlg{z-index:95}
+#cdlg h2{font-size:17px;font-weight:650;line-height:1.35;margin:0 0 14px;word-break:break-word}
+#cdlg input[type=text]{width:100%;box-sizing:border-box;background:var(--field);color:var(--text);border:2px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:15px;margin-bottom:14px}
+#cdlg input[type=text]:focus{outline:0;border-color:#2563eb}
+.upd .cb{padding:8px 14px}
+.dev button[data-a=rename]{color:#3b82f6;border-color:#3b82f6}
+.dev button[data-a=trust]{background:#16a34a;color:#fff;border-color:#15803d}
+.dev button[data-a=kick],.dev button[data-a=untrust]{background:#dc2626;color:#fff;border-color:#b91c1c}
 input[type=text],input[type=number],select{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:14px;min-width:0}
 .switch{position:relative;width:50px;height:29px;flex:none}
 .switch input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
@@ -289,7 +316,7 @@ body{animation:pgIn .35s ease both}
  </div>
 </header>
 <nav class="nav"><button data-t="connect" style="--t1:#3b82f6;--t2:#8b5cf6"><span class="chip"><svg class="ic"><use href="#i-phone"/></svg></span><span data-i="tConnect"></span></button><button data-t="recv" style="--t1:#10b981;--t2:#06b6d4"><span class="chip"><svg class="ic"><use href="#i-down"/></svg></span><span data-i="tRecv"></span></button><button data-t="files" style="--t1:#f97316;--t2:#ec4899"><span class="chip"><svg class="ic"><use href="#i-up"/></svg></span><span data-i="tShare"></span></button><button data-t="settings" style="--t1:#a855f7;--t2:#6366f1"><span class="chip"><svg class="ic"><use href="#i-sliders"/></svg></span><span data-i="tSet"></span></button></nav>
-<div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button><button class="g" id="updlater"><span data-i="updLater"></span></button></div>
+<div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="cb cb-ok" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button><button class="cb cb-amb" id="updlater"><span data-i="updLater"></span></button></div>
 
 <div id="tc">
  <div class="panel guide" id="gcard" hidden></div>
@@ -418,8 +445,9 @@ body{animation:pgIn .35s ease both}
 </div>
 </div>
 <div class="dover" id="dover"><div><svg class="ic"><use href="#i-tray"/></svg><b id="dtitle"></b><span id="dname"></span></div></div>
-<div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><div class="mcode"><span data-i="codeL"></span> <b id="mrC"></b></div><small id="mrI"></small><small data-i="reqCode"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="b" id="mrA"><span data-i="allowOnce"></span></button><button class="b" id="mrT"><span data-i="allowTrust"></span></button><button class="g dgr" id="mrD"><span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
+<div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><div class="mcode"><span data-i="codeL"></span> <b id="mrC"></b></div><small id="mrI"></small><small data-i="reqCode"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="cb cb-ok" id="mrA">✓ <span data-i="allowOnce"></span></button><button class="cb cb-blue" id="mrT">★ <span data-i="allowTrust"></span></button><button class="cb cb-red" id="mrD">✕ <span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
 <div class="mback" id="gm" hidden><div class="mbox" id="gmb"></div></div>
+<div class="mback" id="cdlg" hidden><div class="mbox" role="dialog" aria-modal="true"><div class="mic" id="cdI">?</div><h2 id="cdT"></h2><input type="text" id="cdIn" hidden autocomplete="off"><div class="mbtn row"><button class="cb cb-gry" id="cdC"></button><button class="cb cb-red" id="cdO"></button></div></div></div>
 <div class="rst" id="rst"><div class="spin"></div><h2 data-i="updRestart"></h2><p data-i="updRestartD"></p></div>
 <div class="toast" id="toast"></div>
 
@@ -509,7 +537,7 @@ noneRH:["Choose where phone files are saved","ফোনের File কোথা�
 noneSH:["Choose a folder to share","Share করার Folder বেছে নিন"],noneSP:["Pick any folder. Whatever you put inside shows up on your phone.","যেকোনো Folder বাছুন। ভেতরের File ফোনে দেখা যাবে।"],chooseF:["Choose folder","Folder বাছুন"],
 dzH:["Drag files or folders here","File বা Folder এখানে টেনে এনে ছাড়ুন"],
 dz1:["or press","অথবা Copy করা File ও screenshot Paste করতে"],dz2:["to paste copied files and screenshots","চাপুন"],
-folderName:["Folder name","Folder-এর নাম"],create:["Create","তৈরি করুন"],cancel:["Cancel","Cancel"],
+folderName:["Folder name","Folder-এর নাম"],create:["Create","তৈরি করুন"],cancel:["Cancel","Cancel"],okB:["OK","ঠিক আছে"],
 emptyR:["Nothing received yet. Files you send from your phone show up here.","এখনো কিছু আসেনি। ফোন থেকে File পাঠালে এখানে দেখা যাবে।"],
 emptyS:["Nothing here yet. Drop files in to share them with your phone.","এখনো কিছু নেই। ফোনে দেখাতে চাইলে এখানে File ছেড়ে দিন।"],
 rootR:["Received","পাওয়া File"],rootS:["Shared folder","Share Folder"],
@@ -563,6 +591,26 @@ let mode='lan',curQ='',lastQ='',S=null,tab='connect',cur='',lastL='',lastDir=nul
 const inFiles=()=>tab==='files'||tab==='recv';
 const root=()=>tab==='recv'?'recv':'share';                       // which folder the file manager shows
 const rootDirOf=s=>s?(root()==='recv'?s.recvDir:s.shareDir):'';
+/* coloured confirm / prompt dialog (replaces the grey browser confirm()/prompt()) */
+function ask(msg,o){o=o||{};const kind=o.kind||'info';
+ return new Promise(res=>{
+  const m=$('#cdlg'),box=m.firstElementChild,inp=$('#cdIn'),ok=$('#cdO'),no=$('#cdC');
+  box.className='mbox '+kind;
+  $('#cdI').textContent=kind==='danger'?'🗑':kind==='warn'?'⚠':o.input!=null?'✎':'?';
+  $('#cdT').textContent=msg;
+  inp.hidden=o.input==null;if(o.input!=null)inp.value=o.input;
+  ok.className='cb '+(kind==='danger'?'cb-red':kind==='warn'?'cb-amb':'cb-blue');
+  ok.textContent=o.ok||t('okB');no.textContent=t('cancel');
+  const done=v=>{m.hidden=true;document.removeEventListener('keydown',key,true);res(v)};
+  const val=()=>o.input!=null?inp.value:true;
+  const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done(o.input!=null?null:false)}
+   else if(e.key==='Enter'){e.preventDefault();e.stopPropagation();done(val())}};
+  ok.onclick=()=>done(val());no.onclick=()=>done(o.input!=null?null:false);
+  m.onclick=e=>{if(e.target===m)no.onclick()};
+  document.addEventListener('keydown',key,true);
+  m.hidden=false;(o.input!=null?inp:no).focus();if(o.input!=null)inp.select();
+ });
+}
 let toastT=0;
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1600)}
 async function api(p,b){
@@ -681,7 +729,7 @@ $('#on').onchange=async()=>{render(await api('/admin/set',{shareOn:$('#on').chec
 $('#auto').onchange=async()=>{const s=await api('/admin/set',{autostart:$('#auto').checked});render(s||await api('/admin/state'));if(s)toast(t(s.autostart?'startOn':'startOff'))};
 $('#br').onclick=async()=>{const j=await api('/admin/browse');if(j&&j.path)render(await api('/admin/set',{recvDir:j.path}))};
 $('#bs').onclick=async()=>{const j=await api('/admin/browse');if(j&&j.path)render(await api('/admin/set',{shareDir:j.path}))};
-$('#quit').onclick=async()=>{if(!confirm(t('quitC')))return;await api('/admin/quit');document.body.innerHTML='<p style="text-align:center;margin-top:120px;font-family:system-ui;color:#999">'+t('quitD')+'</p>'};
+$('#quit').onclick=async()=>{if(!await ask(t('quitC'),{kind:'warn',ok:t('quitT')}))return;await api('/admin/quit');document.body.innerHTML='<p style="text-align:center;margin-top:120px;font-family:system-ui;color:#999">'+t('quitD')+'</p>'};
 
 /* ---------- tabs ---------- */
 function setTab(tb){
@@ -812,14 +860,14 @@ function ftile(it){
 async function delMany(paths){
  if(!paths.length)return;
  if(paths.length===1){const it=ITEMS.get(paths[0]);if(it)return del(paths[0],it)}
- if(!confirm(t('delN',paths.length)))return;
+ if(!await ask(t('delN',paths.length),{kind:'danger',ok:t('del')}))return;
  let ok=0;
  for(const p of paths){const it=ITEMS.get(p);if(await post('/admin/del',{path:p,root:root(),recursive:!!(it&&it.dir)}))ok++}
  SEL.clear();anchor=null;toast(t('deletedN',ok));lastL='';loadFiles();
 }
 async function del(full,it){
  const msg=it.dir?t('delDir',it.name):t('delOne',it.name);
- if(!confirm(msg))return;
+ if(!await ask(msg,{kind:'danger',ok:t('del')}))return;
  if(await post('/admin/del',{path:full,root:root(),recursive:!!it.dir})){toast(t('deleted'));lastL='';loadFiles()}
 }
 
@@ -1073,7 +1121,7 @@ const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/60));return m<1?'now':m<60?m+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' d'};
 async function devAct(op,id,trust,name){const j=await api('/admin/dev',{op,id,trust:!!trust,name:name||''});if(j){DV=j;drawDev()}}
 const dcode=id=>String(id).slice(0,4).toUpperCase();
-async function devRename(id,cur){const n=prompt(t('renameQ'),cur);if(n===null)return;devAct('rename',id,false,n.trim())}
+async function devRename(id,cur){const n=await ask(t('renameQ'),{input:cur,ok:t('rename')});if(n===null)return;devAct('rename',id,false,n.trim())}
 function drawDev(){
  if(!DV)return;
  const sl=$('#devl');sl.innerHTML='';
@@ -1149,7 +1197,7 @@ function drawGuide(g){
     s='<div class="mic">📶</div><h2>'+t('hs1T')+'</h2>'
      +'<ol class="hl"><li>'+t('hsSt1')+'</li><li>'+t('hsSt2')+'</li><li>'+t('hsSt3')+'</li></ol>'
      +'<div class="foundw"></div>'
-     +'<div class="mbtn"><button class="b" data-w="panel"><svg class="ic"><use href="#i-wifi"/></svg>'+t('hsPanel')+'</button><button class="g" data-w="later">'+t('hsLater')+'</button></div>'
+     +'<div class="mbtn"><button class="cb cb-blue" data-w="panel"><svg class="ic"><use href="#i-wifi"/></svg>'+t('hsPanel')+'</button><button class="cb cb-amb" data-w="later">'+t('hsLater')+'</button></div>'
      +'<div class="why"><b>'+t('hsWhyT')+'</b>'+t('hsWhy')+'</div>';
    }
    swapBox(gb,s);
@@ -1191,7 +1239,7 @@ function smRender(s){
 $('#wkSave').onclick=async()=>{const j=await api('/admin/set',{workerUrl:$('#wkUrl').value.trim()});if(j){toast(t('smSaved'));render(j)}};
 $('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.checked});if(j)render(j)};
 $('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
-$('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
+$('#wkReset').onclick=async()=>{if(!await ask(t('wkResetQ'),{kind:'warn',ok:t('wkReset')}))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
 
 let pullT=0,pulling=false,again=false;
 async function doPull(){

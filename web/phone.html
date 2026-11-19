@@ -150,6 +150,17 @@ header{justify-content:space-between;flex-wrap:wrap}
 #gate h2{margin:0;font-size:22px}#gate p{margin:0;color:var(--mute);font-size:15px;line-height:1.5}
 #gate input{width:100%;box-sizing:border-box;font:inherit;font-size:17px;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);text-align:center}
 #gate .gb{width:100%;border:0;border-radius:14px;padding:13px;font:inherit;font-size:16px;font-weight:650;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2))}
+#gate #gok{background:#16a34a}
+#gate #gre{background:#2563eb}
+/* coloured confirm dialog */
+#cf{position:fixed;inset:0;z-index:120;background:rgba(5,8,20,.72);display:flex;align-items:center;justify-content:center;padding:20px}
+#cf[hidden]{display:none}
+#cf .bx{width:100%;max-width:340px;background:var(--card);border:1px solid var(--line);border-top:6px solid #dc2626;border-radius:20px;padding:22px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#cf p{margin:0 0 16px;font-size:16px;line-height:1.45}
+#cf .rw{display:flex;gap:10px}
+#cf button{flex:1;border:2px solid transparent;border-radius:12px;padding:12px;font:inherit;font-weight:700;color:#fff}
+#cf .no{background:var(--card2);color:var(--text);border-color:var(--line)}
+#cf .yes{background:#dc2626;border-color:#b91c1c}
 .gbar{width:100%;height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
 .gbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width 1.5s linear}
 .gerr{color:var(--bad)!important;font-weight:600}
@@ -176,7 +187,7 @@ header{justify-content:space-between;flex-wrap:wrap}
 .hh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 4px 2px;color:var(--mute);font-size:13px;font-weight:650}
 .hh button{border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:6px 4px;text-decoration:underline}
 .drow.hr{cursor:default}.drow .ok{flex:none;color:var(--ok);font-weight:800;font-size:20px;width:40px;text-align:center}
-</style></head><body><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
+</style></head><body><div id="cf" hidden><div class="bx"><p id="cft"></p><div class="rw"><button class="no" id="cfn"></button><button class="yes" id="cfy"></button></div></div></div><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
 <header>
  <div class="hb"><div class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
  <div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div>
@@ -668,7 +679,7 @@ function drawSendHist(all){
  const h=document.createElement('div');h.className='hh';
  const l=document.createElement('span');l.textContent=tr('sentH')+' · '+list.length;
  const c=document.createElement('button');c.textContent=tr('clearH');
- c.onclick=()=>{if(confirm(tr('clearQ'))){histSet([]);drawSend()}};
+ c.onclick=async()=>{if(await ask(tr('clearQ'),tr('clearH'))){histSet([]);drawSend()}};
  h.append(l,c);box.append(h);
  if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent=tr('sentNone');box.append(e);return}
  list.forEach(x=>{
@@ -681,6 +692,8 @@ function drawSendHist(all){
   row.append(badge(x.n),dx,ok);box.append(row);
  });
 }
+function ask(msg,okLabel){return new Promise(res=>{const m=$('#cf');$('#cft').textContent=msg;$('#cfy').textContent=okLabel;$('#cfn').textContent=tr('cancel');
+ const done=v=>{m.hidden=true;res(v)};$('#cfy').onclick=()=>done(true);$('#cfn').onclick=()=>done(false);m.onclick=e=>{if(e.target===m)done(false)};m.hidden=false;$('#cfn').focus()})}
 $('#spick').onclick=pickDocs;
 
 /* ================= files from PC ================= */
