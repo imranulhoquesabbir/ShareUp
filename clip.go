@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Imranul Hoque Sabbir. All rights reserved.
+
 package main
 
 // Clipboard and drag-out routes for the desktop file manager.

@@ -1,5 +1,7 @@
 //go:build windows
 
+// Copyright (c) 2026 Imranul Hoque Sabbir. All rights reserved.
+
 package main
 
 // Real Windows clipboard support for the file manager.

@@ -1,5 +1,7 @@
 //go:build !windows
 
+// Copyright (c) 2026 Imranul Hoque Sabbir. All rights reserved.
+
 package main
 
 import "errors"
