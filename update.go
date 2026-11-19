@@ -66,7 +66,32 @@ func updateSnapshot() updateState {
 	return s
 }
 
-func assetWanted() string {
+// assetWanted lists the release files that can update THIS system, best first.
+//
+// Every release holds:
+//   - shareUp.zip: everything in one zip (Windows, Linux, macOS). The website serves this.
+//   - update-<system>.bin: one single build per system, used only by the auto-updater. The ".bin"
+//     ending keeps these out of the way of the website, which prefers .exe/.apk/.zip files.
+//   - the plain shareUp.exe / shareUp-linux / ... names, only so builds made before this change
+//     (and releases that still carry them) keep updating.
+//
+// The updater picks the file for the system it runs on, so Windows gets the exe, Linux its own
+// binary, and a Mac the build for its chip. The zip is the last resort.
+func assetWanted() []string {
+	switch runtime.GOOS {
+	case "windows":
+		return []string{"update-windows.bin", "shareUp.exe"}
+	case "darwin":
+		if runtime.GOARCH == "arm64" {
+			return []string{"update-mac-arm64.bin", "shareUp-mac-arm64"}
+		}
+		return []string{"update-mac-intel.bin", "shareUp-mac-intel"}
+	}
+	return []string{"update-linux.bin", "shareUp-linux"}
+}
+
+// zipEntry is the name of this system's build inside shareUp.zip.
+func zipEntry() string {
 	switch runtime.GOOS {
 	case "windows":
 		return "shareUp.exe"
@@ -135,13 +160,19 @@ func checkUpdate() {
 		return
 	}
 	asset, isZip := "", false
+	byName := map[string]string{}
 	for _, a := range rel.Assets {
-		if a.Name == assetWanted() {
-			asset, isZip = a.URL, false // best: only the build for this system (small, quick download)
+		byName[a.Name] = a.URL
+	}
+	for _, n := range assetWanted() { // best: only the build for this system (small, quick download)
+		if u, ok := byName[n]; ok {
+			asset = u
 			break
 		}
-		if a.Name == "shareUp.zip" {
-			asset, isZip = a.URL, true // fallback: one zip with every build (4x bigger)
+	}
+	if asset == "" { // fallback: the zip with every build (several times bigger)
+		if u, ok := byName["shareUp.zip"]; ok {
+			asset, isZip = u, true
 		}
 	}
 	avail := rel.Tag != version && version != "dev"
@@ -245,7 +276,7 @@ func installUpdate() {
 		us.Phase = "unpack" // copying the build out of the zip can take a few seconds: say so
 		umu.Unlock()
 		notifyState()
-		err := extractFromZip(dl, assetWanted(), tmp)
+		err := extractFromZip(dl, zipEntry(), tmp)
 		os.Remove(dl)
 		if err != nil {
 			os.Remove(tmp)
