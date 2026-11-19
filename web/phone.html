@@ -163,6 +163,7 @@ header{justify-content:space-between;flex-wrap:wrap}
 .pair .mos,.dmos{width:84px;height:84px}
 .dmos{display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:14px;overflow:hidden;flex:none}
 .dmos i{display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px;color:#fff;letter-spacing:.02em}
+#ssc{padding:6px 12px calc(90px + env(safe-area-inset-bottom))}#ssc .big.docs{width:100%;box-sizing:border-box;margin-bottom:10px}.shint{color:var(--mute);font-size:13px;line-height:1.5;margin:0 4px 6px}
 .dsearch{display:block;width:calc(100% - 24px);margin:0 12px 8px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font:inherit;font-size:15px}
 .drow{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;text-decoration:none;color:var(--text)}
 .drow:active{background:var(--card2)}
@@ -184,7 +185,7 @@ header{justify-content:space-between;flex-wrap:wrap}
  <div class="two">
   <label class="big"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.7"/><path d="m21 16-5-5-8 8"/></svg><b data-i="openGal"></b><small data-i="pv"></small><input id="g" type="file" accept="image/*,video/*" multiple hidden></label>
   <label class="big alt"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><b data-i="browse"></b><small data-i="anyType"></small><input id="f" type="file" multiple hidden></label>
-   <button type="button" class="big docs" id="odo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="dt"><b data-i="docT"></b><small data-i="docTabs"></small></span></button><input id="d" type="file" accept=".pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.txt,.md,.json,application/pdf,text/plain" multiple hidden>
+   <button type="button" class="big docs" id="odo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="dt"><b data-i="sendDocT"></b><small data-i="docTabs"></small></span></button><input id="d" type="file" accept=".pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.txt,.md,.json,application/pdf,text/plain" multiple hidden>
  </div>
  <p class="hint" data-i="hint"></p>
  <div id="ups"></div>
@@ -231,11 +232,25 @@ header{justify-content:space-between;flex-wrap:wrap}
  <div class="gtop">
   <button class="ib" id="dback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
   <div class="ttl" data-i="docT"></div>
-  <button class="tx" id="dup" type="button" data-i="upDoc"></button>
+  <span style="width:44px"></span>
  </div>
  <div class="tabs" id="dtabs"></div>
  <input class="dsearch" id="dq" type="search" data-ph="docSearch" autocomplete="off">
  <div class="gscroll" id="dsc"></div>
+</div>
+
+<div class="ov" id="sdocs" hidden>
+ <div class="gtop">
+  <button class="ib" id="sback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+  <div class="ttl" data-i="sendDocT"></div>
+  <span style="width:44px"></span>
+ </div>
+ <div class="tabs" id="stabs"></div>
+ <div class="gscroll" id="ssc">
+  <button type="button" class="big docs" id="spick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="dt"><b id="spickt"></b></span></button>
+  <p class="shint" id="shint"></p>
+  <div id="sups"></div>
+ </div>
 </div>
 
 <div class="vw" id="vw" hidden>
@@ -267,7 +282,7 @@ hint:["Pick one or many, press OK, and they're sent to the PC right away. Large 
 recvH:["Get from PC","পিসি থেকে নিন"],recvS:["Files your PC is sharing","পিসি যে ফাইল শেয়ার করেছে"],refresh:["Refresh","রিফ্রেশ"],
 galT:["Gallery","গ্যালারি"],
 docT:["Documents","ডকুমেন্ট"],docN:["{0} files","{0}টি ফাইল"],docSearch:["Search documents","ডকুমেন্ট খুঁজুন"],docNone:["No documents in this tab","এই ট্যাবে কোনো ডকুমেন্ট নেই"],noDocs:["No documents in the shared folder yet","শেয়ার ফোল্ডারে এখনো কোনো ডকুমেন্ট নেই"],
-docTabs:["PDF, Word, Excel in tabs","PDF, Word, Excel আলাদা ট্যাবে"],upDoc:["Upload","আপলোড"],noShare:["Folder sharing is off on the PC. Turn it on to see documents here.","পিসিতে ফোল্ডার শেয়ারিং বন্ধ আছে। চালু করলে ডকুমেন্ট এখানে দেখা যাবে।"],
+docTabs:["PDF, Word, Excel in tabs","PDF, Word, Excel আলাদা ট্যাবে"],sendDocT:["Send documents","ডকুমেন্ট পাঠান"],pickAll:["Choose documents from phone","ফোন থেকে ডকুমেন্ট বেছে নিন"],pickK:["Choose {0} from phone","ফোন থেকে {0} বেছে নিন"],sendHint:["Your phone's file list opens showing only this type. Tick the files, press OK, and they go to the PC right away.","ফোনের ফাইল লিস্ট শুধু এই ধরনের ফাইল দেখাবে। ফাইল বেছে OK চাপলেই সঙ্গে সঙ্গে পিসিতে চলে যাবে।"],upDoc:["Upload","আপলোড"],noShare:["Folder sharing is off on the PC. Turn it on to see documents here.","পিসিতে ফোল্ডার শেয়ারিং বন্ধ আছে। চালু করলে ডকুমেন্ট এখানে দেখা যাবে।"],
 kpdf:["PDF","PDF"],kword:["Word","ওয়ার্ড"],ksheet:["Excel","এক্সেল"],kslide:["Slides","স্লাইড"],ktext:["Text","টেক্সট"],saveDoc:["Save","সেভ"],
 filesT:["Files","ফাইল"],
 send1:["Sending 1 file…","১টি ফাইল পাঠানো হচ্ছে…"],sendN:["Sending {0} files…","{0}টি ফাইল পাঠানো হচ্ছে…"],
@@ -294,7 +309,7 @@ let toastT=0;
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1800)}
 
 /* ================= send to PC (auto-upload as soon as you press OK) ================= */
-const ups=$('#ups');
+const ups=$('#ups');let UPT=null;
 async function sendPicked(el){
  const fs=[...el.files];
  if(!fs.length)return;
@@ -323,7 +338,7 @@ function localThumb(f,box){
 function up(f){return new Promise(async res=>{
  const row=document.createElement('div');row.className='up';
  row.innerHTML='<div class="tb"></div><div class="m"><div class="n"></div><progress max="100" value="0"></progress><small>0%</small></div>';
- row.querySelector('.n').textContent=f.name;localThumb(f,row.querySelector('.tb'));ups.prepend(row);
+ row.querySelector('.n').textContent=f.name;localThumb(f,row.querySelector('.tb'));(UPT||ups).prepend(row);
  const p=row.querySelector('progress'),s=row.querySelector('small');
  const id=rid(),name=encodeURIComponent(f.name);
  let off=0,fails=0,sent=false;
@@ -389,7 +404,7 @@ function push(n){history.pushState({n},'');stack.push(n)}
 function back(){history.back()}
 addEventListener('popstate',()=>{
  const n=stack.pop();
- if(n==='view')hideView();else if(n==='sel')endSel();else if(n==='gal')hideGal();else if(n==='docs')hideDocs();
+ if(n==='view')hideView();else if(n==='sel')endSel();else if(n==='gal')hideGal();else if(n==='docs')hideDocs();else if(n==='sdocs')hideSend();
 });
 
 /* ================= PC gallery ================= */
@@ -553,7 +568,7 @@ function paintDocs(on){
  if(!on||!DOCS.length){b.hidden=true;return}
  b.hidden=false;$('#dsum').textContent=tr('docN',DOCS.length);
 }
-$('#od').onclick=()=>openDocs();$('#odo').onclick=()=>openDocs();$('#dup').onclick=()=>$('#d').click();
+$('#od').onclick=()=>openDocs();$('#odo').onclick=()=>openSend();
 async function openDocs(){
  $('#docs').hidden=false;document.body.style.overflow='hidden';push('docs');
  DFLT='all';DQ='';$('#dq').value='';drawDocs();
@@ -593,6 +608,34 @@ function drawDocs(keepTabs){
   sc.append(row);
  });
 }
+
+/* ================= send documents from the phone (tabs by type) ================= */
+const DACC={
+ all:'.pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.txt,.md,.json,application/pdf,text/plain',
+ pdf:'.pdf,application/pdf',
+ word:'.doc,.docx,.odt,.rtf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text,application/rtf',
+ sheet:'.xls,.xlsx,.csv,.ods,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/vnd.oasis.opendocument.spreadsheet',
+ slide:'.ppt,.pptx,.odp,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.presentation',
+ text:'.txt,.md,.json,.xml,.log,text/plain,application/json'
+};
+let SK='all';
+function openSend(){
+ $('#sdocs').hidden=false;document.body.style.overflow='hidden';push('sdocs');
+ UPT=$('#sups');SK='all';drawSend();
+}
+function hideSend(){$('#sdocs').hidden=true;document.body.style.overflow='';UPT=null}
+$('#sback').onclick=back;
+function drawSend(){
+ const tabs=$('#stabs');tabs.textContent='';
+ ['all',...DKINDS].forEach(k=>{
+  const b=document.createElement('button');b.className=SK===k?'on':'';
+  b.textContent=tr(k==='all'?'all':'k'+k);
+  b.onclick=()=>{SK=k;drawSend()};tabs.append(b);
+ });
+ $('#spickt').textContent=SK==='all'?tr('pickAll'):tr('pickK',tr('k'+SK));
+ $('#shint').textContent=tr('sendHint');
+}
+$('#spick').onclick=()=>{const d=$('#d');d.setAttribute('accept',DACC[SK]||DACC.all);d.click()};
 
 /* ================= files from PC ================= */
 let cur='';
@@ -639,6 +682,7 @@ async function refreshAll(){
  const dn=await loadDocs();paintDocs(dn);
  if(!$('#gal').hidden)drawGal();
  if(!$('#docs').hidden)drawDocs();
+ if(!$('#sdocs').hidden)drawSend();
  load();
 }
 
