@@ -1,0 +1,103 @@
+{
+  "site": {
+    "title": "Software Hub",
+    "tagline": "Free, handy software made by me. Download the latest build in one click.",
+    "owner": "Imranul Hoque Sabbir",
+    "facebook": "https://www.facebook.com/imranul.hoque.sabbir1",
+    "hideForks": true,
+    "theme": "auto",
+    "palette": "forest",
+    "sort": "new",
+    "defPlat": "all",
+    "badgeDays": 14,
+    "showStats": true,
+    "email": "imranul.hoque.sabbir@gmail.com",
+    "avatar": "icons/me-mwccsy8l.jpg"
+  },
+  "apps": {
+    "IMageFixer": {
+      "name": "Image Fixer Old",
+      "icon": "🖼️",
+      "category": "Photo Tools",
+      "hide": true
+    },
+    "PrintMerged": {
+      "name": "Print Merged",
+      "icon": "🖨️",
+      "category": "Print Tools"
+    },
+    "QRPRINT": {
+      "hide": true
+    },
+    "QRPRINT2": {
+      "name": "QR Print",
+      "icon": "📇",
+      "category": "Print Tools",
+      "hide": true
+    },
+    "ShareUp": {
+      "name": "ShareUp",
+      "icon": "🚀",
+      "category": "Sharing",
+      "file": "ShareUp-full.zip"
+    },
+    "VideoStream": {
+      "hide": true
+    },
+    "buttonKeymapper": {
+      "name": "Button Keymapper",
+      "icon": "🎛️",
+      "category": "Android Apps",
+      "hide": true
+    },
+    "imageDetection-Data": {
+      "hide": true
+    },
+    "imageFixer3": {
+      "name": "Image Fixer",
+      "icon": "🖼️",
+      "category": "Photo Tools"
+    },
+    "imagefixer2": {
+      "hide": true
+    },
+    "keybar": {
+      "hide": true
+    },
+    "pcPrint": {
+      "name": "PC Print",
+      "icon": "🖨️",
+      "category": "Print Tools",
+      "hide": true
+    },
+    "pdfEditor": {
+      "hide": true
+    },
+    "pdfEditor2": {
+      "name": "PDF Editor",
+      "icon": "📄",
+      "category": "Documents",
+      "hide": true
+    },
+    "phone-print": {
+      "hide": true
+    },
+    "phonekeyboard": {
+      "hide": true
+    },
+    "shareHub": {
+      "name": "Share Hub",
+      "icon": "📡",
+      "category": "Sharing"
+    }
+  },
+  "feed": {
+    "enabled": true,
+    "accounts": [
+      {
+        "name": "imranul.hoque.site",
+        "url": "https://script.google.com/macros/s/AKfycbyVdYUH7x7zJY2lL04DIhnYSTvS8yWOqlQ91rskPnMLmN_hcCL-YCCmB0xKvW0X3aEJ2g/exec"
+      }
+    ]
+  }
+}
