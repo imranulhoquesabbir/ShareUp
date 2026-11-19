@@ -820,6 +820,9 @@ func main() {
 	mux.HandleFunc("/admin/del", local(adminDel))
 	mux.HandleFunc("/admin/open", local(adminOpen))
 	mux.HandleFunc("/admin/pv/", local(adminPreview))
+	mux.HandleFunc("/admin/raw/", local(adminRaw))
+	mux.HandleFunc("/admin/clipcopy", local(adminClipCopy))
+	mux.HandleFunc("/admin/clippaste", local(adminClipPaste))
 	mux.HandleFunc("/admin/show", local(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{"ok": true})
 		uiShow()
