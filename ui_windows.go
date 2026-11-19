@@ -1,5 +1,7 @@
 //go:build windows
 
+// Copyright (c) 2026 Imranul Hoque Sabbir. All rights reserved.
+
 package main
 
 import (
@@ -107,17 +109,26 @@ func windowSize() (int, int) {
 func openWindow() {
 	ww, wh := windowSize()
 	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", "webview")
-	w := webview2.NewWithOptions(webview2.WebViewOptions{
-		AutoFocus: true,
-		DataPath:  data,
-		WindowOptions: webview2.WindowOptions{
-			Title:  "shareUp",
-			Width:  uint(ww),
-			Height: uint(wh),
-			IconId: 2, // the icon embedded in the exe by the build
-			Center: true,
-		},
-	})
+	create := func() webview2.WebView {
+		return webview2.NewWithOptions(webview2.WebViewOptions{
+			AutoFocus: true,
+			DataPath:  data,
+			WindowOptions: webview2.WindowOptions{
+				Title:  "shareUp",
+				Width:  uint(ww),
+				Height: uint(wh),
+				IconId: 2, // the icon embedded in the exe by the build
+				Center: true,
+			},
+		})
+	}
+	w := create()
+	// Right after an update the old copy's WebView2 processes can still hold the data folder for a
+	// moment, so creating the view may fail: try again before giving up on the native window.
+	for i := 0; w == nil && i < 8; i++ {
+		time.Sleep(600 * time.Millisecond)
+		w = create()
+	}
 	if w == nil { // WebView2 runtime missing: fall back to the browser
 		openBrowser(adminURL())
 		return
@@ -128,6 +139,18 @@ func openWindow() {
 	winHwnd = uintptr(w.Window())
 	winMu.Unlock()
 	w.Navigate(adminURL())
+	// A blank white window (seen right after an update) means the page never loaded. The page asks for
+	// /admin/state as soon as it starts, so if that has not happened, load it again.
+	t0 := time.Now().UnixNano()
+	go func() {
+		for i := 0; i < 8; i++ {
+			time.Sleep(2 * time.Second)
+			if lastAdminHit.Load() > t0 || !windowOpen() {
+				return
+			}
+			w.Dispatch(func() { w.Navigate(adminURL()) })
+		}
+	}()
 	w.Run()
 	winMu.Lock()
 	winHwnd = 0

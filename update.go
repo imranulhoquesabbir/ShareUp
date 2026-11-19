@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Imranul Hoque Sabbir. All rights reserved.
+
 package main
 
 import (
@@ -134,10 +136,12 @@ func checkUpdate() {
 	}
 	asset, isZip := "", false
 	for _, a := range rel.Assets {
+		if a.Name == assetWanted() {
+			asset, isZip = a.URL, false // best: only the build for this system (small, quick download)
+			break
+		}
 		if a.Name == "shareUp.zip" {
-			asset, isZip = a.URL, true // preferred: one zip with every build
-		} else if a.Name == assetWanted() && !isZip {
-			asset = a.URL // older releases: a file per system
+			asset, isZip = a.URL, true // fallback: one zip with every build (4x bigger)
 		}
 	}
 	avail := rel.Tag != version && version != "dev"
@@ -276,7 +280,7 @@ func installUpdate() {
 	us.Phase = "restart"
 	umu.Unlock()
 	notifyState()
-	time.Sleep(900 * time.Millisecond) // the window shows "Restarting…" before it goes away
+	time.Sleep(400 * time.Millisecond) // the window shows "Restarting…" before it goes away
 	cmd := exec.Command(exe, args...)
 	hideWindow(cmd)
 	if err := cmd.Start(); err != nil {

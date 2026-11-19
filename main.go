@@ -192,7 +192,11 @@ func page(name string) http.HandlerFunc {
 	}
 }
 
+// lastAdminHit is when the admin page last asked for its state: proof that the window really loaded.
+var lastAdminHit atomic.Int64
+
 func adminState(w http.ResponseWriter, r *http.Request) {
+	lastAdminHit.Store(time.Now().UnixNano())
 	c := get()
 	ips := localIPs()
 	ip := pickIP(c, ips)
