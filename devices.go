@@ -31,6 +31,7 @@ const (
 type TrustedDev struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
+	Label    string `json:"label,omitempty"` // name the person gave on the PC (wins over Name)
 	Added    int64  `json:"added"`
 	LastSeen int64  `json:"lastSeen"`
 }
@@ -87,6 +88,25 @@ func clientIP(r *http.Request) string {
 	return h
 }
 
+var androidModelRe = regexp.MustCompile(`Android [0-9.]+; ([^;)]+)`)
+
+// androidModel finds the phone model in the User-Agent (e.g. "SM-A546E", "Redmi Note 11").
+// New Chrome versions hide it behind a plain "K"; then there is nothing to show.
+func androidModel(ua string) string {
+	m := androidModelRe.FindStringSubmatch(ua)
+	if m == nil {
+		return ""
+	}
+	v := strings.TrimSpace(m[1])
+	if i := strings.Index(v, " Build"); i > 0 {
+		v = v[:i]
+	}
+	if len(v) < 2 || strings.EqualFold(v, "wv") || strings.HasPrefix(strings.ToLower(v), "linux") {
+		return ""
+	}
+	return v
+}
+
 func devName(ua string) string {
 	os := "Device"
 	l := strings.ToLower(ua)
@@ -97,6 +117,9 @@ func devName(ua string) string {
 		os = "iPad"
 	case strings.Contains(l, "android"):
 		os = "Android"
+		if m := androidModel(ua); m != "" {
+			os = "Android " + m
+		}
 	case strings.Contains(l, "windows"):
 		os = "Windows PC"
 	case strings.Contains(l, "mac os"):
@@ -435,6 +458,16 @@ type devTrusted struct {
 	Online   bool   `json:"online"`
 }
 
+// shownName is the name the person gave a trusted device, else the guessed one.
+func shownName(c Config, id, def string) string {
+	for _, t := range c.Trusted {
+		if t.ID == id && t.Label != "" {
+			return t.Label
+		}
+	}
+	return def
+}
+
 func devicesSnapshot() map[string]any {
 	c := get()
 	now := time.Now()
@@ -447,7 +480,7 @@ func devicesSnapshot() map[string]any {
 			if left < 0 {
 				left = 0
 			}
-			pl = append(pl, devPending{id, p.Name, p.IP, p.Remote, left})
+			pl = append(pl, devPending{id, shownName(c, id, p.Name), p.IP, p.Remote, left})
 		}
 	}
 	sort.Slice(pl, func(i, j int) bool { return pl[i].ID < pl[j].ID })
@@ -455,12 +488,12 @@ func devicesSnapshot() map[string]any {
 	online := map[string]bool{}
 	for _, s := range sessions {
 		online[s.DevID] = true
-		sl = append(sl, devSession{s.DevID, s.Name, s.IP, s.Remote, s.Created.Unix(), isTrusted(c, s.DevID)})
+		sl = append(sl, devSession{s.DevID, shownName(c, s.DevID, s.Name), s.IP, s.Remote, s.Created.Unix(), isTrusted(c, s.DevID)})
 	}
 	sort.Slice(sl, func(i, j int) bool { return sl[i].Since < sl[j].Since })
 	tl := []devTrusted{}
 	for _, t := range c.Trusted {
-		tl = append(tl, devTrusted{t.ID, t.Name, t.Added, t.LastSeen, online[t.ID]})
+		tl = append(tl, devTrusted{t.ID, shownName(c, t.ID, t.Name), t.Added, t.LastSeen, online[t.ID]})
 	}
 	return map[string]any{"pending": pl, "sessions": sl, "trusted": tl}
 }
@@ -475,6 +508,7 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		Op    string `json:"op"`
 		ID    string `json:"id"`
 		Trust bool   `json:"trust"`
+		Name  string `json:"name"`
 	}
 	if json.NewDecoder(r.Body).Decode(&q) != nil || !idRe.MatchString(q.ID) {
 		http.Error(w, "bad request", 400)
@@ -504,6 +538,26 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		addTrusted(q.ID, name)
 	case "untrust":
 		removeTrusted(q.ID)
+	case "rename":
+		nm := strings.TrimSpace(q.Name)
+		if r := []rune(nm); len(r) > 30 {
+			nm = string(r[:30])
+		}
+		mu.Lock()
+		for i := range cfg.Trusted {
+			if cfg.Trusted[i].ID == q.ID {
+				cfg.Trusted[i].Label = nm
+			}
+		}
+		saveLocked()
+		mu.Unlock()
+		if nm != "" {
+			for _, s := range sessions { // a phone that is not trusted yet: the name lasts while it is connected
+				if s.DevID == q.ID {
+					s.Name = nm
+				}
+			}
+		}
 	default:
 		dmu.Unlock()
 		http.Error(w, "bad op", 400)

@@ -65,6 +65,8 @@ var (
 	hotJoin  time.Time       // when we last tried to join (zero = not joining)
 	hotBad   bool            // the last join did not work (wrong password)
 	hotOKAt  atomic.Int64    // unix nano: hotspot joined
+	hotEpi   bool            // this PC was without any network (a "no network" episode is running)
+	hotPanel bool            // the Wi-Fi list was already opened by itself in this episode
 
 	regMu   sync.Mutex
 	regOK   bool
@@ -292,9 +294,10 @@ func looksLikePhone(name string) bool {
 
 func hotReset() {
 	hotMu.Lock()
-	if hotSel != "" {
+	if hotSel != "" || hotEpi { // the PC got a network again: show the green "connected" note
 		hotOKAt.Store(time.Now().UnixNano())
 	}
+	hotEpi, hotPanel = false, false
 	hotSel, hotAll, hotNets, hotBase, hotBad = "", false, nil, nil, false
 	hotJoin = time.Time{}
 	hotState, hotErr = "", ""
@@ -312,6 +315,9 @@ func maybeHotspot(c Config, up bool) {
 	if sessionCount() > 0 || transferBusy() {
 		return
 	}
+	hotMu.Lock()
+	hotEpi = true
+	hotMu.Unlock()
 	if c.HotSSID != "" { // optional manual override (Advanced settings)
 		hotMu.Lock()
 		due := time.Since(hotLast) >= 20*time.Second
@@ -333,7 +339,7 @@ func maybeHotspot(c Config, up bool) {
 		}
 	}
 	if !hotJoin.IsZero() && time.Since(hotJoin) > 20*time.Second {
-		hotBad, hotJoin = true, time.Time{} // joined but still no network: password was wrong
+		hotSel, hotJoin, hotLast = "", time.Time{}, time.Now() // auto-join did not work: back to the guide
 	}
 	var phones, others []string
 	for _, v := range vis {
@@ -346,9 +352,16 @@ func maybeHotspot(c Config, up bool) {
 	sort.Strings(phones) // stable order, so the list does not jump around on screen
 	sort.Strings(others)
 	hotNets = append(phones, others...)
-	busy := hotSel != ""
+	busy := hotSel != "" || time.Since(hotLast) < 30*time.Second
 	nets := hotNets
+	openIt := len(phones) > 0 && !hotPanel // a phone hotspot just showed up: open the Wi-Fi list for the person
+	if openIt {
+		hotPanel = true
+	}
 	hotMu.Unlock()
+	if openIt {
+		go openWifiPanel()
+	}
 	if busy {
 		return
 	}
@@ -378,8 +391,10 @@ func adminWifi(w http.ResponseWriter, r *http.Request) {
 		hotMu.Lock()
 		hotAll = true
 		hotMu.Unlock()
-	case "rescan": // "Refresh" button: look for Wi-Fi again right now
+	case "rescan": // look for Wi-Fi again right now
 		go wifiScan()
+	case "panel": // "Open Wi-Fi list" button
+		go openWifiPanel()
 	case "back":
 		hotMu.Lock()
 		hotSel, hotBad, hotJoin = "", false, time.Time{}
@@ -440,6 +455,9 @@ type guideInfo struct {
 
 func guide(c Config) guideInfo {
 	now := time.Now().UnixNano()
+	if t := hotOKAt.Load(); t != 0 && now-t < int64(8*time.Second) {
+		return guideInfo{Kind: "joined"}
+	}
 	if onlineNow.Load() {
 		if t := backAt.Load(); t != 0 && now-t < int64(8*time.Second) {
 			return guideInfo{Kind: "back"}
@@ -453,23 +471,14 @@ func guide(c Config) guideInfo {
 		return guideInfo{}
 	}
 	if hasNetwork() {
-		if t := hotOKAt.Load(); t != 0 && now-t < int64(8*time.Second) {
-			return guideInfo{Kind: "joined"}
-		}
 		return guideInfo{} // same Wi-Fi / hotspot: the normal QR just works
 	}
 	g := guideInfo{Kind: "offline", Step: 1, HotSet: c.HotSSID != ""}
 	hotMu.Lock()
-	switch {
-	case hotSel != "" && !hotJoin.IsZero():
-		g.Step, g.Sel = 4, hotSel
-	case hotSel != "":
-		g.Step, g.Sel = 3, hotSel
-		if hotBad {
-			g.Err = "wrongpass"
-		}
-	case len(hotNets) > 0:
-		g.Step, g.Nets = 2, append([]string(nil), hotNets...)
+	if hotSel != "" && !hotJoin.IsZero() {
+		g.Step, g.Sel = 4, hotSel // joining a hotspot this PC already knows
+	} else if len(hotNets) > 0 {
+		g.Nets = append([]string(nil), hotNets...) // a phone hotspot is in range
 	}
 	hotMu.Unlock()
 	return g

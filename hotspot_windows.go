@@ -78,6 +78,18 @@ func hotspotConnect(ssid, pass string) error {
 	return fmt.Errorf("Wi-Fi: %s", last)
 }
 
+// openWifiPanel opens the Windows Wi-Fi list (the same flyout as the taskbar Wi-Fi icon),
+// so the person can pick their phone's Hotspot there. Older Windows falls back to Settings.
+func openWifiPanel() {
+	c := exec.Command("cmd", "/c", "start", "", "ms-availablenetworks:")
+	hideWindow(c)
+	if c.Run() != nil {
+		f := exec.Command("cmd", "/c", "start", "", "ms-settings:network-wifi")
+		hideWindow(f)
+		f.Run()
+	}
+}
+
 // wifiRescan asks the Wi-Fi adapter to look for networks again. "netsh wlan show networks"
 // only shows what Windows scanned a while ago, so without this a hotspot that was just
 // turned on can take a minute to appear.
