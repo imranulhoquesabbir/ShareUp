@@ -640,8 +640,8 @@ func media(w http.ResponseWriter, r *http.Request) {
 				return nil
 			}
 			ct := previewTypes[strings.ToLower(filepath.Ext(d.Name()))]
-			if ct == "" || ct == "image/svg+xml" {
-				return nil
+			if !(strings.HasPrefix(ct, "image/") || strings.HasPrefix(ct, "video/")) || ct == "image/svg+xml" {
+				return nil // the gallery shows photos and videos only (documents have their own list)
 			}
 			info, err := d.Info()
 			if err != nil {
@@ -719,6 +719,10 @@ var previewTypes = map[string]string{
 	".gif": "image/gif", ".webp": "image/webp", ".bmp": "image/bmp",
 	".svg": "image/svg+xml", ".avif": "image/avif",
 	".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime", ".m4v": "video/mp4",
+	// documents that the phone can open right in the browser
+	".pdf": "application/pdf",
+	".txt": "text/plain; charset=utf-8", ".md": "text/plain; charset=utf-8", ".log": "text/plain; charset=utf-8",
+	".json": "text/plain; charset=utf-8", ".xml": "text/plain; charset=utf-8", ".csv": "text/plain; charset=utf-8",
 }
 
 // preview: inline, only for image/video thumbnails.
@@ -777,6 +781,7 @@ func phoneRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/upload", gate(trackXfer(upload)))
 	mux.HandleFunc("/api/list", gate(list))
 	mux.HandleFunc("/api/media", gate(media))
+	mux.HandleFunc("/api/docs", gate(docs))
 	mux.HandleFunc("/dl/", gate(trackXfer(download)))
 	mux.HandleFunc("/pv/", gate(preview))
 }

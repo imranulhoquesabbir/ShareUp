@@ -150,8 +150,15 @@ func checkUpdate() {
 	}
 }
 
-// installUpdate downloads the new build, swaps it in, and restarts.
+// installUpdate downloads the new build, swaps it in, and restarts. It only runs when the
+// person asks for it.
 func installUpdate() {
+	if transferBusy() {
+		umu.Lock()
+		us.Status, us.Error = "error", "A file is being sent right now. Try again when it finishes."
+		umu.Unlock()
+		return
+	}
 	umu.Lock()
 	if us.Status == "installing" || !us.Available || uAsset == "" {
 		if uAsset == "" && us.Available {
@@ -319,8 +326,9 @@ func kickUpdate() {
 }
 
 // updateLoop checks at start, every 5 minutes, and whenever kickUpdate is called.
+// It only LOOKS for a new version. Nothing is downloaded, replaced or restarted until the
+// person presses "Update now" (window banner or tray menu), so the app never changes by itself.
 func updateLoop() {
-	go autoInstallLoop()
 	t := time.NewTicker(5 * time.Minute)
 	defer t.Stop()
 	for {
@@ -330,26 +338,6 @@ func updateLoop() {
 		select {
 		case <-t.C:
 		case <-updKick:
-		}
-	}
-}
-
-// autoInstallLoop installs a found update by itself (app restarts in a second, window
-// reopens if it was open). It waits while a file is being sent, and retries a failed
-// install only every 10 minutes.
-func autoInstallLoop() {
-	var last time.Time
-	for {
-		time.Sleep(3 * time.Second)
-		if !get().AutoUpdate || transferBusy() || time.Since(last) < 10*time.Minute {
-			continue
-		}
-		umu.Lock()
-		ready := us.Available && uAsset != "" && us.Status != "installing" && !uBusy
-		umu.Unlock()
-		if ready {
-			last = time.Now()
-			installUpdate()
 		}
 	}
 }
