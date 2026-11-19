@@ -4,79 +4,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 	"syscall"
 	"unsafe"
 )
-
-func xmlEsc(s string) string {
-	return strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", "\"", "&quot;", "'", "&apos;").Replace(s)
-}
-
-// profileXML builds a Wi-Fi profile. kind: "wpa2", "wpa3" or "open".
-func profileXML(ssid, pass, kind string) string {
-	auth, enc, key := "open", "none", ""
-	switch kind {
-	case "wpa2":
-		auth, enc = "WPA2PSK", "AES"
-	case "wpa3":
-		auth, enc = "WPA3SAE", "AES"
-	}
-	if kind != "open" {
-		key = "<sharedKey><keyType>passphrase</keyType><protected>false</protected><keyMaterial>" + xmlEsc(pass) + "</keyMaterial></sharedKey>"
-	}
-	return `<?xml version="1.0"?><WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1"><name>` + xmlEsc(ssid) +
-		`</name><SSIDConfig><SSID><name>` + xmlEsc(ssid) + `</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>auto</connectionMode><MSM><security><authEncryption><authentication>` +
-		auth + `</authentication><encryption>` + enc + `</encryption><useOneX>false</useOneX></authEncryption>` + key + `</security></MSM></WLANProfile>`
-}
-
-// runNetsh runs netsh with the given raw command line. The file path is quoted by hand
-// (key="value"): Go would otherwise quote the whole "filename=C:\Users\Some Name\..."
-// argument, which netsh rejects as an invalid profile when the path has a space in it.
-func runNetsh(raw string) (string, error) {
-	c := exec.Command("netsh")
-	hideWindow(c)
-	c.SysProcAttr.CmdLine = "netsh " + raw
-	b, err := c.CombinedOutput()
-	return strings.TrimSpace(string(b)), err
-}
-
-// hotspotConnect saves the phone-hotspot as a Wi-Fi profile and asks Windows to connect.
-// A failed "connect" is not an error (the hotspot may simply not be on yet); the caller
-// keeps retrying until the PC is on a network.
-func hotspotConnect(ssid, pass string) error {
-	if pass != "" && (len(pass) < 8 || len(pass) > 63) {
-		return fmt.Errorf("Wi-Fi password must be 8 to 63 characters")
-	}
-	kinds := []string{"wpa2", "wpa3"}
-	if pass == "" {
-		kinds = []string{"open"}
-	}
-	// remove an older / broken profile with this name first
-	runNetsh(`wlan delete profile name="` + strings.ReplaceAll(ssid, `"`, "") + `"`)
-	last := ""
-	for _, kind := range kinds {
-		f, err := os.CreateTemp("", "suw*.xml")
-		if err != nil {
-			return err
-		}
-		name := f.Name()
-		f.WriteString(profileXML(ssid, pass, kind))
-		f.Close()
-		out, err := runNetsh(`wlan add profile filename="` + name + `" user=current`)
-		os.Remove(name)
-		if err == nil {
-			con := exec.Command("netsh", "wlan", "connect", "name="+ssid)
-			hideWindow(con)
-			con.Run()
-			return nil
-		}
-		last = out
-	}
-	return fmt.Errorf("Wi-Fi: %s", last)
-}
 
 // openWifiPanel opens the Windows Wi-Fi list (the same flyout as the taskbar Wi-Fi icon),
 // so the person can pick their phone's Hotspot there. Older Windows falls back to Settings.

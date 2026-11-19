@@ -51,8 +51,6 @@ type Config struct {
 	DevKey    string `json:"devKey,omitempty"` // private key that lets this PC update the Worker
 	AutoNet   bool   `json:"autoNet"`
 	OfflineOn bool   `json:"offlineOn"`
-	HotSSID   string `json:"hotSsid,omitempty"`
-	HotPass   string `json:"hotPass,omitempty"`
 }
 
 var (
@@ -223,8 +221,6 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		WorkerURL  *string `json:"workerUrl"`
 		AutoNet    *bool   `json:"autoNet"`
 		OfflineOn  *bool   `json:"offlineOn"`
-		HotSSID    *string `json:"hotSsid"`
-		HotPass    *string `json:"hotPass"`
 		ResetFixed *bool   `json:"resetFixed"`
 	}
 	if json.NewDecoder(r.Body).Decode(&q) != nil {
@@ -302,10 +298,6 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		mu.Unlock()
 		smartReset()
 	}
-	if q.HotPass != nil && *q.HotPass != "" && (len(*q.HotPass) < 8 || len(*q.HotPass) > 63) {
-		http.Error(w, "Hotspot password must be 8-63 characters", 400)
-		return
-	}
 	stopNet := false
 	mu.Lock()
 	if q.AutoNet != nil {
@@ -314,12 +306,6 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 	}
 	if q.OfflineOn != nil {
 		cfg.OfflineOn = *q.OfflineOn
-	}
-	if q.HotSSID != nil {
-		cfg.HotSSID = strings.TrimSpace(*q.HotSSID)
-	}
-	if q.HotPass != nil {
-		cfg.HotPass = *q.HotPass
 	}
 	if q.ResetFixed != nil && *q.ResetFixed {
 		cfg.PubID, cfg.DevKey = randID(12), randID(32)
