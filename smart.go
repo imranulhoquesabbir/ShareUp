@@ -63,6 +63,8 @@ var (
 	hotOKAt  atomic.Int64    // unix nano: hotspot joined
 	hotEpi   bool            // this PC was without any network (a "no network" episode is running)
 	hotPanel bool            // the Wi-Fi list was already opened by itself in this episode
+	hotSeen  map[string]int  // how many scans in a row each Wi-Fi name has been in range
+	hotJoinNet string        // name of the Wi-Fi the PC joined (shown with the green tick)
 
 	regMu   sync.Mutex
 	regOK   bool
@@ -189,9 +191,16 @@ func sessionCount() int {
 func netWatch() {
 	last := 0
 	for {
-		time.Sleep(4 * time.Second)
+		select {
+		case <-time.After(4 * time.Second):
+		case <-kickNW: // the network just changed: check right now
+		}
 		up := internetUp()
 		prev := onlineNow.Swap(up)
+		if prev != up {
+			notifyState()
+			kickHotspot()
+		}
 		if !up {
 			wasOffline.Store(true)
 		} else if !prev && wasOffline.Load() {
@@ -214,7 +223,6 @@ func smartLoop() {
 		time.Sleep(5 * time.Second)
 		c := get()
 		up := onlineNow.Load()
-		maybeHotspot(c, up)
 		if !up {
 			continue
 		}
@@ -278,6 +286,13 @@ func registerWorker(c Config, base, lan, tunnel, sig string) {
 var phoneHints = []string{"iphone", "android", "galaxy", "samsung", "redmi", "xiaomi", "poco", "pixel", "oppo", "vivo",
 	"realme", "infinix", "tecno", "itel", "oneplus", "huawei", "honor", "motorola", "nokia", "symphony", "walton", "hotspot"}
 
+// wifiAP is one Wi-Fi network in range.
+type wifiAP struct {
+	Name  string
+	Sig   int  // signal strength in %, 0 when unknown
+	Local bool // the radio address is "locally administered": what a phone hotspot uses, a router almost never does
+}
+
 func looksLikePhone(name string) bool {
 	n := strings.ToLower(name)
 	for _, h := range phoneHints {
@@ -290,13 +305,24 @@ func looksLikePhone(name string) bool {
 
 func hotReset() {
 	hotMu.Lock()
-	if hotSel != "" || hotEpi { // the PC got a network again: show the green "connected" note
-		hotOKAt.Store(time.Now().UnixNano())
+	was := hotSel != "" || hotEpi // the PC got a network again after a "no network" episode
+	hotMu.Unlock()
+	name := ""
+	if was {
+		name = wifiCurrent() // asked outside the lock: it runs a Windows command
+	}
+	hotMu.Lock()
+	if was {
+		hotJoinNet = name
+		hotOKAt.Store(time.Now().UnixNano()) // show the green "connected" note
 	}
 	hotEpi, hotPanel = false, false
-	hotSel, hotNets, hotBase = "", nil, nil
+	hotSel, hotNets, hotBase, hotSeen = "", nil, nil, nil
 	hotJoin = time.Time{}
 	hotMu.Unlock()
+	if was {
+		notifyState()
+	}
 }
 
 // maybeHotspot runs every few seconds. With no network at all it looks for a phone hotspot,
@@ -313,35 +339,64 @@ func maybeHotspot(c Config, up bool) {
 	hotMu.Lock()
 	hotEpi = true
 	hotMu.Unlock()
-	vis, saved := wifiScan()
+	aps, saved := wifiScan()
+	cur := wifiCurrent() // the Wi-Fi this PC is on right now is never offered as a hotspot
 	hotMu.Lock()
 	if hotBase == nil {
 		hotBase = map[string]bool{}
-		for _, v := range vis {
-			hotBase[v] = true
+		for _, a := range aps {
+			hotBase[a.Name] = true
+		}
+	}
+	if hotSeen == nil {
+		hotSeen = map[string]int{}
+	}
+	inRange := map[string]bool{}
+	for _, a := range aps {
+		inRange[a.Name] = true
+		hotSeen[a.Name]++
+	}
+	for n := range hotSeen { // a name that vanished for one scan starts counting again
+		if !inRange[n] {
+			delete(hotSeen, n)
 		}
 	}
 	if !hotJoin.IsZero() && time.Since(hotJoin) > 20*time.Second {
 		hotSel, hotJoin, hotLast = "", time.Time{}, time.Now() // auto-join did not work: back to the guide
 	}
+	// Wi-Fi scans are noisy: neighbours' routers blink in and out of range. So a name is only
+	// offered when it has stayed for several scans in a row, and a name that does not look
+	// like a phone must also use a phone-style (locally administered) radio address, have
+	// been absent when the network was lost, and be reasonably strong.
 	var phones, others []string
-	for _, v := range vis {
-		if looksLikePhone(v) {
-			phones = append(phones, v)
-		} else if !hotBase[v] { // a new name appeared: most likely the hotspot just turned on
-			others = append(others, v)
+	for _, a := range aps {
+		if a.Name == cur {
+			continue
+		}
+		seen := hotSeen[a.Name]
+		switch {
+		case looksLikePhone(a.Name):
+			if seen >= 2 {
+				phones = append(phones, a.Name)
+			}
+		case a.Local && !hotBase[a.Name] && seen >= 3 && (a.Sig == 0 || a.Sig >= 50):
+			others = append(others, a.Name)
 		}
 	}
 	sort.Strings(phones) // stable order, so the list does not jump around on screen
 	sort.Strings(others)
-	hotNets = append(phones, others...)
+	nets := append(append([]string(nil), phones...), others...)
+	changed := strings.Join(nets, "\x00") != strings.Join(hotNets, "\x00")
+	hotNets = nets
 	busy := hotSel != "" || time.Since(hotLast) < 30*time.Second
-	nets := hotNets
 	openIt := len(phones) > 0 && !hotPanel // a phone hotspot just showed up: open the Wi-Fi list for the person
 	if openIt {
 		hotPanel = true
 	}
 	hotMu.Unlock()
+	if changed {
+		notifyState()
+	}
 	if openIt {
 		go openWifiPanel()
 	}
@@ -373,12 +428,16 @@ type guideInfo struct {
 	Step int      `json:"step"` // offline: 1 guide, 4 joining a hotspot this PC already knows
 	Nets []string `json:"nets,omitempty"`
 	Sel  string   `json:"sel,omitempty"`
+	Net  string   `json:"net,omitempty"` // joined: the Wi-Fi this PC is on now
 }
 
 func guide(c Config) guideInfo {
 	now := time.Now().UnixNano()
-	if t := hotOKAt.Load(); t != 0 && now-t < int64(8*time.Second) {
-		return guideInfo{Kind: "joined"}
+	if t := hotOKAt.Load(); t != 0 && now-t < int64(10*time.Second) {
+		hotMu.Lock()
+		n := hotJoinNet
+		hotMu.Unlock()
+		return guideInfo{Kind: "joined", Net: n}
 	}
 	if onlineNow.Load() {
 		if t := backAt.Load(); t != 0 && now-t < int64(8*time.Second) {
@@ -426,9 +485,40 @@ func smartSnapshot(c Config) map[string]any {
 	}
 }
 
+var kickHot = make(chan struct{}, 1)
+
+// kickHotspot makes hotLoop look at the network now instead of waiting for its timer.
+func kickHotspot() {
+	select {
+	case kickHot <- struct{}{}:
+	default:
+	}
+}
+
+// hotLoop watches for "no network" and a phone hotspot. It runs on its own so that a slow
+// Wi-Fi scan never delays the internet check or the worker registration. While the PC has
+// no network it looks every 2 s, otherwise every 5 s (or at once when something changes).
+func hotLoop() {
+	for {
+		maybeHotspot(get(), onlineNow.Load())
+		wait := 5 * time.Second
+		hotMu.Lock()
+		if hotEpi {
+			wait = 2 * time.Second
+		}
+		hotMu.Unlock()
+		select {
+		case <-time.After(wait):
+		case <-kickHot:
+		}
+	}
+}
+
 func smartStart() {
 	onlineNow.Store(internetUp())
 	go netWatch()
+	go netFast()
+	go hotLoop()
 	go smartLoop()
 	go mdnsLoop()
 }

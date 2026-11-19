@@ -786,8 +786,8 @@ func main() {
 	loadConfig()
 	cleanupOldBuild()
 	if afterUpdate { // the old version is exiting: continue the moment it frees the port
-		for i := 0; i < 60 && alreadyRunning(get().Port); i++ {
-			time.Sleep(100 * time.Millisecond)
+		for i := 0; i < 120 && alreadyRunning(get().Port); i++ {
+			time.Sleep(50 * time.Millisecond)
 		}
 	}
 	if alreadyRunning(get().Port) {
@@ -805,6 +805,7 @@ func main() {
 	phoneRoutes(mux)
 	mux.HandleFunc("/admin", local(page("admin.html")))
 	mux.HandleFunc("/admin/state", local(adminState))
+	mux.HandleFunc("/admin/events", local(adminEvents))
 	mux.HandleFunc("/admin/set", local(adminSet))
 	mux.HandleFunc("/admin/remote", local(adminRemote))
 	mux.HandleFunc("/admin/browse", local(adminBrowse))
@@ -858,6 +859,7 @@ func adminURL() string { return fmt.Sprintf("http://localhost:%d/admin", curPort
 
 func quitApp() {
 	remoteStop()
+	uiQuit() // remove the tray icon cleanly
 	time.Sleep(300 * time.Millisecond)
 	os.Exit(0)
 }

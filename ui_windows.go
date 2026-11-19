@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"sync"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"fyne.io/systray"
@@ -54,6 +55,13 @@ func uiShow() {
 	case showCh <- struct{}{}:
 	default:
 	}
+}
+
+// uiQuit takes the tray icon away. Exiting the process without this leaves a dead icon in
+// the tray until the mouse moves over it (and a second one appears after an update).
+func uiQuit() {
+	systray.Quit()
+	time.Sleep(350 * time.Millisecond) // let Windows really remove the icon
 }
 
 func windowOpen() bool {

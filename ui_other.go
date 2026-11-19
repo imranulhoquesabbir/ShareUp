@@ -13,3 +13,5 @@ func runUI(silent bool) {
 func uiShow() { kickUpdate(); openBrowser(adminURL()) }
 
 func windowOpen() bool { return false }
+
+func uiQuit() {}

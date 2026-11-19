@@ -36,6 +36,7 @@ type updateState struct {
 	Status    string `json:"status"` // idle | checking | uptodate | installing | error
 	Error     string `json:"error"`
 	Progress  int    `json:"progress"`
+	Phase     string `json:"phase,omitempty"` // while installing: download | unpack | restart
 	Checked   int64  `json:"checked"`
 }
 
@@ -87,12 +88,13 @@ func checkUpdate() {
 	us.Status = "checking"
 	us.Error = ""
 	umu.Unlock()
-	defer func() { umu.Lock(); uBusy = false; umu.Unlock() }()
+	defer func() { umu.Lock(); uBusy = false; umu.Unlock(); notifyState() }()
 
 	fail := func(msg string) {
 		umu.Lock()
-		us.Status, us.Error = "error", msg
+		us.Status, us.Error, us.Phase = "error", msg, ""
 		umu.Unlock()
+		notifyState()
 	}
 	r := updateRepo()
 	if !strings.Contains(r, "/") {
@@ -167,14 +169,16 @@ func installUpdate() {
 		umu.Unlock()
 		return
 	}
-	us.Status, us.Error, us.Progress = "installing", "", 0
+	us.Status, us.Error, us.Progress, us.Phase = "installing", "", 0, "download"
 	url, isZip := uAsset, uZip
 	umu.Unlock()
+	notifyState()
 
 	fail := func(msg string) {
 		umu.Lock()
-		us.Status, us.Error = "error", msg
+		us.Status, us.Error, us.Phase = "error", msg, ""
 		umu.Unlock()
+		notifyState()
 	}
 	exe := exePath()
 	tmp := exe + ".new"
@@ -206,9 +210,14 @@ func installUpdate() {
 			}
 			done += int64(n)
 			if resp.ContentLength > 0 {
+				p := int(done * 100 / resp.ContentLength)
 				umu.Lock()
-				us.Progress = int(done * 100 / resp.ContentLength)
+				changed := p != us.Progress
+				us.Progress = p
 				umu.Unlock()
+				if changed {
+					notifyState() // the progress moves smoothly in the window
+				}
 			}
 		}
 		if rerr != nil {
@@ -228,6 +237,10 @@ func installUpdate() {
 		return
 	}
 	if isZip {
+		umu.Lock()
+		us.Phase = "unpack" // copying the build out of the zip can take a few seconds: say so
+		umu.Unlock()
+		notifyState()
 		err := extractFromZip(dl, assetWanted(), tmp)
 		os.Remove(dl)
 		if err != nil {
@@ -259,6 +272,11 @@ func installUpdate() {
 	if quiet && !windowOpen() { // window was open: reopen it after the restart
 		args = append(args, "--startup")
 	}
+	umu.Lock()
+	us.Phase = "restart"
+	umu.Unlock()
+	notifyState()
+	time.Sleep(900 * time.Millisecond) // the window shows "Restarting…" before it goes away
 	cmd := exec.Command(exe, args...)
 	hideWindow(cmd)
 	if err := cmd.Start(); err != nil {
@@ -267,7 +285,11 @@ func installUpdate() {
 		fail("Could not restart: " + err.Error())
 		return
 	}
+	if srv != nil {
+		srv.Close() // free the port at once so the new copy can take it
+	}
 	remoteStop()
+	uiQuit() // remove the old tray icon properly, otherwise a dead second icon stays behind
 	os.Exit(0)
 }
 
