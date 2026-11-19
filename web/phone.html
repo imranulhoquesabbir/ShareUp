@@ -153,6 +153,25 @@ header{justify-content:space-between;flex-wrap:wrap}
 .gbar{width:100%;height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
 .gbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width 1.5s linear}
 .gerr{color:var(--bad)!important;font-weight:600}
+
+.big.docs{grid-column:1/-1;flex-direction:row;justify-content:center;gap:14px;padding:14px 12px;background:linear-gradient(135deg,#10b981,#06b6d4);box-shadow:0 8px 20px rgba(16,185,129,.3)}
+.big.docs .dt{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
+.pair:not(:has(>button:not([hidden]))){display:none;margin:0}
+.pair .gcard{flex-direction:column;text-align:center;margin-bottom:0;padding:14px 10px;gap:10px}
+.pair .gcard .chev{display:none}
+.pair .mos,.dmos{width:84px;height:84px}
+.dmos{display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:14px;overflow:hidden;flex:none}
+.dmos i{display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px;color:#fff;letter-spacing:.02em}
+.dsearch{display:block;width:calc(100% - 24px);margin:0 12px 8px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--text);font:inherit;font-size:15px}
+.drow{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;text-decoration:none;color:var(--text)}
+.drow:active{background:var(--card2)}
+.drow .badge{width:40px;height:50px;font-size:11px;padding-bottom:5px;flex:none}
+.drow .dx{flex:1;min-width:0}
+.drow .dx b{display:block;font-weight:650;font-size:15px;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.drow .dx small{color:var(--mute);font-size:12.5px}
+.drow .ds{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--text);display:grid;place-items:center}
+.drow .ds svg{width:20px;height:20px}
 </style></head><body><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
 <header>
  <div class="hb"><div class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
@@ -165,6 +184,7 @@ header{justify-content:space-between;flex-wrap:wrap}
  <div class="two">
   <label class="big"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.7"/><path d="m21 16-5-5-8 8"/></svg><b data-i="openGal"></b><small data-i="pv"></small><input id="g" type="file" accept="image/*,video/*" multiple hidden></label>
   <label class="big alt"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><b data-i="browse"></b><small data-i="anyType"></small><input id="f" type="file" multiple hidden></label>
+   <label class="big docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="dt"><b data-i="sendDoc"></b><small data-i="docTypes"></small></span><input id="d" type="file" accept=".pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.txt,.md,.json,application/pdf,text/plain" multiple hidden></label>
  </div>
  <p class="hint" data-i="hint"></p>
  <div id="ups"></div>
@@ -175,11 +195,17 @@ header{justify-content:space-between;flex-wrap:wrap}
  <div class="ch"><span class="ci"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg></span><div class="ct"><h2 data-i="recvH"></h2><small data-i="recvS"></small></div>
   <button class="btn2" id="rf"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg><span data-i="refresh"></span></button></div>
  <div class="cb">
- <button class="gcard" id="og" hidden>
+ <div class="pair">
+  <button class="gcard" id="og" hidden>
   <div class="mos" id="mos"></div>
   <div class="t"><b data-i="galT"></b><small id="gsum"></small></div>
   <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
  </button>
+  <button class="gcard" id="od" hidden>
+   <div class="dmos"><i style="background:#dc2626">PDF</i><i style="background:#2563eb">DOC</i><i style="background:#16a34a">XLS</i><i style="background:#6b7280">TXT</i></div>
+   <div class="t"><b data-i="docT"></b><small id="dsum"></small></div>
+  </button>
+  </div>
  <div class="sec" id="fsec" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span data-i="filesT"></span></div>
  <div id="bar" class="bar"></div>
  <div id="dl"></div>
@@ -199,6 +225,17 @@ header{justify-content:space-between;flex-wrap:wrap}
   <button class="alt" id="ashare" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span data-i="share"></span></button>
   <button id="asave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg><span id="asl">Save</span></button>
  </div>
+</div>
+
+<div class="ov" id="docs" hidden>
+ <div class="gtop">
+  <button class="ib" id="dback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+  <div class="ttl" data-i="docT"></div>
+  <span style="width:44px"></span>
+ </div>
+ <div class="tabs" id="dtabs"></div>
+ <input class="dsearch" id="dq" type="search" data-ph="docSearch" autocomplete="off">
+ <div class="gscroll" id="dsc"></div>
 </div>
 
 <div class="vw" id="vw" hidden>
@@ -228,7 +265,11 @@ sendH:["Send to PC","পিসিতে পাঠান"],sendS:["Pick photos or
 openGal:["Open gallery","গ্যালারি খুলুন"],pv:["Photos & videos","ছবি ও ভিডিও"],browse:["Browse files","ফাইল বাছুন"],anyType:["Any file type","যেকোনো ধরনের ফাইল"],
 hint:["Pick one or many, press OK, and they're sent to the PC right away. Large files are sent in pieces.","এক বা একাধিক বেছে OK চাপুন, সঙ্গে সঙ্গে পিসিতে চলে যাবে। বড় ফাইল ছোট ছোট অংশে পাঠানো হয়।"],
 recvH:["Get from PC","পিসি থেকে নিন"],recvS:["Files your PC is sharing","পিসি যে ফাইল শেয়ার করেছে"],refresh:["Refresh","রিফ্রেশ"],
-galT:["Gallery","গ্যালারি"],filesT:["Files","ফাইল"],
+galT:["Gallery","গ্যালারি"],
+docT:["Documents","ডকুমেন্ট"],docN:["{0} files","{0}টি ফাইল"],docSearch:["Search documents","ডকুমেন্ট খুঁজুন"],docNone:["No documents in this tab","এই ট্যাবে কোনো ডকুমেন্ট নেই"],noDocs:["No documents in the shared folder yet","শেয়ার ফোল্ডারে এখনো কোনো ডকুমেন্ট নেই"],
+sendDoc:["Send documents","ডকুমেন্ট পাঠান"],docTypes:["PDF, Word, Excel, text…","PDF, Word, Excel, টেক্সট…"],
+kpdf:["PDF","PDF"],kword:["Word","ওয়ার্ড"],ksheet:["Excel","এক্সেল"],kslide:["Slides","স্লাইড"],ktext:["Text","টেক্সট"],saveDoc:["Save","সেভ"],
+filesT:["Files","ফাইল"],
 send1:["Sending 1 file…","১টি ফাইল পাঠানো হচ্ছে…"],sendN:["Sending {0} files…","{0}টি ফাইল পাঠানো হচ্ছে…"],
 couldNot:["Could not send","পাঠানো যায়নি"],sent:["Sent to PC","পিসিতে পাঠানো হয়েছে"],failed:["Failed","ব্যর্থ"],retrying:["Retrying…","আবার চেষ্টা হচ্ছে…"],
 today:["Today","আজ"],yest:["Yesterday","গতকাল"],
@@ -261,7 +302,7 @@ async function sendPicked(el){
  for(const f of fs){try{await up(f)}catch(e){toast(tr('couldNot')+' '+f.name,2500)}}
  try{el.value=''}catch(e){}   // clear only AFTER everything is sent (Android hands over content:// files that must stay readable)
 }
-for(const id of['g','f']){const el=$('#'+id);el.onchange=()=>sendPicked(el);el.oninput=null}
+for(const id of['g','f','d']){const el=$('#'+id);el.onchange=()=>sendPicked(el);el.oninput=null}
 const CHUNK=16*1024*1024; // small pieces so big files also work over the internet link
 const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 function sendChunk(url,blob,onp){return new Promise(res=>{
@@ -348,7 +389,7 @@ function push(n){history.pushState({n},'');stack.push(n)}
 function back(){history.back()}
 addEventListener('popstate',()=>{
  const n=stack.pop();
- if(n==='view')hideView();else if(n==='sel')endSel();else if(n==='gal')hideGal();
+ if(n==='view')hideView();else if(n==='sel')endSel();else if(n==='gal')hideGal();else if(n==='docs')hideDocs();
 });
 
 /* ================= PC gallery ================= */
@@ -499,6 +540,60 @@ addEventListener('keydown',e=>{
  else if(e.key==='Escape')back();
 });
 
+
+/* ================= documents (PDF / Word / Excel / Slides / Text tabs) ================= */
+let DOCS=[],DFLT='all',DQ='';
+const DKINDS=['pdf','word','sheet','slide','text'],VIEWABLE=['pdf','txt','md','log','json','xml','csv'];
+async function loadDocs(){
+ try{const j=await (await fetch('/api/docs')).json();DOCS=j.shareOn?j.items:[];return j.shareOn}
+ catch(e){DOCS=[];return false}
+}
+function paintDocs(on){
+ const b=$('#od');
+ if(!on||!DOCS.length){b.hidden=true;return}
+ b.hidden=false;$('#dsum').textContent=tr('docN',DOCS.length);
+}
+$('#od').onclick=()=>openDocs();
+async function openDocs(){
+ $('#docs').hidden=false;document.body.style.overflow='hidden';push('docs');
+ DFLT='all';DQ='';$('#dq').value='';drawDocs();
+ if(!DOCS.length){const on=await loadDocs();paintDocs(on);drawDocs()}
+}
+function hideDocs(){$('#docs').hidden=true;document.body.style.overflow=''}
+$('#dback').onclick=back;
+$('#dq').oninput=e=>{DQ=e.target.value.trim().toLowerCase();drawDocs(true)};
+function drawDocs(keepTabs){
+ const cnt=k=>DOCS.filter(d=>d.k===k).length;
+ const tabs=$('#dtabs');tabs.textContent='';
+ [['all',tr('all'),DOCS.length],...DKINDS.map(k=>[k,tr('k'+k),cnt(k)])].forEach(([k,l,n])=>{
+  if(k!=='all'&&!n)return;
+  const b=document.createElement('button');b.className=DFLT===k?'on':'';b.innerHTML=l+'<span>'+n+'</span>';
+  b.onclick=()=>{DFLT=k;drawDocs();$('#dsc').scrollTop=0};tabs.append(b);
+ });
+ $('#dq').placeholder=tr('docSearch');
+ const list=DOCS.filter(d=>(DFLT==='all'||d.k===DFLT)&&(!DQ||bname(d.path).toLowerCase().includes(DQ)));
+ const sc=$('#dsc');sc.textContent='';
+ if(!list.length){sc.innerHTML='<div class="empty" style="padding:60px 20px">'+(DOCS.length?tr('docNone'):tr('noDocs'))+'</div>';return}
+ list.forEach(d=>{
+  const name=bname(d.path),ext=extOf(name),enc=ENC(d.path);
+  const row=document.createElement('div');row.className='drow';
+  const dx=document.createElement('div');dx.className='dx';
+  const nb=document.createElement('b');nb.textContent=name;
+  const sm=document.createElement('small');sm.textContent=[ext.toUpperCase(),sz(d.size),dayLabel(d.t)].join(' · ');
+  dx.append(nb,sm);row.append(badge(name),dx);
+  const sv=document.createElement('a');sv.className='ds';sv.href='/dl/'+enc;sv.setAttribute('download',name);sv.setAttribute('aria-label',tr('saveDoc'));
+  sv.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>';
+  sv.onclick=e=>e.stopPropagation();
+  row.append(sv);
+  // PDF and text open right in the browser; Word / Excel / Slides are saved to the phone
+  row.onclick=()=>{
+   if(VIEWABLE.includes(ext))window.open('/pv/'+enc,'_blank');
+   else{const a=document.createElement('a');a.href='/dl/'+enc;a.setAttribute('download',name);document.body.append(a);a.click();a.remove();toast(tr('saving1'))}
+  };
+  sc.append(row);
+ });
+}
+
 /* ================= files from PC ================= */
 let cur='';
 function tile(it){
@@ -527,7 +622,7 @@ async function load(){
  const d=$('#dl'),bar=$('#bar');d.textContent='';bar.textContent='';
  try{
   const j=await (await fetch('/api/list?path='+encodeURIComponent(cur))).json();
-  if(!j.shareOn){d.innerHTML='<div class="empty">'+tr('shareOff')+'</div>';$('#og').hidden=true;$('#fsec').hidden=true;return}
+  if(!j.shareOn){d.innerHTML='<div class="empty">'+tr('shareOff')+'</div>';$('#og').hidden=true;$('#od').hidden=true;$('#fsec').hidden=true;return}
   if(cur){
    const b=document.createElement('button');b.className='btn2';b.textContent=tr('back');
    b.onclick=()=>{cur=cur.split('/').slice(0,-1).join('/');load()};
@@ -541,7 +636,9 @@ async function load(){
 }
 async function refreshAll(){
  const on=await loadMedia();paintHome(on);
+ const dn=await loadDocs();paintDocs(dn);
  if(!$('#gal').hidden)drawGal();
+ if(!$('#docs').hidden)drawDocs();
  load();
 }
 

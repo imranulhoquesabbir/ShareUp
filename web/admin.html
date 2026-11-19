@@ -266,7 +266,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
  </div>
 </header>
 <nav class="nav"><button data-t="connect" style="--t1:#3b82f6;--t2:#8b5cf6"><span class="chip"><svg class="ic"><use href="#i-phone"/></svg></span><span data-i="tConnect"></span></button><button data-t="recv" style="--t1:#10b981;--t2:#06b6d4"><span class="chip"><svg class="ic"><use href="#i-down"/></svg></span><span data-i="tRecv"></span></button><button data-t="files" style="--t1:#f97316;--t2:#ec4899"><span class="chip"><svg class="ic"><use href="#i-up"/></svg></span><span data-i="tShare"></span></button><button data-t="settings" style="--t1:#a855f7;--t2:#6366f1"><span class="chip"><svg class="ic"><use href="#i-sliders"/></svg></span><span data-i="tSet"></span></button></nav>
-<div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button></div>
+<div class="upd" id="upd" hidden><div><b id="updt"></b><small id="updd"></small></div><button class="b" id="updgo"><svg class="ic"><use href="#i-cloud"/></svg><span data-i="updNow"></span></button><button class="g" id="updlater"><span data-i="updLater"></span></button></div>
 
 <div id="tc">
  <div class="panel guide" id="gcard" hidden></div>
@@ -510,11 +510,11 @@ langT:["Language","ভাষা"],langS:["Choose the language of the app","অ�
 startT:["Start when I sign in","কম্পিউটার চালু হলে নিজে থেকে চালু হোক"],
 startS:["Runs quietly in the system tray. Click the tray icon or open shareUp again to see this window.","সিস্টেম ট্রেতে চুপচাপ চলবে। ট্রে-র আইকনে ক্লিক করলে বা শেয়ারআপ আবার খুললে এই উইন্ডো দেখা যাবে।"],
 startOn:["Will start when you sign in","সাইন ইন করলে নিজে থেকে চালু হবে"],startOff:["Startup off","স্টার্টআপ বন্ধ"],
-updT:["Auto update","অটো আপডেট"],updS:["Checks GitHub for a new build and shows it here","গিটহাবে নতুন সংস্করণ আছে কিনা দেখে এখানে জানাবে"],
+updT:["Check for updates","আপডেট খোঁজা"],updS:["Looks for a new version and asks you before installing. Nothing updates by itself.","নতুন সংস্করণ খুঁজে জানাবে, ইনস্টলের আগে আপনার অনুমতি চাইবে। নিজে থেকে কিছু আপডেট হবে না।"],updLater:["Later","পরে"],
 updCheck:["Checking for updates…","আপডেট খোঁজা হচ্ছে…"],updReady:["New build {0} is ready (you have {1})","নতুন সংস্করণ {0} প্রস্তুত (আপনার কাছে {1})"],
 updOk:["Up to date ({0})","আপ টু ডেট ({0})"],updNone:["Up to date – no releases yet","আপ টু ডেট – এখনো কোনো রিলিজ নেই"],
 updInst:["Installing {0}…{1}","{0} ইনস্টল হচ্ছে…{1}"],updAvail:["New version {0} available","নতুন সংস্করণ {0} পাওয়া যাচ্ছে"],
-updHave:["You have {0}. shareUp will restart after updating.","আপনার কাছে {0} আছে। আপডেটের পর শেয়ারআপ রিস্টার্ট হবে।"],updNow:["Update now","এখনই আপডেট করুন"],
+updHave:["You have {0}. Update now? shareUp will close and reopen by itself.","আপনার কাছে {0} আছে। এখনই আপডেট করবেন? শেয়ারআপ বন্ধ হয়ে নিজে আবার খুলবে।"],updNow:["Update now","এখনই আপডেট করুন"],
 autoOn:["Auto update on","অটো আপডেট চালু"],autoOff:["Auto update off","অটো আপডেট বন্ধ"],
 netSet:["Network (advanced)","নেটওয়ার্ক (উন্নত)"],netSetS:["Usually you don’t need to change these.","সাধারণত এগুলো বদলানোর দরকার হয় না।"],
 ip:["IP address","আইপি অ্যাড্রেস"],port:["Port","পোর্ট"],apply:["Apply","প্রয়োগ করুন"],
@@ -602,6 +602,7 @@ function filesHook(s){
  if(d!==lastDir){lastDir=d;cur='';lastL='';loadFiles()}
  else if(S&&inFiles())loadFiles();
 }
+let updLater='';
 function renderUpd(s){
  const u=s.update;if(!u)return;
  $('#aupd').checked=u.enabled;
@@ -614,16 +615,17 @@ function renderUpd(s){
   else if(u.status==='uptodate')sub=u.latest?t('updOk',u.current):t('updNone');
  }
  $('#updsub').textContent=sub;
- const show=u.enabled&&(u.available||u.status==='installing');
+ const show=u.enabled&&((u.available&&u.latest!==updLater)||u.status==='installing');
  b.hidden=!show;
  if(show){
   $('#updt').textContent=u.status==='installing'?t('updInst',u.latest,u.progress?' '+u.progress+'%':''):t('updAvail',u.latest);
   $('#updd').textContent=u.status==='error'?u.error:t('updHave',u.current);
-  $('#updgo').disabled=u.status==='installing';
+  $('#updgo').disabled=u.status==='installing';$('#updlater').hidden=u.status==='installing';
  }
 }
 $('#aupd').onchange=async()=>{const s=await api('/admin/set',{autoUpdate:$('#aupd').checked});render(s||await api('/admin/state'));toast(t($('#aupd').checked?'autoOn':'autoOff'))};
 $('#updgo').onclick=async()=>render(await api('/admin/update',{install:true}));
+$('#updlater').onclick=()=>{updLater=(S&&S.update&&S.update.latest)||'';$('#upd').hidden=true};
 document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render(S)});
 $('#cp').onclick=()=>curQ&&copy(curQ);
 $('#cp2').onclick=()=>S&&S.remote.link&&copy(S.remote.link);
