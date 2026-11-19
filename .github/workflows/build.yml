@@ -44,7 +44,7 @@ jobs:
         run: |
           cd dist
           zip -9 shareUp.zip shareUp.exe shareUp-linux shareUp-mac-arm64 shareUp-mac-intel
-      - name: Release (one zip: the website and the in-app updater both use it)
+      - name: Release the zip (used by the website and the in-app updater)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VER }}
