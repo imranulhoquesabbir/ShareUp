@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"sync"
 	"syscall"
+	"unsafe"
 
 	"fyne.io/systray"
 	"github.com/jchv/go-webview2"
@@ -22,6 +23,7 @@ var (
 	pShowWindow    = user32.NewProc("ShowWindow")
 	pSetForeground = user32.NewProc("SetForegroundWindow")
 	pIsIconic      = user32.NewProc("IsIconic")
+	pSysParams     = user32.NewProc("SystemParametersInfoW")
 	winMu          sync.Mutex
 	winHwnd        uintptr // 0 while the window is closed (app lives in the tray)
 	showCh         = make(chan struct{}, 1)
@@ -69,15 +71,41 @@ func windowLoop() {
 	}
 }
 
+// windowSize picks a window that fits this screen: up to 1100x820, otherwise 92% x 88% of
+// the usable screen area (the part not covered by the taskbar).
+func windowSize() (int, int) {
+	var rc struct{ l, t, r, b int32 }
+	w, h := 1100, 820
+	if ok, _, _ := pSysParams.Call(0x0030, 0, uintptr(unsafe.Pointer(&rc)), 0); ok != 0 {
+		sw, sh := int(rc.r-rc.l), int(rc.b-rc.t)
+		if sw > 0 && sh > 0 {
+			if v := sw * 92 / 100; v < w {
+				w = v
+			}
+			if v := sh * 88 / 100; v < h {
+				h = v
+			}
+		}
+	}
+	if w < 420 {
+		w = 420
+	}
+	if h < 520 {
+		h = 520
+	}
+	return w, h
+}
+
 func openWindow() {
+	ww, wh := windowSize()
 	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", "webview")
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		AutoFocus: true,
 		DataPath:  data,
 		WindowOptions: webview2.WindowOptions{
 			Title:  "shareUp",
-			Width:  900,
-			Height: 760,
+			Width:  uint(ww),
+			Height: uint(wh),
 			IconId: 2, // the icon embedded in the exe by the build
 			Center: true,
 		},

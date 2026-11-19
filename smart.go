@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -342,6 +343,8 @@ func maybeHotspot(c Config, up bool) {
 			others = append(others, v)
 		}
 	}
+	sort.Strings(phones) // stable order, so the list does not jump around on screen
+	sort.Strings(others)
 	hotNets = append(phones, others...)
 	busy := hotSel != ""
 	nets := hotNets
@@ -375,6 +378,8 @@ func adminWifi(w http.ResponseWriter, r *http.Request) {
 		hotMu.Lock()
 		hotAll = true
 		hotMu.Unlock()
+	case "rescan": // "Refresh" button: look for Wi-Fi again right now
+		go wifiScan()
 	case "back":
 		hotMu.Lock()
 		hotSel, hotBad, hotJoin = "", false, time.Time{}
@@ -403,8 +408,8 @@ func adminWifi(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "no hotspot", 400)
 			return
 		}
-		if len(q.Pass) > 63 {
-			http.Error(w, "password too long", 400)
+		if len(q.Pass) < 8 || len(q.Pass) > 63 {
+			http.Error(w, "badlen", 400)
 			return
 		}
 		if err := hotspotConnect(sel, q.Pass); err != nil {
