@@ -377,9 +377,6 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
   <div style="padding:0 20px 14px"><span id="wkSt" class="chip2 off"></span><small style="display:block;color:var(--mute);margin-top:6px" data-i="wkS"></small></div>
   <div class="item"><div class="itx"><b data-i="anT"></b><small data-i="anS"></small></div><label class="switch"><input type="checkbox" id="anOn" data-al="anT"><span class="slider"></span></label></div>
   <div class="item" hidden><div class="itx"><b data-i="ofT"></b><small data-i="ofS"></small></div><label class="switch"><input type="checkbox" id="ofOn" data-al="ofT"><span class="slider"></span></label></div>
-  <div class="subh" data-i="hsT"></div>
-  <div class="pwrow"><input type="text" id="hsSsid" data-ph="hsSsidPh" autocomplete="off"><input type="password" id="hsPass" data-ph="hsPassPh" autocomplete="new-password"><button class="g" id="hsSave"><span data-i="wkSave"></span></button></div>
-  <div style="padding:0 20px 14px"><small style="display:block;color:var(--mute)" data-i="hsS"></small></div>
   <div class="item"><div class="itx"></div><button class="g dgr" id="wkReset"><span data-i="wkReset"></span></button></div>
  </div>
  <div class="panel">
@@ -445,7 +442,6 @@ smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for
 wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","সেভ"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","সেভ হয়েছে"],
 anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link ready by itself (needs the fixed QR).","Internet link নিজে চালু রাখবে (fixed QR লাগবে)।"],
 ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
-hsT:["Phone Hotspot","Phone Hotspot"],hsS:["Optional. Normally not needed: the PC finds and joins your phone’s Hotspot by itself.","ঐচ্ছিক। সাধারণত লাগে না: PC নিজেই ফোনের Hotspot খুঁজে connect করে।"],hsSsidPh:["Hotspot name","Hotspot-এর নাম"],hsPassPh:["Password","Password"],
 wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
 devH:["Connected phones","কানেক্টেড ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
 secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
@@ -1084,7 +1080,7 @@ $('#gcard').onclick=async e=>{const b=e.target.closest('[data-act]');if(!b)retur
  else if(b.dataset.act==='set')setTab('settings')};
 function smRender(s){
  const sm=s.smart;if(!sm)return;
- setVal('#wkUrl',sm.workerUrl||'');setVal('#hsSsid',sm.hotSsid||'');
+ setVal('#wkUrl',sm.workerUrl||'');
  $('#anOn').checked=!!sm.autoNet;$('#ofOn').checked=!!sm.offlineOn;
  const e=$('#wkSt');
  if(!sm.configured){e.textContent=t('wkNone');e.className='chip2 off'}
@@ -1092,7 +1088,6 @@ function smRender(s){
  else{e.textContent=sm.regErr||t('wkWait');e.className='chip2'+(sm.regErr?' off':'')}
 }
 $('#wkSave').onclick=async()=>{const j=await api('/admin/set',{workerUrl:$('#wkUrl').value.trim()});if(j){toast(t('smSaved'));render(j)}};
-$('#hsSave').onclick=async()=>{const b={hotSsid:$('#hsSsid').value.trim()};const p=$('#hsPass').value;if(p)b.hotPass=p;const j=await api('/admin/set',b);if(j){$('#hsPass').value='';toast(t('smSaved'));render(j)}};
 $('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.checked});if(j)render(j)};
 $('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
 $('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
