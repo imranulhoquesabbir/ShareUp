@@ -40,6 +40,13 @@ jobs:
           GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "$LD" -o dist/shareUp-mac-arm64 .
           GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "$LD" -o dist/shareUp-mac-intel .
           GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags "$LD" -o dist/shareUp-linux .
+      # Full pack for the website: every build + setup notes in one zip.
+      # The loose files stay in the release too, because the in-app updater downloads shareUp.exe etc. by name.
+      - name: Zip full pack
+        run: |
+          mkdir pack
+          cp dist/* WORKER_SETUP.md pack/
+          (cd pack && zip -r ../dist/ShareUp-full.zip .)
       - uses: actions/upload-artifact@v4
         with:
           name: shareUp
