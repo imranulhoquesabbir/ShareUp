@@ -41,18 +41,27 @@ jobs:
           GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "$LD" -o dist/shareUp-mac-arm64 .
           GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "$LD" -o dist/shareUp-mac-intel .
           GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags "$LD" -o dist/shareUp-linux .
-      - name: Pack everything into one zip
+      - name: Pack the release files
         run: |
           cd dist
+          # 1) The ONE file the website offers: every system in a single zip.
           zip -9 shareUp.zip shareUp.exe shareUp-linux shareUp-mac-arm64 shareUp-mac-intel
-      - name: Release the zip (used by the website and the in-app updater)
+          # 2) One build per system for the in-app updater (Windows gets the exe, Linux its own binary, ...).
+          #    The ".bin" ending is on purpose: the website prefers .exe/.apk/.zip names, so it
+          #    never offers these and always gives the full zip. The updater finds them by name.
+          cp shareUp.exe        update-windows.bin
+          cp shareUp-linux      update-linux.bin
+          cp shareUp-mac-arm64  update-mac-arm64.bin
+          cp shareUp-mac-intel  update-mac-intel.bin
+          ls -l
+      - name: Release (full zip for the website, per-system files for the updaters)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VER }}
           make_latest: true
           files: |
             dist/shareUp.zip
-            dist/shareUp.exe
-            dist/shareUp-linux
-            dist/shareUp-mac-arm64
-            dist/shareUp-mac-intel
+            dist/update-windows.bin
+            dist/update-linux.bin
+            dist/update-mac-arm64.bin
+            dist/update-mac-intel.bin
