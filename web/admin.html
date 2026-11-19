@@ -173,6 +173,11 @@ h2{margin:0;font-size:17px;font-weight:700}
 #cdlg input[type=text]{width:100%;box-sizing:border-box;background:var(--field);color:var(--text);border:2px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:15px;margin-bottom:14px}
 #cdlg input[type=text]:focus{outline:0;border-color:#2563eb}
 .upd .cb{padding:8px 14px}
+/* small approval window (opens by itself when a phone asks to connect, even from the tray) */
+body.pop>*:not(.mback){display:none!important}
+body.pop #gm,body.pop #cdlg{display:none!important}
+body.pop{background:var(--bg)}
+body.pop #mreq{background:transparent;padding:8px}
 .dev button[data-a=rename]{color:#3b82f6;border-color:#3b82f6}
 .dev button[data-a=trust]{background:#16a34a;color:#fff;border-color:#15803d}
 .dev button[data-a=kick],.dev button[data-a=untrust]{background:#dc2626;color:#fff;border-color:#b91c1c}
@@ -1116,7 +1121,8 @@ document.addEventListener('paste',e=>{
 
 
 // ---- devices & security ----
-let DV=null,reqId='';
+let DV=null,reqId='',popT=0;
+const POP=new URLSearchParams(location.search).get('popup')==='1';if(POP)document.body.classList.add('pop');
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/60));return m<1?'now':m<60?m+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' d'};
 async function devAct(op,id,trust,name){const j=await api('/admin/dev',{op,id,trust:!!trust,name:name||''});if(j){DV=j;drawDev()}}
@@ -1139,7 +1145,8 @@ function drawDev(){
  const p=DV.pending[0],m=$('#mreq');
  if(p){m.hidden=false;reqId=p.id;$('#mrN').textContent=p.name;$('#mrC').textContent=dcode(p.id);$('#mrI').textContent=p.ip+' · '+t(p.remote?'viaNet':'viaLan');
   $('#mrM').textContent=t('reqLeft',p.left);$('#mrF').style.width=Math.max(0,Math.min(100,p.left/60*100))+'%'}
- else{m.hidden=true;reqId=''}
+ else{m.hidden=true;reqId='';
+  if(POP){clearTimeout(popT);popT=setTimeout(()=>{if(!reqId)fetch('/admin/popupdone',{method:'POST'}).catch(()=>{})},700)}}
 }
 async function pollDev(){try{DV=await (await fetch('/admin/devices',{method:'POST'})).json();drawDev()}catch(e){}}
 $('#mrA').onclick=()=>reqId&&devAct('allow',reqId,false);
@@ -1177,7 +1184,7 @@ function swapBox(el,html){   // fade the old content out, put the new one in, fa
 function setFound(f){
  if(f!==undefined)lastFound=f;
  const w=document.querySelector('#gmb .foundw');if(!w)return;
- const h=lastFound?'<div class="found">✓ '+t('hsFound',esc(lastFound))+'</div>':'';
+ const h=''; // the "hotspot found" line is not shown: only the connected message matters
  if(w.dataset.h!==h){w.dataset.h=h;w.innerHTML=h}
 }
 function drawGuide(g){
