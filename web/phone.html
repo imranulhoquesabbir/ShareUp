@@ -217,7 +217,7 @@ const $=s=>document.querySelector(s);
 const I={
 gChk:["Connecting…","Connect হচ্ছে…"],
 gPwT:["Enter password","Password দিন"],gPwD:["This PC is password protected.","এই PC password দিয়ে সুরক্ষিত।"],gPwBad:["Wrong password. Try again.","Password ভুল। আবার চেষ্টা করুন।"],gPh:["Password","Password"],gGo:["Continue","চালিয়ে যান"],
-gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষায়"],gWaitD:["Press Allow on the PC screen. {0}s left.","PC-র screen-এ Allow চাপুন। আর {0} সেকেন্ড।"],
+gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষায়"],gWaitD:["Press Allow on the PC screen. {0}s left. Code on the PC: {1}","PC-র screen-এ Allow চাপুন। আর {0} সেকেন্ড। PC-তে কোড: {1}"],
 gDenyT:["Not allowed","Allow করা হয়নি"],gDenyD:["The PC did not allow this device.","PC এই device-কে Allow করেনি।"],gTry:["Try again","আবার চেষ্টা করুন"],
 gOkT:["Connected!","Connected!"],
 gLockT:["Too many tries","অনেকবার ভুল হয়েছে"],gLockD:["Wait {0} seconds, then try again.","{0} সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন।"],
@@ -560,7 +560,7 @@ function gateRender(){
  $('#gin').placeholder=tr('gPh');$('#gok').textContent=tr('gGo');$('#gre').textContent=tr(st==='gone'?'gRe':'gTry');
  if(st==='check'||st==='net')set('wait','<div class="gsp"></div>',st==='net'?'gNetT':'gChk',st==='net'?tr('gNetD'):'');
  else if(st==='password')set('lock','🔒','gPwT',j.bad?tr('gPwBad'):tr('gPwD'),j.bad);
- else if(st==='pending'){set('wait','<div class="gsp"></div>','gWaitT',tr('gWaitD',j.left));$('#gfill').style.width=Math.max(0,Math.min(100,(j.left||0)/60*100))+'%'}
+ else if(st==='pending'){set('wait','<div class="gsp"></div>','gWaitT',tr('gWaitD',j.left,devId().slice(0,4).toUpperCase()));$('#gfill').style.width=Math.max(0,Math.min(100,(j.left||0)/60*100))+'%'}
  else if(st==='denied')set('bad','✕','gDenyT',tr('gDenyD'));
  else if(st==='locked')set('bad','✕','gLockT',tr('gLockD',j.wait));
  else if(st==='gone')set('wait','⏻','gGoneT',tr('gGoneD'));
