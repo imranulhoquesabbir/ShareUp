@@ -425,23 +425,23 @@ body{animation:pgIn .35s ease both}
 <script>
 const I={
 hsBanT:["No network. Connect to your phone’s Hotspot to keep using shareUp.","Network নেই। shareUp চালাতে ফোনের Hotspot-এ connect করুন।"],
-hsOpenGuide:["Show steps","ধাপগুলো দেখান"],
+hsOpenGuide:["Show steps","Step-গুলো দেখান"],
 hsPanel:["Open Wi-Fi list","Wi-Fi list খুলুন"],
 hsLater:["Not now","এখন না"],
 hsSt1:["Turn on Hotspot on your phone","ফোনে Hotspot চালু করুন"],
-hsSt2:["Tap “Open Wi-Fi list” below","নিচের “Wi-Fi list খুলুন” বাটনে চাপুন"],
+hsSt2:["Tap “Open Wi-Fi list” below","নিচের “Wi-Fi list খুলুন” button-এ চাপুন"],
 hsSt3:["Pick your phone and connect. A green ✓ will show up here.","আপনার ফোনের নাম বেছে connect করুন। এখানে সবুজ ✓ দেখা যাবে।"],
 hsFound:["Hotspot found: {0}","Hotspot পাওয়া গেছে: {0}"],
-codeL:["Code","কোড"],rename:["Rename","নাম বদলান"],renameQ:["Name for this phone","এই ফোনের নাম দিন"],added:["Added {0} ago","যোগ হয়েছে {0} আগে"],
-reqCode:["Check that the phone shows this code","ফোনেও এই কোডটা দেখাচ্ছে কিনা মিলিয়ে নিন"],
+codeL:["Code","code"],rename:["Rename","নাম বদলান"],renameQ:["Name for this phone","এই ফোনের নাম দিন"],added:["Added {0} ago","যোগ হয়েছে {0} আগে"],
+reqCode:["Check that the phone shows this code","ফোনেও এই code-টা দেখাচ্ছে কিনা মিলিয়ে নিন"],
 hsWhyT:["Why do I need this?","কেন এটা দরকার?"],
-hsWhy:["This PC has no Wi-Fi or internet, so your phone can’t reach it. Connecting the PC to your phone’s Hotspot lets the two talk and send files, no internet needed.","এই PC-তে WiFi বা internet নেই, তাই ফোন এর সাথে যুক্ত হতে পারছে না। PC-কে ফোনের Hotspot-এ connect করলে internet ছাড়াই দুটোতে ফাইল আদান-প্রদান করা যাবে।"],
-hsRefresh:["Refresh list","তালিকা রিফ্রেশ করুন"],
-hsNone:["Looking for Wi-Fi…","WiFi খোঁজা হচ্ছে…"],
-hsBadLen:["The Wi-Fi password must be 8 to 63 characters.","WiFi password ৮ থেকে ৬৩ অক্ষরের হতে হবে।"],
+hsWhy:["This PC has no Wi-Fi or internet, so your phone can’t reach it. Connecting the PC to your phone’s Hotspot lets the two talk and send files, no internet needed.","এই PC-তে Wi-Fi বা internet নেই, তাই ফোন এর সাথে যুক্ত হতে পারছে না। PC-কে ফোনের Hotspot-এ connect করলে internet ছাড়াই দুটোতে File পাঠানো-নেওয়া যাবে।"],
+hsRefresh:["Refresh list","List Refresh করুন"],
+hsNone:["Looking for Wi-Fi…","Wi-Fi খোঁজা হচ্ছে…"],
+hsBadLen:["The Wi-Fi password must be 8 to 63 characters.","Wi-Fi password ৮ থেকে ৬৩ অক্ষরের হতে হবে।"],
 hsFail:["Could not connect. Check the password and try again.","Connect করা যায়নি। Password দেখে আবার চেষ্টা করুন।"],
-hsJoinedD:["Now scan the QR code with your phone.","এবার ফোন দিয়ে QR কোডটা scan করুন।"],
-hsJoined:["Wi-Fi connected","Wi-Fi connect হয়েছে"], hsJoinedNet:["Connected to {0}","{0}-এ connect হয়েছে"], updUnpack:["Preparing the update…","আপডেট প্রস্তুত হচ্ছে…"], updRestart:["Restarting shareUp…","shareUp আবার চালু হচ্ছে…"], updRestartD:["This takes a few seconds. The window will reopen by itself.","কয়েক সেকেন্ড লাগবে। উইন্ডো নিজে থেকেই আবার খুলবে।"],
+hsJoinedD:["Now scan the QR code with your phone.","এবার ফোন দিয়ে QR code-টা scan করুন।"],
+hsJoined:["Wi-Fi connected","Wi-Fi connect হয়েছে"], hsJoinedNet:["Connected to {0}","{0}-এ connect হয়েছে"], updUnpack:["Preparing the update…","Update তৈরি হচ্ছে…"], updRestart:["Restarting shareUp…","shareUp আবার চালু হচ্ছে…"], updRestartD:["This takes a few seconds. The window will reopen by itself.","কয়েক সেকেন্ড লাগবে। window নিজে থেকেই আবার খুলবে।"],
 hs4T:["Connecting…","Connect হচ্ছে…"],
 hsWrong:["That password did not work. Try again.","Password মেলেনি। আবার দিন।"],
 hsOther:["Use a different Hotspot","অন্য Hotspot বেছে নিন"],
@@ -449,97 +449,100 @@ hsConn:["Connect","Connect করুন"],
 hs3T:["Enter the Hotspot password","Hotspot-এর password দিন"],
 hs2P:["Tap the name of your phone.","আপনার ফোনের নামটিতে চাপুন।"],
 hs2T:["Choose your phone’s Hotspot","আপনার ফোনের Hotspot বেছে নিন"],
-hsAll:["Can’t see it? Show all Wi-Fi","দেখা যাচ্ছে না? সব WiFi দেখান"],
+hsAll:["Can’t see it? Show all Wi-Fi","দেখা যাচ্ছে না? সব Wi-Fi দেখান"],
 hs1P:["Open Settings on your phone and switch Hotspot on. We will find it here by ourselves.","ফোনের Settings থেকে Hotspot চালু করুন। আমরা এখানে নিজেই খুঁজে নেব।"],
 hs1T:["Connect this PC to your phone’s Hotspot","PC-কে ফোনের Hotspot-এ connect করুন"],
-gS2n:["First time only: join your phone’s Hotspot once from the PC’s Wi-Fi list. After that it is automatic.","প্রথমবার শুধু: PC-র WiFi list থেকে ফোনের Hotspot-এ একবার connect করুন। এরপর সব নিজে নিজে হবে।"],
-selN:["{0} selected","{0}টি বাছা হয়েছে"],selAll:["Select all","সব বাছুন"],delN:["Delete {0} items from this PC?","{0}টি আইটেম এই পিসি থেকে মুছে ফেলবেন?"],deletedN:["Deleted {0} items","{0}টি মুছে ফেলা হয়েছে"],
-advT:["Advanced settings (not needed for normal use)","উন্নত সেটিং (সাধারণ ব্যবহারে লাগে না)"],
+gS2n:["First time only: join your phone’s Hotspot once from the PC’s Wi-Fi list. After that it is automatic.","প্রথমবার শুধু: PC-র Wi-Fi list থেকে ফোনের Hotspot-এ একবার connect করুন। এরপর সব নিজে নিজে হবে।"],
+selN:["{0} selected","{0}টি selected"],selAll:["Select all","Select all"],delN:["Delete {0} items from this PC?","{0}টি item এই PC থেকে মুছে ফেলবেন?"],deletedN:["Deleted {0} items","{0}টি মুছে ফেলা হয়েছে"],
+advT:["Advanced settings (not needed for normal use)","Advanced Settings (সাধারণ ব্যবহারে লাগে না)"],
 scanPT:["Works on any network. The QR may change when shareUp restarts.","যেকোনো network-এ কাজ করবে।"],
 hintT:["Fixed QR is not on yet","Fixed QR এখনো চালু হয়নি"],hintD:["Add your Worker link once in Settings (see WORKER_SETUP.md) and one QR will work everywhere.","Settings-এ একবার Worker link দিন (WORKER_SETUP.md দেখুন), তারপর একটা QR সব জায়গায় কাজ করবে।"],
 scanHF:["Scan to connect","Scan করে connect করুন"],scanPF:["This QR never changes. It works on any network, even mobile data.","এই QR কখনো বদলাবে না। যেকোনো network বা mobile data-তেই কাজ করবে।"],
-scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই WiFi বা Hotspot-এ কাজ করবে।"],
+scanHO:["Offline QR","Offline QR"],scanPO:["No internet: this QR works only on the same Wi-Fi or Hotspot.","Internet নেই: এই QR শুধু একই Wi-Fi বা Hotspot-এ কাজ করবে।"],
 gNoNet:["No internet","Internet নেই"],gS1:["Turn on Offline mode","Offline mode চালু করুন"],gS2:["Turn on your phone’s Hotspot. The PC joins it by itself.","ফোনের Hotspot on করুন। PC নিজেই connect হয়ে যাবে।"],gS2s:["Save your Hotspot name and password in Settings","Settings-এ Hotspot-এর নাম ও password দিন"],gS3:["Scan the QR again","QR আবার scan করুন"],
 gD1:["Offline mode is on","Offline mode চালু হয়েছে"],gD2:["Network connected","Network connected"],gDo1:["Turn on","চালু করুন"],gDo2:["Open Settings","Settings খুলুন"],
 gBack:["Internet is back","Internet ফিরে এসেছে"],gBackD:["Your old QR works again. Nothing else to do.","আগের QR আবার কাজ করবে। আর কিছু করতে হবে না।"],gDone:["Connected!","Connected!"],
-smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for Wi-Fi and internet.","একটা QR যা কখনো বদলায় না, WiFi আর internet দুটোতেই।"],
-wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","সেভ"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","সেভ হয়েছে"],
+smT:["Smart connection","Smart connection"],smS:["One QR that never changes, for Wi-Fi and internet.","একটা QR যা কখনো বদলায় না, Wi-Fi আর internet দুটোতেই।"],
+wkT:["Fixed QR link (Cloudflare Worker)","Fixed QR link (Cloudflare Worker)"],wkS:["Paste your Worker address. See WORKER_SETUP.md.","আপনার Worker-এর address দিন। WORKER_SETUP.md দেখুন।"],wkSave:["Save","Save"],wkNone:["Not set up","সেট করা হয়নি"],wkReady:["✓ Ready","✓ প্রস্তুত"],wkWait:["Connecting to Worker…","Worker-এর সাথে connect হচ্ছে…"],smSaved:["Saved","Save হয়েছে"],
 anT:["Automatic Internet","Automatic Internet"],anS:["Keeps the internet link ready by itself (needs the fixed QR).","Internet link নিজে চালু রাখবে (fixed QR লাগবে)।"],
-ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই WiFi বা Hotspot-এর QR দেখাবে।"],
+ofT:["Offline mode","Offline mode"],ofS:["With no internet, show a QR for the same Wi-Fi or Hotspot.","Internet না থাকলে একই Wi-Fi বা Hotspot-এর QR দেখাবে।"],
 wkReset:["Reset fixed QR","Fixed QR reset"],wkResetQ:["The old QR will stop working. Continue?","পুরোনো QR আর কাজ করবে না। চালিয়ে যাবেন?"],
-devH:["Connected phones","কানেক্টেড ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
+devH:["Connected phones","Connected ফোন"],devNone:["No device connected yet","এখনো কোনো device connect হয়নি"],
 secH:["Security","Security"],secS:["Choose how new phones are let in.","নতুন phone কীভাবে ঢুকবে সেটা ঠিক করুন।"],
 apT:["Approval","Approval"],apS:["Ask on this PC before a new device connects.","নতুন device connect হওয়ার আগে এই PC-তে জিজ্ঞেস করবে।"],
 pwT:["Password","Password"],pwS:["Phones must enter the password to connect.","Connect করতে phone-এ password দিতে হবে।"],
-pwPh:["New password (min 4)","নতুন password (কমপক্ষে ৪)"],pwSave:["Save password","Password সেভ"],pwSaved:["Password saved","Password সেভ হয়েছে"],pwFirst:["Save a password first","আগে একটা password সেভ করুন"],
+pwPh:["New password (min 4)","নতুন password (কমপক্ষে ৪)"],pwSave:["Save password","Password Save"],pwSaved:["Password saved","Password Save হয়েছে"],pwFirst:["Save a password first","আগে একটা password Save করুন"],
 indT:["Allow both on / both off","দুটো একসাথে on বা off রাখুন"],indS:["Normally turning one on switches the other off. Turn this on to control both yourself.","সাধারণত একটা on করলে অন্যটা নিজে off হয়। নিজে দুটো ঠিক করতে এটা on করুন।"],
-warnOpen:["Warning: with Approval and Password both off, anyone who scans the QR can connect.","সাবধান: Approval ও Password দুটোই off থাকলে QR স্ক্যান করা যে কেউ connect করতে পারবে।"],
+warnOpen:["Warning: with Approval and Password both off, anyone who scans the QR can connect.","সাবধান: Approval ও Password দুটোই off থাকলে QR scan করা যে কেউ connect করতে পারবে।"],
 trH:["Always-allowed phones","সবসময় অনুমতি পাওয়া ফোন"],trNone:["None","কেউ নেই"],
 reqH:["Let this phone in?","এই ফোনকে ঢুকতে দেবেন?"],allowOnce:["Just this time","এইবারের জন্য"],allowTrust:["Always allow","সবসময়ের জন্য"],deny:["Don’t allow","না"],reqLeft:["Auto-deny in {0}s","{0} সেকেন্ডে নিজে “না” হয়ে যাবে"],
 kick:["Disconnect","Disconnect"],trust:["Always allow","সবসময় অনুমতি"],untrust:["Remove","সরান"],viaNet:["Internet","Internet"],viaLan:["Wi-Fi","WiFi"],online:["Online","Online"],lastSeen:["Last seen {0}","শেষ দেখা {0}"],
-tag:["Send files between phone and PC","ফোন ও পিসির মধ্যে ফাইল আদান-প্রদান"],
-running:["Running","চালু আছে"],nonet:["No network","নেটওয়ার্ক নেই"],
-tConnect:["Connect Phone","ফোন কানেক্ট"],tRecv:["From Phone","ফোন থেকে পাওয়া"],tShare:["Shared from PC","পিসি থেকে শেয়ার"],tSet:["Settings","সেটিংস"],
-modeLan:["Same Wi-Fi","একই ওয়াইফাই"],modeNet:["Internet","ইন্টারনেট"],
-scanH:["Scan to connect","কিউআর কোড স্ক্যান করুন"],
-scanP:["Point your phone camera at the code. Your phone and PC need to be on the same Wi-Fi.","ফোনের ক্যামেরা কোডটির দিকে ধরুন। ফোন ও পিসি একই ওয়াইফাইতে থাকতে হবে।"],
-copy:["Copy","কপি"],copyLink:["Copy link","লিংক কপি"],copied:["Copied","কপি হয়েছে"],
-netH:["Internet access","ইন্টারনেট অ্যাক্সেস"],newLink:["New link","নতুন লিংক"],newLinkDone:["New link created","নতুন লিংক তৈরি হয়েছে"],
-rOff:["Send files from any network, even mobile data. Off by default, and it switches off whenever shareUp restarts.","যেকোনো নেটওয়ার্ক বা মোবাইল ডেটা থেকে ফাইল পাঠানো যায়। ডিফল্টে বন্ধ থাকে, আর শেয়ারআপ রিস্টার্ট হলে নিজে থেকেই বন্ধ হয়ে যায়।"],
-rDown:["Downloading the connection helper (first time only)… {0}%","কানেকশন হেল্পার ডাউনলোড হচ্ছে (শুধু প্রথমবার)… {0}%"],
-rStart:["Connecting…","কানেক্ট হচ্ছে…"],
-rOn:["Scan with your phone on any network. Only people with this private link can connect. Make a new link to cut off the old one.","যেকোনো নেটওয়ার্কে ফোন দিয়ে স্ক্যান করুন। শুধু এই প্রাইভেট লিংক যাদের কাছে আছে তারাই কানেক্ট করতে পারবে। পুরোনো লিংক বন্ধ করতে নতুন লিংক বানান।"],
+tag:["Send files between phone and PC","ফোন আর PC-র মধ্যে File পাঠান ও নিন"],
+running:["Running","চালু আছে"],nonet:["No network","Network নেই"],
+tConnect:["Connect Phone","ফোন Connect"],tRecv:["From Phone","ফোন থেকে পাওয়া"],tShare:["Shared from PC","PC থেকে Share"],tSet:["Settings","Settings"],
+modeLan:["Same Wi-Fi","একই Wi-Fi"],modeNet:["Internet","Internet"],
+scanH:["Scan to connect","QR code scan করুন"],
+scanP:["Point your phone camera at the code. Your phone and PC need to be on the same Wi-Fi.","ফোনের camera এই QR code-এর দিকে ধরুন। ফোন ও PC একই Wi-Fi-তে থাকতে হবে।"],
+copy:["Copy","Copy"],copyLink:["Copy link","link Copy"],copied:["Copied","Copy হয়েছে"],
+netH:["Internet access","Internet access"],newLink:["New link","নতুন link"],newLinkDone:["New link created","নতুন link তৈরি হয়েছে"],
+rOff:["Send files from any network, even mobile data. Off by default, and it switches off whenever shareUp restarts.","যেকোনো Network বা Mobile data থেকে File পাঠানো যায়। Default-এ বন্ধ থাকে, আর shareUp Restart হলে নিজে থেকেই বন্ধ হয়ে যায়।"],
+rDown:["Downloading the connection helper (first time only)… {0}%","connection helper Download হচ্ছে (শুধু প্রথমবার)… {0}%"],
+rStart:["Connecting…","connect হচ্ছে…"],
+rOn:["Scan with your phone on any network. Only people with this private link can connect. Make a new link to cut off the old one.","যেকোনো Network-এ ফোন দিয়ে scan করুন। শুধু এই private link যাদের কাছে আছে তারাই connect করতে পারবে। পুরোনো link বন্ধ করতে নতুন link বানান।"],
 retry:["Switch on to try again.","আবার চেষ্টা করতে চালু করুন।"],
-nonetfound:["No network found","কোনো নেটওয়ার্ক পাওয়া যায়নি"],
+nonetfound:["No network found","কোনো Network পাওয়া যায়নি"],
 howH:["How to use","ব্যবহারের নিয়ম"],
-s1t:["Scan the QR code","কিউআর কোড স্ক্যান করুন"],s1d:["Open your phone camera and point it at the code above.","ফোনের ক্যামেরা খুলে ওপরের কোডে ধরুন।"],
-s2t:["Send files to the PC","ফোন থেকে পিসিতে পাঠান"],s2d:["They arrive in the “From Phone” tab.","ফাইল আসবে “ফোন থেকে পাওয়া” ট্যাবে।"],
-s3t:["Get PC files on the phone","পিসির ফাইল ফোনে নিন"],s3d:["Put files in the “Shared from PC” tab and open them on your phone.","“পিসি থেকে শেয়ার” ট্যাবে ফাইল রাখুন, ফোনে খুলে নিন।"],
-recvT:["Files received from your phone","ফোন থেকে পাওয়া ফাইল"],recvS:["Everything you send from your phone is saved in this folder.","ফোন থেকে পাঠানো সব ফাইল এই ফোল্ডারে জমা হয়।"],
-shareT:["Files shared from this PC","এই পিসি থেকে শেয়ার করা ফাইল"],shareS:["Your phone can see and download whatever is in this folder.","এই ফোল্ডারের ফাইল ফোনে দেখা ও ডাউনলোড করা যাবে।"],
-defRecv:["Default save folder","ডিফল্ট সেভ ফোল্ডার"],defShare:["Default shared folder","ডিফল্ট শেয়ার ফোল্ডার"],
-change:["Change folder","ফোল্ডার বদলান"],
-shSw:["Let the phone see these files","ফোনকে ফাইল দেখতে দিন"],shOn:["On – phone can see files","চালু – ফোন দেখতে পাচ্ছে"],shOff:["Off – phone can’t see files","বন্ধ – ফোন দেখতে পাচ্ছে না"],
-sharingOn:["Sharing on","শেয়ারিং চালু হয়েছে"],sharingOff:["Sharing off","শেয়ারিং বন্ধ হয়েছে"],
-filesH:["Files in this folder","এই ফোল্ডারের ফাইল"],
-pasteHere:["Paste here","এখানে পেস্ট"],moveHere:["Move here","এখানে সরান"],
-newFolder:["New folder","নতুন ফোল্ডার"],openFolder:["Open folder","ফোল্ডার খুলুন"],addFiles:["Add files","ফাইল যোগ করুন"],
-noneRH:["Choose where phone files are saved","ফোনের ফাইল কোথায় জমবে বেছে নিন"],noneRP:["Files you send from your phone land in this folder.","ফোন থেকে পাঠানো ফাইল এই ফোল্ডারে সেভ হবে।"],chooseR:["Choose save folder","সেভ ফোল্ডার বাছুন"],
-noneSH:["Choose a folder to share","শেয়ার করার ফোল্ডার বেছে নিন"],noneSP:["Pick any folder. Whatever you put inside shows up on your phone.","যেকোনো ফোল্ডার বাছুন। ভেতরের ফাইল ফোনে দেখা যাবে।"],chooseF:["Choose folder","ফোল্ডার বাছুন"],
-dzH:["Drag files or folders here","ফাইল বা ফোল্ডার এখানে টেনে এনে ছাড়ুন"],
-dz1:["or press","অথবা কপি করা ফাইল ও স্ক্রিনশট পেস্ট করতে"],dz2:["to paste copied files and screenshots","চাপুন"],
-folderName:["Folder name","ফোল্ডারের নাম"],create:["Create","তৈরি করুন"],cancel:["Cancel","বাতিল"],
-emptyR:["Nothing received yet. Files you send from your phone show up here.","এখনো কিছু আসেনি। ফোন থেকে ফাইল পাঠালে এখানে দেখা যাবে।"],
-emptyS:["Nothing here yet. Drop files in to share them with your phone.","এখনো কিছু নেই। ফোনে দেখাতে চাইলে এখানে ফাইল ছেড়ে দিন।"],
-rootR:["Received","পাওয়া ফাইল"],rootS:["Shared folder","শেয়ার ফোল্ডার"],
-item1:["1 item","১টি আইটেম"],itemN:["{0} items","{0}টি আইটেম"],
-folder:["Folder","ফোল্ডার"],dbl:["Double-click to open","খুলতে ডাবল-ক্লিক করুন"],
-del:["Delete","মুছুন"],more:["More options for","আরও অপশন:"],
-delDir:["Delete the folder “{0}” and everything inside it from this PC?","ফোল্ডার “{0}” ও এর ভেতরের সবকিছু এই পিসি থেকে মুছে ফেলবেন?"],
-delOne:["Delete “{0}” from this PC?","“{0}” এই পিসি থেকে মুছে ফেলবেন?"],deleted:["Deleted","মুছে ফেলা হয়েছে"],
-open:["Open","খুলুন"],rename:["Rename","নাম বদলান"],copyM:["Copy","কপি"],cut:["Cut","কাট"],pasteInto:["Paste into folder","ফোল্ডারের ভেতরে পেস্ট"],
+s1t:["Scan the QR code","QR code scan করুন"],s1d:["Open your phone camera and point it at the code above.","ফোনের camera খুলে ওপরের code-এ ধরুন।"],
+s2t:["Send files to the PC","ফোন থেকে PC-তে পাঠান"],s2d:["They arrive in the “From Phone” tab.","File আসবে “ফোন থেকে পাওয়া” Tab-এ।"],
+s3t:["Get PC files on the phone","PC-র File ফোনে নিন"],s3d:["Put files in the “Shared from PC” tab and open them on your phone.","“PC থেকে Share” Tab-এ File রাখুন, ফোনে খুলে নিন।"],
+recvT:["Files received from your phone","ফোন থেকে পাওয়া File"],recvS:["Everything you send from your phone is saved in this folder.","ফোন থেকে পাঠানো সব File এই Folder-এ জমা হয়।"],
+shareT:["Files shared from this PC","এই PC থেকে Share করা File"],shareS:["Your phone can see and download whatever is in this folder.","এই Folder-এর File ফোনে দেখা ও Download করা যাবে।"],
+defRecv:["Default save folder","Default Save Folder"],defShare:["Default shared folder","Default Share Folder"],
+change:["Change folder","Folder বদলান"],
+shSw:["Let the phone see these files","ফোনকে File দেখতে দিন"],shOn:["On – phone can see files","চালু – ফোন দেখতে পাচ্ছে"],shOff:["Off – phone can’t see files","বন্ধ – ফোন দেখতে পাচ্ছে না"],
+sharingOn:["Sharing on","Sharing চালু হয়েছে"],sharingOff:["Sharing off","Sharing বন্ধ হয়েছে"],
+filesH:["Files in this folder","এই Folder-এর File"],
+pasteHere:["Paste here","এখানে Paste"],moveHere:["Move here","এখানে সরান"],
+newFolder:["New folder","নতুন Folder"],openFolder:["Open folder","Folder খুলুন"],addFiles:["Add files","File যোগ করুন"],
+noneRH:["Choose where phone files are saved","ফোনের File কোথায় জমবে বেছে নিন"],noneRP:["Files you send from your phone land in this folder.","ফোন থেকে পাঠানো File এই Folder-এ Save হবে।"],chooseR:["Choose save folder","Save Folder বাছুন"],
+noneSH:["Choose a folder to share","Share করার Folder বেছে নিন"],noneSP:["Pick any folder. Whatever you put inside shows up on your phone.","যেকোনো Folder বাছুন। ভেতরের File ফোনে দেখা যাবে।"],chooseF:["Choose folder","Folder বাছুন"],
+dzH:["Drag files or folders here","File বা Folder এখানে টেনে এনে ছাড়ুন"],
+dz1:["or press","অথবা Copy করা File ও screenshot Paste করতে"],dz2:["to paste copied files and screenshots","চাপুন"],
+folderName:["Folder name","Folder-এর নাম"],create:["Create","তৈরি করুন"],cancel:["Cancel","Cancel"],
+emptyR:["Nothing received yet. Files you send from your phone show up here.","এখনো কিছু আসেনি। ফোন থেকে File পাঠালে এখানে দেখা যাবে।"],
+emptyS:["Nothing here yet. Drop files in to share them with your phone.","এখনো কিছু নেই। ফোনে দেখাতে চাইলে এখানে File ছেড়ে দিন।"],
+rootR:["Received","পাওয়া File"],rootS:["Shared folder","Share Folder"],
+item1:["1 item","১টি item"],itemN:["{0} items","{0}টি item"],
+folder:["Folder","Folder"],dbl:["Double-click to open","খুলতে Double-click করুন"],
+del:["Delete","মুছুন"],more:["More options for","আরও option:"],
+delDir:["Delete the folder “{0}” and everything inside it from this PC?","Folder “{0}” ও এর ভেতরের সবকিছু এই PC থেকে মুছে ফেলবেন?"],
+delOne:["Delete “{0}” from this PC?","“{0}” এই PC থেকে মুছে ফেলবেন?"],deleted:["Deleted","মুছে ফেলা হয়েছে"],
+open:["Open","খুলুন"],rename:["Rename","নাম বদলান"],copyM:["Copy","Copy"],cut:["Cut","Cut"],pasteInto:["Paste into folder","Folder-এর ভেতরে Paste"],
 newName:["New name","নতুন নাম"],renamed:["Renamed","নাম বদলানো হয়েছে"],
-clipCut:["Cut. Open a folder and choose Move here","কাট হয়েছে। কোনো ফোল্ডারে গিয়ে “এখানে সরান” চাপুন"],
-clipCopy:["Copied. Open a folder and choose Paste here","কপি হয়েছে। কোনো ফোল্ডারে গিয়ে “এখানে পেস্ট” চাপুন"],
-movedN:["Moved {0} items","{0}টি আইটেম সরানো হয়েছে"],copiedN:["Copied {0} items","{0}টি আইটেম কপি হয়েছে"],
-folderMade:["Folder created","ফোল্ডার তৈরি হয়েছে"],chooseFirst:["Choose a folder first","আগে একটি ফোল্ডার বাছুন"],
-adding:["Adding {0} of {1} files","{1}টির মধ্যে {0}টি ফাইল যোগ হচ্ছে"],addedN:["Added {0} files","{0}টি ফাইল যোগ হয়েছে"],addedFail:["{0} added, {1} failed","{0}টি যোগ হয়েছে, {1}টি ব্যর্থ"],
-dropR:["Drop to add to received files","ছেড়ে দিন – পাওয়া ফাইলে যোগ হবে"],dropS:["Drop to add to shared folder","ছেড়ে দিন – শেয়ার ফোল্ডারে যোগ হবে"],
+clipCut:["Cut. Open a folder and choose Move here","Cut হয়েছে। কোনো Folder-এ গিয়ে “এখানে সরান” চাপুন"],
+clipCopy:["Copied. Open a folder and choose Paste here","Copy হয়েছে। কোনো Folder-এ গিয়ে “এখানে Paste” চাপুন"],
+clipCopyOs:["Copied. You can paste it in any folder, even outside shareUp (Ctrl+V)","Copy হয়েছে। যেকোনো Folder-এ, এমনকি shareUp-এর বাইরেও Paste করা যাবে (Ctrl+V)"],
+clipCutOs:["Cut. Paste it in any folder (Ctrl+V) to move it","Cut হয়েছে। যেকোনো Folder-এ Paste (Ctrl+V) করলে সরে যাবে"],
+clipNone:["Nothing to paste. Copy some files first.","Paste করার মতো কিছু নেই। আগে File Copy করুন।"],
+movedN:["Moved {0} items","{0}টি item সরানো হয়েছে"],copiedN:["Copied {0} items","{0}টি item Copy হয়েছে"],
+folderMade:["Folder created","Folder তৈরি হয়েছে"],chooseFirst:["Choose a folder first","আগে একটি Folder বাছুন"],
+adding:["Adding {0} of {1} files","{1}টির মধ্যে {0}টি File যোগ হচ্ছে"],addedN:["Added {0} files","{0}টি File যোগ হয়েছে"],addedFail:["{0} added, {1} failed","{0}টি যোগ হয়েছে, {1}টি হয়নি"],
+dropR:["Drop to add to received files","ছেড়ে দিন – পাওয়া File-এ যোগ হবে"],dropS:["Drop to add to shared folder","ছেড়ে দিন – Share Folder-এ যোগ হবে"],
 wrong:["Something went wrong","কিছু একটা সমস্যা হয়েছে"],
-langT:["Language","ভাষা"],langS:["Choose the language of the app","অ্যাপের ভাষা বেছে নিন"],
-startT:["Start when I sign in","কম্পিউটার চালু হলে নিজে থেকে চালু হোক"],
-startS:["Runs quietly in the system tray. Click the tray icon or open shareUp again to see this window.","সিস্টেম ট্রেতে চুপচাপ চলবে। ট্রে-র আইকনে ক্লিক করলে বা শেয়ারআপ আবার খুললে এই উইন্ডো দেখা যাবে।"],
-startOn:["Will start when you sign in","সাইন ইন করলে নিজে থেকে চালু হবে"],startOff:["Startup off","স্টার্টআপ বন্ধ"],
-updT:["Check for updates","আপডেট খোঁজা"],updS:["Looks for a new version and asks you before installing. Nothing updates by itself.","নতুন সংস্করণ খুঁজে জানাবে, ইনস্টলের আগে আপনার অনুমতি চাইবে। নিজে থেকে কিছু আপডেট হবে না।"],updLater:["Later","পরে"],
-updCheck:["Checking for updates…","আপডেট খোঁজা হচ্ছে…"],updReady:["New build {0} is ready (you have {1})","নতুন সংস্করণ {0} প্রস্তুত (আপনার কাছে {1})"],
-updOk:["Up to date ({0})","আপ টু ডেট ({0})"],updNone:["Up to date – no releases yet","আপ টু ডেট – এখনো কোনো রিলিজ নেই"],
-updInst:["Installing {0}…{1}","{0} ইনস্টল হচ্ছে…{1}"],updAvail:["New version {0} available","নতুন সংস্করণ {0} পাওয়া যাচ্ছে"],
-updHave:["You have {0}. Update now? shareUp will close and reopen by itself.","আপনার কাছে {0} আছে। এখনই আপডেট করবেন? শেয়ারআপ বন্ধ হয়ে নিজে আবার খুলবে।"],updNow:["Update now","এখনই আপডেট করুন"],
-autoOn:["Auto update on","অটো আপডেট চালু"],autoOff:["Auto update off","অটো আপডেট বন্ধ"],
-netSet:["Network (advanced)","নেটওয়ার্ক (উন্নত)"],netSetS:["Usually you don’t need to change these.","সাধারণত এগুলো বদলানোর দরকার হয় না।"],
-ip:["IP address","আইপি অ্যাড্রেস"],port:["Port","পোর্ট"],apply:["Apply","প্রয়োগ করুন"],
-quitT:["Stop shareUp","শেয়ারআপ বন্ধ করুন"],quitS:["Closes the app completely, including the tray icon.","অ্যাপটি ট্রে-র আইকনসহ পুরোপুরি বন্ধ হয়ে যাবে।"],quitB:["Quit","বন্ধ করুন"],
-quitC:["Stop shareUp?","শেয়ারআপ বন্ধ করবেন?"],quitD:["shareUp stopped. You can close this window.","শেয়ারআপ বন্ধ হয়েছে। এই উইন্ডোটি বন্ধ করতে পারেন।"]
+langT:["Language","ভাষা"],langS:["Choose the language of the app","App-এর ভাষা বেছে নিন"],
+startT:["Start when I sign in","Sign in করলে নিজে থেকে চালু হোক"],
+startS:["Runs quietly in the system tray. Click the tray icon or open shareUp again to see this window.","system tray-তে চুপচাপ চলবে। system tray-র icon-এ click করলে বা shareUp আবার খুললে এই window দেখা যাবে।"],
+startOn:["Will start when you sign in","Sign in করলে নিজে থেকে চালু হবে"],startOff:["Startup off","Startup বন্ধ"],
+updT:["Check for updates","Update খোঁজা"],updS:["Looks for a new version and asks you before installing. Nothing updates by itself.","নতুন version খুঁজে জানাবে, Install-এর আগে আপনার অনুমতি চাইবে। নিজে থেকে কিছু Update হবে না।"],updLater:["Later","পরে"],
+updCheck:["Checking for updates…","Update খোঁজা হচ্ছে…"],updReady:["New build {0} is ready (you have {1})","নতুন version {0} প্রস্তুত (আপনার কাছে {1})"],
+updOk:["Up to date ({0})","Up to date ({0})"],updNone:["Up to date – no releases yet","Up to date – এখনো কোনো release নেই"],
+updInst:["Installing {0}…{1}","{0} Install হচ্ছে…{1}"],updAvail:["New version {0} available","নতুন version {0} পাওয়া যাচ্ছে"],
+updHave:["You have {0}. Update now? shareUp will close and reopen by itself.","আপনার কাছে {0} আছে। এখনই Update করবেন? shareUp বন্ধ হয়ে নিজে আবার খুলবে।"],updNow:["Update now","এখনই Update করুন"],
+autoOn:["Auto update on","Auto Update চালু"],autoOff:["Auto update off","Auto Update বন্ধ"],
+netSet:["Network (advanced)","Network (Advanced)"],netSetS:["Usually you don’t need to change these.","সাধারণত এগুলো বদলানোর দরকার হয় না।"],
+ip:["IP address","IP address"],port:["Port","Port"],apply:["Apply","Apply"],
+quitT:["Stop shareUp","shareUp বন্ধ করুন"],quitS:["Closes the app completely, including the tray icon.","App-টি system tray-র icon-সহ পুরোপুরি বন্ধ হয়ে যাবে।"],quitB:["Quit","বন্ধ করুন"],
+quitC:["Stop shareUp?","shareUp বন্ধ করবেন?"],quitD:["shareUp stopped. You can close this window.","shareUp বন্ধ হয়েছে। এই window-টি বন্ধ করতে পারেন।"]
 };
 let LANG='bn';try{LANG=localStorage.getItem('lang')||'bn'}catch(e){}
 const t=(k,...a)=>{const e=I[k];let s=e?e[LANG==='bn'?1:0]:k;a.forEach((v,i)=>{s=s.split('{'+i+'}').join(v)});return s};
@@ -567,8 +570,11 @@ async function api(p,b){
   return r.json()}catch(e){return null}
 }
 function setVal(sel,v){const e=$(sel);if(document.activeElement!==e)e.value=v}
-function copy(t){
- return navigator.clipboard.writeText(t).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove()}).then(()=>toast(t('copied')));
+function copy(txt){   // (the argument used to be called "t", which hid the translate function t() and broke the "Copied" message)
+ const fallback=()=>{const a=document.createElement('textarea');a.value=txt;a.style.cssText='position:fixed;left:-9999px;top:0';document.body.append(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();return ok};
+ let p;
+ try{p=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()}catch(e){p=Promise.reject(e)}
+ return p.catch(()=>{if(!fallback())throw 0}).then(()=>toast(t('copied')),()=>toast(t('wrong'),2400));
 }
 let qrTok=0;
 function setQR(q){
@@ -792,7 +798,11 @@ function ftile(it){
  m.onclick=e=>{e.stopPropagation();const r=m.getBoundingClientRect();openMenu(r.left,r.bottom+4,full,it,el)};
  el.oncontextmenu=e=>{e.preventDefault();openMenu(e.clientX,e.clientY,full,it,el)};
  el.draggable=true;
- el.ondragstart=e=>{if(!SEL.has(full)){SEL.clear();SEL.add(full);anchor=full;paintSel()}const ps=[...SEL];e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:ps[0],paths:ps}));e.dataTransfer.effectAllowed='copyMove'};
+ el.ondragstart=e=>{if(!SEL.has(full)){SEL.clear();SEL.add(full);anchor=full;paintSel()}const ps=[...SEL];e.dataTransfer.setData(DT,JSON.stringify({root:root(),path:ps[0],paths:ps}));
+  // A single file can also be dragged out of the window (Desktop, Explorer folder...): Windows downloads it from this link.
+  // Several files or a folder can't be dragged out that way: use Copy, then Paste in the other folder.
+  if(!it.dir&&ps.length===1)try{e.dataTransfer.setData('DownloadURL','application/octet-stream:'+it.name.replace(/[:\\/]/g,'_')+':'+location.origin+'/admin/raw/'+enc+'?root='+root())}catch(x){}
+  e.dataTransfer.effectAllowed='copyMove'};
  el.onclick=e=>{e.stopPropagation();clickSel(full,e)};
  el.ondblclick=()=>it.dir?go(full):openIt(full);
  if(it.dir)dropOn(el,()=>full);
@@ -831,7 +841,7 @@ function openMenu(x,y,full,it,el){
   add(t('rename'),()=>renameIt(full,it,el));
   add(t('copyM'),()=>setClip('copy',[full]));
   add(t('cut'),()=>setClip('cut',[full]));
-  if(clip&&it.dir)add(t('pasteInto'),()=>pasteTo(full));
+  if(it.dir)add(t('pasteInto'),()=>pasteTo(full));
   cm.append(document.createElement('hr'));
   add(t('del'),()=>delMany([full]),'dg');
  }
@@ -849,8 +859,8 @@ document.addEventListener('keydown',e=>{
  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
  if(mod&&k==='a'){e.preventDefault();selectAll()}
  else if(e.key==='Delete'&&SEL.size){e.preventDefault();delMany([...SEL])}
- else if(mod&&k==='c'&&SEL.size){e.preventDefault();setClip('copy',[...SEL])}
- else if(mod&&k==='x'&&SEL.size){e.preventDefault();setClip('cut',[...SEL])}
+ else if(mod&&k==='c'&&SEL.size&&!String(getSelection()||'')){e.preventDefault();setClip('copy',[...SEL])}
+ else if(mod&&k==='x'&&SEL.size&&!String(getSelection()||'')){e.preventDefault();setClip('cut',[...SEL])}
  else if(e.key==='F2'&&SEL.size===1){const p=[...SEL][0],it=ITEMS.get(p),el=document.querySelector('#fgrid .ft[data-p="'+CSS.escape(p)+'"]');if(it&&el){e.preventDefault();renameIt(p,it,el)}}
  else if(e.key==='Enter'&&SEL.size===1){const p=[...SEL][0],it=ITEMS.get(p);if(it)it.dir?go(p):openIt(p)}
 });
@@ -860,14 +870,18 @@ $('#fgrid').addEventListener('click',e=>{if(e.target===$('#fgrid'))clearSel()});
 window.addEventListener('scroll',closeMenu,true);
 
 function updatePaste(){
+ // always offered in the file tabs: files copied in Explorer can be pasted too, not only files copied here
  const b=$('#fpaste');
- b.hidden=!(clip&&inFiles());
- if(clip)$('#fpt').textContent=t(clip.mode==='cut'?'moveHere':'pasteHere');
+ b.hidden=!(inFiles()&&rootDirOf(S));
+ $('#fpt').textContent=t(clip&&clip.mode==='cut'?'moveHere':'pasteHere');
 }
-function setClip(mode,paths){
+async function setClip(mode,paths){
  clip={mode,root:root(),paths:[].concat(paths)};
- toast(t(mode==='cut'?'clipCut':'clipCopy'),2200);
  lastL='';loadFiles();updatePaste();
+ // also put the files on the real Windows clipboard, so they can be pasted outside shareUp too
+ const j=await post('/admin/clipcopy',{root:clip.root,paths:clip.paths,cut:mode==='cut'});
+ const os=!!(j&&j.ok);
+ toast(t(mode==='cut'?(os?'clipCutOs':'clipCut'):(os?'clipCopyOs':'clipCopy')),2600);
 }
 async function transfer(c,dest){
  const move=c.mode==='cut'||c.mode==='move';
@@ -877,10 +891,24 @@ async function transfer(c,dest){
  else toast(t(move?'movedN':'copiedN',j.done));
  lastL='';loadFiles();return j;
 }
-async function pasteTo(dest){
- if(!clip)return;
+// Files on the real clipboard (copied in Explorer, or copied here) -> into folder dest. null = nothing there.
+async function pasteNative(dest){
+ const j=await post('/admin/clippaste',{root:root(),to:dest});
+ if(!j||j.none)return null;
+ if(j.error)toast(j.error,3200);
+ else toast(t(j.cut?'movedN':'copiedN',j.done));
+ lastL='';loadFiles();
+ return j;
+}
+async function pasteInternal(dest){
+ if(!clip){toast(t('clipNone'),2400);return}
  const c=clip,j=await transfer(c,dest);
- if(j&&c.mode==='cut'&&j.done){clip=null;updatePaste()}
+ if(j&&c.mode==='cut'&&(j.done||j.error)){clip=null;updatePaste()}
+}
+async function pasteTo(dest){
+ const n=await pasteNative(dest);
+ if(n){if(n.cut&&n.done){clip=null;updatePaste()}return}
+ pasteInternal(dest);
 }
 $('#fpaste').onclick=()=>pasteTo(cur);
 
@@ -1007,14 +1035,8 @@ async function walk(en,prefix,out){
 /* ---------- paste (Ctrl+V) ---------- */
 const two=n=>String(n).padStart(2,'0');
 function stamp(){const d=new Date();return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+' '+two(d.getHours())+'.'+two(d.getMinutes())+'.'+two(d.getSeconds())}
-document.addEventListener('paste',e=>{
- const cd=e.clipboardData;
- if(!cd||!cd.files||!cd.files.length){
-  if(clip&&inFiles()&&!/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'')){e.preventDefault();pasteTo(cur)}
-  return;
- }
- e.preventDefault();
- const list=[...cd.files].map(f=>{
+function uploadPasted(files){
+ const list=files.map(f=>{
   if(!f.name||/^image\.(png|jpe?g|gif|webp)$/i.test(f.name)){
    const ext=((f.type.split('/')[1])||'png').replace('jpeg','jpg');
    return{f:new File([f],'Pasted '+stamp()+'.'+ext,{type:f.type}),sub:''};
@@ -1023,6 +1045,24 @@ document.addEventListener('paste',e=>{
  });
  if(!inFiles())setTab('files');
  enqueue(list);
+}
+document.addEventListener('paste',e=>{
+ const cd=e.clipboardData;
+ const files=cd&&cd.files?[...cd.files]:[];   // read now: the clipboard is not available after an await
+ const typing=/INPUT|TEXTAREA/.test((document.activeElement||{}).tagName||'');
+ if(inFiles()&&!typing){
+  e.preventDefault();
+  (async()=>{
+   const n=await pasteNative(cur);                 // files or folders copied in Explorer / copied here
+   if(n){if(n.cut&&n.done){clip=null;updatePaste()}return}
+   if(files.length)uploadPasted(files);            // a screenshot or an image copied from a browser
+   else if(clip)pasteInternal(cur);
+  })();
+  return;
+ }
+ if(!files.length)return;
+ e.preventDefault();
+ uploadPasted(files);
 });
 
 

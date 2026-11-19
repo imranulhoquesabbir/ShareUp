@@ -173,6 +173,9 @@ header{justify-content:space-between;flex-wrap:wrap}
 .drow .dx small{color:var(--mute);font-size:12.5px}
 .drow .ds{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--text);display:grid;place-items:center}
 .drow .ds svg{width:20px;height:20px}
+.hh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 4px 2px;color:var(--mute);font-size:13px;font-weight:650}
+.hh button{border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:6px 4px;text-decoration:underline}
+.drow.hr{cursor:default}.drow .ok{flex:none;color:var(--ok);font-weight:800;font-size:20px;width:40px;text-align:center}
 </style></head><body><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
 <header>
  <div class="hb"><div class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
@@ -250,6 +253,7 @@ header{justify-content:space-between;flex-wrap:wrap}
   <button type="button" class="big docs" id="spick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="dt"><b id="spickt"></b></span></button>
   <p class="shint" id="shint"></p>
   <div id="sups"></div>
+  <div id="shist"></div>
  </div>
 </div>
 
@@ -269,33 +273,33 @@ const $=s=>document.querySelector(s);
 const I={
 gChk:["Connecting…","Connect হচ্ছে…"],
 gPwT:["Enter password","Password দিন"],gPwD:["This PC is password protected.","এই PC password দিয়ে সুরক্ষিত।"],gPwBad:["Wrong password. Try again.","Password ভুল। আবার চেষ্টা করুন।"],gPh:["Password","Password"],gGo:["Continue","চালিয়ে যান"],
-gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষায়"],gWaitD:["Press Allow on the PC screen. {0}s left. Code on the PC: {1}","PC-র screen-এ Allow চাপুন। আর {0} সেকেন্ড। PC-তে কোড: {1}"],
+gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষায়"],gWaitD:["Press Allow on the PC screen. {0}s left. Code on the PC: {1}","PC-র screen-এ Allow চাপুন। আর {0} সেকেন্ড। PC-তে code: {1}"],
 gDenyT:["Not allowed","Allow করা হয়নি"],gDenyD:["The PC did not allow this device.","PC এই device-কে Allow করেনি।"],gTry:["Try again","আবার চেষ্টা করুন"],
 gOkT:["Connected!","Connected!"],
 gLockT:["Too many tries","অনেকবার ভুল হয়েছে"],gLockD:["Wait {0} seconds, then try again.","{0} সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন।"],
 gGoneT:["Disconnected","Connection শেষ হয়েছে"],gGoneD:["Tap Reconnect to continue.","চালিয়ে যেতে Reconnect চাপুন।"],gRe:["Reconnect","Reconnect"],
-gNetT:["Can't reach the PC","PC-র সাথে যোগাযোগ হচ্ছে না"],gNetD:["Check your Wi-Fi or internet. Trying again…","WiFi বা internet দেখুন। আবার চেষ্টা হচ্ছে…"],
-tag:["Phone ⇄ PC","ফোন ⇄ পিসি"],
-sendH:["Send to PC","পিসিতে পাঠান"],sendS:["Pick photos or files from your phone","ফোন থেকে ছবি বা ফাইল বেছে নিন"],
-openGal:["Open gallery","গ্যালারি খুলুন"],pv:["Photos & videos","ছবি ও ভিডিও"],browse:["Browse files","ফাইল বাছুন"],anyType:["Any file type","যেকোনো ধরনের ফাইল"],
-hint:["Pick one or many, press OK, and they're sent to the PC right away. Large files are sent in pieces.","এক বা একাধিক বেছে OK চাপুন, সঙ্গে সঙ্গে পিসিতে চলে যাবে। বড় ফাইল ছোট ছোট অংশে পাঠানো হয়।"],
-recvH:["Get from PC","পিসি থেকে নিন"],recvS:["Files your PC is sharing","পিসি যে ফাইল শেয়ার করেছে"],refresh:["Refresh","রিফ্রেশ"],
-galT:["Gallery","গ্যালারি"],
-docT:["Documents","ডকুমেন্ট"],docN:["{0} files","{0}টি ফাইল"],docSearch:["Search documents","ডকুমেন্ট খুঁজুন"],docNone:["No documents in this tab","এই ট্যাবে কোনো ডকুমেন্ট নেই"],noDocs:["No documents in the shared folder yet","শেয়ার ফোল্ডারে এখনো কোনো ডকুমেন্ট নেই"],
-docTabs:["PDF, Word, Excel in tabs","PDF, Word, Excel আলাদা ট্যাবে"],sendDocT:["Send documents","ডকুমেন্ট পাঠান"],pickAll:["Choose documents from phone","ফোন থেকে ডকুমেন্ট বেছে নিন"],pickK:["Choose {0} from phone","ফোন থেকে {0} বেছে নিন"],sendHint:["Your phone's file list opens showing only this type. Tick the files, press OK, and they go to the PC right away.","ফোনের ফাইল লিস্ট শুধু এই ধরনের ফাইল দেখাবে। ফাইল বেছে OK চাপলেই সঙ্গে সঙ্গে পিসিতে চলে যাবে।"],upDoc:["Upload","আপলোড"],noShare:["Folder sharing is off on the PC. Turn it on to see documents here.","পিসিতে ফোল্ডার শেয়ারিং বন্ধ আছে। চালু করলে ডকুমেন্ট এখানে দেখা যাবে।"],
-kpdf:["PDF","PDF"],kword:["Word","ওয়ার্ড"],ksheet:["Excel","এক্সেল"],kslide:["Slides","স্লাইড"],ktext:["Text","টেক্সট"],saveDoc:["Save","সেভ"],
-filesT:["Files","ফাইল"],
-send1:["Sending 1 file…","১টি ফাইল পাঠানো হচ্ছে…"],sendN:["Sending {0} files…","{0}টি ফাইল পাঠানো হচ্ছে…"],
-couldNot:["Could not send","পাঠানো যায়নি"],sent:["Sent to PC","পিসিতে পাঠানো হয়েছে"],failed:["Failed","ব্যর্থ"],retrying:["Retrying…","আবার চেষ্টা হচ্ছে…"],
+gNetT:["Can't reach the PC","PC-র সাথে যোগাযোগ হচ্ছে না"],gNetD:["Check your Wi-Fi or internet. Trying again…","Wi-Fi বা internet দেখুন। আবার চেষ্টা হচ্ছে…"],
+tag:["Phone ⇄ PC","ফোন ⇄ PC"],
+sendH:["Send to PC","PC-তে পাঠান"],sendS:["Pick photos or files from your phone","ফোন থেকে ছবি বা File বেছে নিন"],
+openGal:["Open gallery","Gallery খুলুন"],pv:["Photos & videos","Photo ও Video"],browse:["Browse files","File বাছুন"],anyType:["Any file type","যেকোনো ধরনের File"],
+hint:["Pick one or many, press OK, and they're sent to the PC right away. Large files are sent in pieces.","এক বা একাধিক বেছে OK চাপুন, সঙ্গে সঙ্গে PC-তে চলে যাবে। বড় File ছোট ছোট অংশে পাঠানো হয়।"],
+recvH:["Get from PC","PC থেকে নিন"],recvS:["Files your PC is sharing","PC যে File Share করেছে"],refresh:["Refresh","Refresh"],
+galT:["Gallery","Gallery"],
+docT:["Documents","Document"],docN:["{0} files","{0}টি File"],docSearch:["Search documents","Document খুঁজুন"],docNone:["No documents in this tab","এই Tab-এ কোনো Document নেই"],noDocs:["No documents in the shared folder yet","Share Folder-এ এখনো কোনো Document নেই"],
+docTabs:["PDF, Word, Excel in tabs","PDF, Word, Excel আলাদা Tab-এ"],sendDocT:["Send documents","Document পাঠান"],pickAll:["Choose documents from phone","ফোন থেকে Document বেছে নিন"],pickK:["Choose {0} from phone","ফোন থেকে {0} বেছে নিন"],sendHint:["Your phone's file list opens showing only this type. Tick the files, press OK, and they go to the PC right away.","ফোনের File list শুধু এই ধরনের File দেখাবে। File বেছে OK চাপলেই সঙ্গে সঙ্গে PC-তে চলে যাবে। যা পাঠানো হবে তা নিচে type অনুযায়ী জমা থাকবে।"],upDoc:["Upload","Upload"],sentH:["Sent from this phone","এই ফোন থেকে পাঠানো"],clearH:["Clear list","List মুছুন"],clearQ:["Clear the list of sent documents? The files on the PC are not touched.","পাঠানো Document-এর list মুছে ফেলবেন? PC-তে থাকা File-গুলো মুছবে না।"],sentNone:["Nothing sent in this tab yet","এই Tab থেকে এখনো কিছু পাঠানো হয়নি"],noShare:["Folder sharing is off on the PC. Turn it on to see documents here.","PC-তে Folder Sharing বন্ধ আছে। চালু করলে Document এখানে দেখা যাবে।"],
+kpdf:["PDF","PDF"],kword:["Word","Word"],ksheet:["Excel","Excel"],kslide:["Slides","Slides"],ktext:["Text","Text"],saveDoc:["Save","Save"],
+filesT:["Files","File"],
+send1:["Sending 1 file…","১টি File পাঠানো হচ্ছে…"],sendN:["Sending {0} files…","{0}টি File পাঠানো হচ্ছে…"],
+couldNot:["Could not send","পাঠানো যায়নি"],sent:["Sent to PC","PC-তে পাঠানো হয়েছে"],failed:["Failed","Failed"],retrying:["Retrying…","আবার চেষ্টা হচ্ছে…"],
 today:["Today","আজ"],yest:["Yesterday","গতকাল"],
-photo1:["1 photo","১টি ছবি"],photoN:["{0} photos","{0}টি ছবি"],video1:["1 video","১টি ভিডিও"],videoN:["{0} videos","{0}টি ভিডিও"],
-all:["All","সব"],photos:["Photos","ছবি"],videos:["Videos","ভিডিও"],
-noneTab:["Nothing in this tab","এই ট্যাবে কিছু নেই"],noMedia:["No photos or videos in the shared folder yet","শেয়ার ফোল্ডারে এখনো কোনো ছবি বা ভিডিও নেই"],
-cancel:["Cancel","বাতিল"],select:["Select","বেছে নিন"],selTitle:["Select items","আইটেম বাছুন"],nSel:["{0} selected","{0}টি বাছা হয়েছে"],
-save:["Save","সেভ"],saveN:["Save {0}","সেভ {0}"],share:["Share","শেয়ার"],
-saving1:["Saving…","সেভ হচ্ছে…"],savingN:["Saving {0} files…","{0}টি ফাইল সেভ হচ্ছে…"],preparing:["Preparing…","তৈরি হচ্ছে…"],
-shareOff:["PC sharing is off","পিসিতে শেয়ারিং বন্ধ আছে। পিসির অ্যাপ থেকে চালু করুন।"],back:["← Back","← পেছনে"],
-empty:["Empty","ফোল্ডারটি খালি"],noShared:["No files shared from the PC yet","পিসি থেকে এখনো কোনো ফাইল শেয়ার করা হয়নি"],error:["Error","লোড করা যায়নি"]
+photo1:["1 photo","১টি Photo"],photoN:["{0} photos","{0}টি Photo"],video1:["1 video","১টি Video"],videoN:["{0} videos","{0}টি Video"],
+all:["All","All"],photos:["Photos","Photos"],videos:["Videos","Videos"],
+noneTab:["Nothing in this tab","এই Tab-এ কিছু নেই"],noMedia:["No photos or videos in the shared folder yet","Share Folder-এ এখনো কোনো ছবি বা ভিডিও নেই"],
+cancel:["Cancel","Cancel"],select:["Select","Select"],selTitle:["Select items","Item select করুন"],nSel:["{0} selected","{0}টি selected"],
+save:["Save","Save"],saveN:["Save {0}","Save {0}"],share:["Share","Share"],
+saving1:["Saving…","Save হচ্ছে…"],savingN:["Saving {0} files…","{0}টি File Save হচ্ছে…"],preparing:["Preparing…","তৈরি হচ্ছে…"],
+shareOff:["PC sharing is off","PC-তে Sharing বন্ধ আছে। PC-র App থেকে চালু করুন।"],back:["← Back","← Back"],
+empty:["Empty","Folder-টি খালি"],noShared:["No files shared from the PC yet","PC থেকে এখনো কোনো File Share করা হয়নি"],error:["Error","Load করা যায়নি"]
 };
 let LANG='bn';try{LANG=localStorage.getItem('lang')||'bn'}catch(e){}
 const tr=(k,...a)=>{const e=I[k];let s=e?e[LANG==='bn'?1:0]:k;a.forEach((v,i)=>{s=s.split('{'+i+'}').join(v)});return s};
@@ -342,7 +346,12 @@ function up(f){return new Promise(async res=>{
  const p=row.querySelector('progress'),s=row.querySelector('small');
  const id=rid(),name=encodeURIComponent(f.name);
  let off=0,fails=0,sent=false;
- const done=()=>{s.textContent='✓ '+tr('sent');s.className='ok';p.value=100};
+ const done=()=>{
+  s.textContent='✓ '+tr('sent');s.className='ok';p.value=100;
+  histAdd(f);
+  // on the Send documents page the finished row moves into the list under its type
+  if(row.parentNode&&row.parentNode.id==='sups')setTimeout(()=>{row.remove();if(!$('#sdocs').hidden)drawSend()},1200);
+ };
  const show=n=>{const v=f.size?Math.min(100,Math.round(n/f.size*100)):100;p.value=v;s.textContent=v+'%'};
  while(true){
   const end=Math.min(off+CHUNK,f.size),last=end>=f.size;
@@ -625,17 +634,53 @@ function openSend(){
 }
 function hideSend(){$('#sdocs').hidden=true;document.body.style.overflow='';UPT=null}
 $('#sback').onclick=back;
+/* A web page cannot read the phone's storage, so it cannot list the phone's files by itself: the
+   phone's own file list (opened with the type filter) is the only way to choose them. To make this
+   page useful anyway, tapping a type opens that list at once (one tap less), and every document sent
+   from this phone is remembered here and listed under its type. */
+const DK={pdf:'pdf',doc:'word',docx:'word',odt:'word',rtf:'word',pages:'word',xls:'sheet',xlsx:'sheet',csv:'sheet',ods:'sheet',numbers:'sheet',ppt:'slide',pptx:'slide',odp:'slide',key:'slide',txt:'text',md:'text',log:'text',json:'text',xml:'text'};
+const HKEY='su_sent';
+function histGet(){try{const h=JSON.parse(localStorage.getItem(HKEY)||'[]');return Array.isArray(h)?h:[]}catch(e){return[]}}
+function histSet(h){try{localStorage.setItem(HKEY,JSON.stringify(h))}catch(e){}}
+function histAdd(f){
+ const k=DK[extOf(f.name)];if(!k)return;
+ histSet([{n:f.name,s:f.size,t:Math.floor(Date.now()/1000),k},...histGet()].slice(0,300));
+}
+function pickDocs(){const d=$('#d');d.setAttribute('accept',DACC[SK]||DACC.all);d.click()}
 function drawSend(){
+ const all=histGet(),cnt=k=>all.filter(x=>x.k===k).length;
  const tabs=$('#stabs');tabs.textContent='';
  ['all',...DKINDS].forEach(k=>{
   const b=document.createElement('button');b.className=SK===k?'on':'';
-  b.textContent=tr(k==='all'?'all':'k'+k);
-  b.onclick=()=>{SK=k;drawSend()};tabs.append(b);
+  b.innerHTML=tr(k==='all'?'all':'k'+k)+(all.length?'<span>'+(k==='all'?all.length:cnt(k))+'</span>':'');
+  b.onclick=()=>{SK=k;drawSend();pickDocs()};tabs.append(b);   // tap a type: its file list opens right away
  });
  $('#spickt').textContent=SK==='all'?tr('pickAll'):tr('pickK',tr('k'+SK));
  $('#shint').textContent=tr('sendHint');
+ drawSendHist(all);
 }
-$('#spick').onclick=()=>{const d=$('#d');d.setAttribute('accept',DACC[SK]||DACC.all);d.click()};
+function drawSendHist(all){
+ const box=$('#shist');if(!box)return;box.textContent='';
+ all=all||histGet();
+ if(!all.length)return;
+ const list=all.filter(x=>SK==='all'||x.k===SK);
+ const h=document.createElement('div');h.className='hh';
+ const l=document.createElement('span');l.textContent=tr('sentH')+' · '+list.length;
+ const c=document.createElement('button');c.textContent=tr('clearH');
+ c.onclick=()=>{if(confirm(tr('clearQ'))){histSet([]);drawSend()}};
+ h.append(l,c);box.append(h);
+ if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent=tr('sentNone');box.append(e);return}
+ list.forEach(x=>{
+  const row=document.createElement('div');row.className='drow hr';
+  const dx=document.createElement('div');dx.className='dx';
+  const nb=document.createElement('b');nb.textContent=x.n;
+  const sm=document.createElement('small');sm.textContent=[extOf(x.n).toUpperCase(),sz(x.s),dayLabel(x.t)].join(' · ');
+  dx.append(nb,sm);
+  const ok=document.createElement('span');ok.className='ok';ok.textContent='✓';ok.setAttribute('aria-label',tr('sent'));
+  row.append(badge(x.n),dx,ok);box.append(row);
+ });
+}
+$('#spick').onclick=pickDocs;
 
 /* ================= files from PC ================= */
 let cur='';
