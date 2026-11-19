@@ -35,6 +35,7 @@ const (
 
 // uiShow opens the window, or brings it to the front if it is already open.
 func uiShow() {
+	kickUpdate()
 	winMu.Lock()
 	h := winHwnd
 	winMu.Unlock()
@@ -51,6 +52,12 @@ func uiShow() {
 	case showCh <- struct{}{}:
 	default:
 	}
+}
+
+func windowOpen() bool {
+	winMu.Lock()
+	defer winMu.Unlock()
+	return winHwnd != 0
 }
 
 // windowLoop owns one OS thread (WebView2 needs that). Closing the window only

@@ -10,4 +10,6 @@ func runUI(silent bool) {
 	select {}
 }
 
-func uiShow() { openBrowser(adminURL()) }
+func uiShow() { kickUpdate(); openBrowser(adminURL()) }
+
+func windowOpen() bool { return false }

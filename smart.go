@@ -135,7 +135,43 @@ func routeIP() string {
 	return ""
 }
 
-func hasNetwork() bool { return routeIP() != "" }
+// virtualAdapter spots adapters that exist even when the PC is on no real network
+// (WSL / Hyper-V / VM / VPN / Docker / Bluetooth ...). They must not count as "online".
+func virtualAdapter(name string) bool {
+	n := strings.ToLower(name)
+	for _, p := range []string{"tun", "utun", "tap", "veth", "br-", "virbr", "vboxnet", "vmnet", "docker", "awdl", "llw", "ap1", "gif", "stf", "anpi"} {
+		if strings.HasPrefix(n, p) {
+			return true
+		}
+	}
+	for _, p := range []string{"vethernet", "wsl", "virtualbox", "vmware", "hyper-v", "bluetooth", "loopback",
+		"tailscale", "zerotier", "vpn", "npcap", "docker", "host-only"} {
+		if strings.Contains(n, p) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasNetwork is true only when a real (non-virtual) adapter is up and has an IPv4 address.
+// A disconnected Wi-Fi is reported as down by the OS, so this turns false right away.
+func hasNetwork() bool {
+	ifs, _ := net.Interfaces()
+	for _, i := range ifs {
+		if i.Flags&net.FlagUp == 0 || i.Flags&net.FlagLoopback != 0 || virtualAdapter(i.Name) {
+			continue
+		}
+		addrs, _ := i.Addrs()
+		for _, a := range addrs {
+			if n, ok := a.(*net.IPNet); ok {
+				if v4 := n.IP.To4(); v4 != nil && !v4.IsLinkLocalUnicast() && !v4.IsLoopback() {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
 func lanURL() string {
 	ip := pickIP(get(), localIPs())
@@ -161,6 +197,7 @@ func netWatch() {
 			wasOffline.Store(true)
 		} else if !prev && wasOffline.Load() {
 			backAt.Store(time.Now().UnixNano())
+			kickUpdate() // look for a new version right away
 		}
 		n := sessionCount()
 		if !up && n > 0 && last == 0 {

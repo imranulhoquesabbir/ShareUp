@@ -794,8 +794,10 @@ func main() {
 	}
 	loadConfig()
 	cleanupOldBuild()
-	if afterUpdate { // the old version is exiting; give it a moment to free the port
-		time.Sleep(1500 * time.Millisecond)
+	if afterUpdate { // the old version is exiting: continue the moment it frees the port
+		for i := 0; i < 60 && alreadyRunning(get().Port); i++ {
+			time.Sleep(100 * time.Millisecond)
+		}
 	}
 	if alreadyRunning(get().Port) {
 		if !silent {

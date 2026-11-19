@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -42,6 +43,7 @@ var (
 	umu    sync.Mutex
 	us     = updateState{Status: "idle"}
 	uAsset string
+	uZip   bool // uAsset is shareUp.zip (holds every build); otherwise the single-file build
 	uBusy  bool
 )
 
@@ -128,15 +130,17 @@ func checkUpdate() {
 		fail("Unexpected reply from GitHub.")
 		return
 	}
-	asset := ""
+	asset, isZip := "", false
 	for _, a := range rel.Assets {
-		if a.Name == assetWanted() {
-			asset = a.URL
+		if a.Name == "shareUp.zip" {
+			asset, isZip = a.URL, true // preferred: one zip with every build
+		} else if a.Name == assetWanted() && !isZip {
+			asset = a.URL // older releases: a file per system
 		}
 	}
 	avail := rel.Tag != version && version != "dev"
 	umu.Lock()
-	us.Latest, us.URL, uAsset = rel.Tag, rel.URL, asset
+	us.Latest, us.URL, uAsset, uZip = rel.Tag, rel.URL, asset, isZip
 	us.Available = avail
 	us.Status = "uptodate"
 	us.Checked = time.Now().Unix()
@@ -157,7 +161,7 @@ func installUpdate() {
 		return
 	}
 	us.Status, us.Error, us.Progress = "installing", "", 0
-	url := uAsset
+	url, isZip := uAsset, uZip
 	umu.Unlock()
 
 	fail := func(msg string) {
@@ -167,13 +171,17 @@ func installUpdate() {
 	}
 	exe := exePath()
 	tmp := exe + ".new"
+	dl := tmp // where the download lands (the zip is unpacked into tmp afterwards)
+	if isZip {
+		dl = exe + ".zip"
+	}
 	resp, err := (&http.Client{}).Get(url)
 	if err != nil || resp.StatusCode != 200 {
 		fail("Download failed.")
 		return
 	}
 	defer resp.Body.Close()
-	f, err := os.Create(tmp)
+	f, err := os.Create(dl)
 	if err != nil {
 		fail("Cannot write next to the app: " + err.Error())
 		return
@@ -185,7 +193,7 @@ func installUpdate() {
 		if n > 0 {
 			if _, werr := f.Write(buf[:n]); werr != nil {
 				f.Close()
-				os.Remove(tmp)
+				os.Remove(dl)
 				fail("Download failed.")
 				return
 			}
@@ -199,7 +207,7 @@ func installUpdate() {
 		if rerr != nil {
 			if rerr != io.EOF {
 				f.Close()
-				os.Remove(tmp)
+				os.Remove(dl)
 				fail("Download interrupted.")
 				return
 			}
@@ -208,9 +216,18 @@ func installUpdate() {
 	}
 	f.Close()
 	if done < 1<<20 {
-		os.Remove(tmp)
+		os.Remove(dl)
 		fail("Downloaded file looks wrong.")
 		return
+	}
+	if isZip {
+		err := extractFromZip(dl, assetWanted(), tmp)
+		os.Remove(dl)
+		if err != nil {
+			os.Remove(tmp)
+			fail("The update file is incomplete.")
+			return
+		}
 	}
 	os.Chmod(tmp, 0755)
 	old := exe + ".old"
@@ -226,7 +243,13 @@ func installUpdate() {
 		return
 	}
 	args := []string{"--after-update"}
-	if len(os.Args) > 1 && os.Args[1] == "--startup" {
+	quiet := false
+	for _, a := range os.Args[1:] {
+		if a == "--startup" {
+			quiet = true
+		}
+	}
+	if quiet && !windowOpen() { // window was open: reopen it after the restart
 		args = append(args, "--startup")
 	}
 	cmd := exec.Command(exe, args...)
@@ -241,19 +264,92 @@ func installUpdate() {
 	os.Exit(0)
 }
 
+// extractFromZip copies one named file out of the zip (the build for this system).
+func extractFromZip(zipPath, name, out string) error {
+	zr, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return err
+	}
+	defer zr.Close()
+	for _, zf := range zr.File {
+		if zf.Name != name {
+			continue
+		}
+		rc, err := zf.Open()
+		if err != nil {
+			return err
+		}
+		defer rc.Close()
+		f, err := os.Create(out)
+		if err != nil {
+			return err
+		}
+		n, err := io.Copy(f, rc)
+		f.Close()
+		if err != nil || n < 1<<20 {
+			os.Remove(out)
+			return fmt.Errorf("bad file in zip")
+		}
+		return nil
+	}
+	return fmt.Errorf("%s not in zip", name)
+}
+
 func cleanupOldBuild() {
+	os.Remove(exePath() + ".zip")
 	os.Remove(exePath() + ".old")
 	os.Remove(exePath() + ".new")
 }
 
-// updateLoop checks at start and then every 30 minutes while auto-update is on.
+var updKick = make(chan struct{}, 1)
+
+// kickUpdate asks for an update check now (window opened, internet came back).
+// At most one check a minute so GitHub is not hammered.
+func kickUpdate() {
+	umu.Lock()
+	recent := time.Now().Unix()-us.Checked < 60
+	umu.Unlock()
+	if recent {
+		return
+	}
+	select {
+	case updKick <- struct{}{}:
+	default:
+	}
+}
+
+// updateLoop checks at start, every 5 minutes, and whenever kickUpdate is called.
 func updateLoop() {
+	go autoInstallLoop()
+	t := time.NewTicker(5 * time.Minute)
+	defer t.Stop()
 	for {
 		if get().AutoUpdate {
 			checkUpdate()
 		}
-		for i := 0; i < 30*60; i++ {
-			time.Sleep(time.Second)
+		select {
+		case <-t.C:
+		case <-updKick:
+		}
+	}
+}
+
+// autoInstallLoop installs a found update by itself (app restarts in a second, window
+// reopens if it was open). It waits while a file is being sent, and retries a failed
+// install only every 10 minutes.
+func autoInstallLoop() {
+	var last time.Time
+	for {
+		time.Sleep(3 * time.Second)
+		if !get().AutoUpdate || transferBusy() || time.Since(last) < 10*time.Minute {
+			continue
+		}
+		umu.Lock()
+		ready := us.Available && uAsset != "" && us.Status != "installing" && !uBusy
+		umu.Unlock()
+		if ready {
+			last = time.Now()
+			installUpdate()
 		}
 	}
 }
