@@ -50,4 +50,9 @@ jobs:
         with:
           tag_name: ${{ env.VER }}
           make_latest: true
-          files: dist/shareUp.zip
+          files: |
+            dist/shareUp.zip
+            dist/shareUp.exe
+            dist/shareUp-linux
+            dist/shareUp-mac-arm64
+            dist/shareUp-mac-intel
