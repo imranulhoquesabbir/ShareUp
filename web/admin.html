@@ -255,6 +255,29 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
  .qrcol{width:clamp(210px,23vw,290px)}
  .hero .row{text-align:left}
 }
+
+/* ---- smooth motion ---- */
+body{animation:pgIn .35s ease both}
+@keyframes pgIn{from{opacity:0}to{opacity:1}}
+#gm{opacity:0;transition:opacity .25s ease}
+#gm.on{opacity:1}
+#gm .mbox{transform:translateY(14px) scale(.97);transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .15s ease}
+#gm.on .mbox{transform:none}
+#gm .mbox.sw{opacity:0}
+#qr{transition:opacity .28s ease,transform .28s ease,filter .28s ease}
+#qr.swapping{opacity:.12;transform:scale(.96);filter:blur(3px)}
+.guide{animation:slideIn .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.found{animation:pop .35s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+.tick{width:24px;height:24px;vertical-align:-5px;margin-right:8px;fill:none;stroke:var(--ok);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.tick circle{stroke-dasharray:63;stroke-dashoffset:63;animation:dash .5s ease forwards}
+.tick path{stroke-dasharray:20;stroke-dashoffset:20;animation:dash .35s .35s ease forwards}
+@keyframes dash{to{stroke-dashoffset:0}}
+.rst{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;text-align:center;padding:24px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s ease}
+.rst.on{opacity:1;pointer-events:auto}
+.rst h2{margin:0;font-size:20px}.rst p{margin:0;color:var(--mute);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style></head><body data-tab="connect">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><path d="M12 10v6M9 13h6"/></symbol><symbol id="i-folderopen" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.3 10H20a2 2 0 0 1 1.9 2.6l-1.6 6A2 2 0 0 1 18.4 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol><symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 13v8M8 17l4 4 4-4M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol><symbol id="i-tray" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol></defs></svg>
 <div class="wrap">
@@ -396,6 +419,7 @@ input[type=text],input[type=number],select{width:100%;background:var(--field);co
 <div class="dover" id="dover"><div><svg class="ic"><use href="#i-tray"/></svg><b id="dtitle"></b><span id="dname"></span></div></div>
 <div class="mback" id="mreq" hidden><div class="mbox"><div class="mic">📱</div><h2 data-i="reqH"></h2><div class="mn" id="mrN"></div><div class="mcode"><span data-i="codeL"></span> <b id="mrC"></b></div><small id="mrI"></small><small data-i="reqCode"></small><div class="mbar"><i id="mrF"></i></div><div class="mbtn"><button class="b" id="mrA"><span data-i="allowOnce"></span></button><button class="b" id="mrT"><span data-i="allowTrust"></span></button><button class="g dgr" id="mrD"><span data-i="deny"></span></button></div><small id="mrM"></small></div></div>
 <div class="mback" id="gm" hidden><div class="mbox" id="gmb"></div></div>
+<div class="rst" id="rst"><div class="spin"></div><h2 data-i="updRestart"></h2><p data-i="updRestartD"></p></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -417,7 +441,7 @@ hsNone:["Looking for Wi-Fi…","WiFi খোঁজা হচ্ছে…"],
 hsBadLen:["The Wi-Fi password must be 8 to 63 characters.","WiFi password ৮ থেকে ৬৩ অক্ষরের হতে হবে।"],
 hsFail:["Could not connect. Check the password and try again.","Connect করা যায়নি। Password দেখে আবার চেষ্টা করুন।"],
 hsJoinedD:["Now scan the QR code with your phone.","এবার ফোন দিয়ে QR কোডটা scan করুন।"],
-hsJoined:["Wi-Fi connected","Wi-Fi connect হয়েছে"],
+hsJoined:["Wi-Fi connected","Wi-Fi connect হয়েছে"], hsJoinedNet:["Connected to {0}","{0}-এ connect হয়েছে"], updUnpack:["Preparing the update…","আপডেট প্রস্তুত হচ্ছে…"], updRestart:["Restarting shareUp…","shareUp আবার চালু হচ্ছে…"], updRestartD:["This takes a few seconds. The window will reopen by itself.","কয়েক সেকেন্ড লাগবে। উইন্ডো নিজে থেকেই আবার খুলবে।"],
 hs4T:["Connecting…","Connect হচ্ছে…"],
 hsWrong:["That password did not work. Try again.","Password মেলেনি। আবার দিন।"],
 hsOther:["Use a different Hotspot","অন্য Hotspot বেছে নিন"],
@@ -546,6 +570,18 @@ function setVal(sel,v){const e=$(sel);if(document.activeElement!==e)e.value=v}
 function copy(t){
  return navigator.clipboard.writeText(t).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove()}).then(()=>toast(t('copied')));
 }
+let qrTok=0;
+function setQR(q){
+ const im=$('#qr'),tok=++qrTok;
+ if(!q){im.removeAttribute('src');im.classList.remove('swapping');return}
+ const u='/admin/qr.png?u='+encodeURIComponent(q);
+ if(!im.getAttribute('src')){im.src=u;return}
+ im.classList.add('swapping');          // fade the old code out while the new one loads
+ const n=new Image();
+ n.onload=()=>{if(tok!==qrTok)return;setTimeout(()=>{if(tok!==qrTok)return;im.src=u;requestAnimationFrame(()=>im.classList.remove('swapping'))},160)};
+ n.onerror=()=>{if(tok===qrTok)im.classList.remove('swapping')};
+ n.src=u;
+}
 function render(s){
  if(!s)return;S=s;const r=s.remote;
  $('#dot').classList.toggle('off',!s.url);
@@ -563,7 +599,7 @@ function render(s){
  else if(sm.online&&sm.autoNet&&(r.status==='starting'||r.status==='downloading'))ph='spin';
  else{q=s.url;if(!q)ph='wifi'}
  if(sm.busy&&lastQ)q=lastQ;
- if(q!==lastQ){lastQ=q;$('#qr').src=q?'/admin/qr.png?u='+encodeURIComponent(q):''}
+ if(q!==lastQ){lastQ=q;setQR(q)}
  $('#qr').hidden=!q;$('#ph').hidden=!!q;
  $('#ph').innerHTML=ph==='spin'?'<div class="spin"></div>':(ph?ic(ph):'');
 
@@ -593,14 +629,16 @@ function render(s){
  if(ip.dataset.k!==key||ip.dataset.s!==s.ip){ip.dataset.k=key;ip.dataset.s=s.ip;ip.innerHTML='';
   s.ips.forEach(i=>{const o=document.createElement('option');o.value=o.textContent=i;if(i==s.ip)o.selected=true;ip.append(o)})}
 }
+let lastFP=0;
 function filesHook(s){
  const d=rootDirOf(s);
  if(d!==lastDir){lastDir=d;cur='';lastL='';loadFiles()}
- else if(S&&inFiles())loadFiles();
+ else if(S&&inFiles()&&Date.now()-lastFP>3000){lastFP=Date.now();loadFiles()}
 }
 let updLater='';
 function renderUpd(s){
  const u=s.update;if(!u)return;
+ $('#rst').classList.toggle('on',u.status==='installing'&&u.phase==='restart');
  $('#aupd').checked=u.enabled;
  const b=$('#upd');
  let sub=t('updS');
@@ -614,7 +652,7 @@ function renderUpd(s){
  const show=u.enabled&&((u.available&&u.latest!==updLater)||u.status==='installing');
  b.hidden=!show;
  if(show){
-  $('#updt').textContent=u.status==='installing'?t('updInst',u.latest,u.progress?' '+u.progress+'%':''):t('updAvail',u.latest);
+  $('#updt').textContent=u.status==='installing'?(u.phase==='unpack'?t('updUnpack'):t('updInst',u.latest,u.progress?' '+u.progress+'%':'')):t('updAvail',u.latest);
   $('#updd').textContent=u.status==='error'?u.error:t('updHave',u.current);
   $('#updgo').disabled=u.status==='installing';$('#updlater').hidden=u.status==='installing';
  }
@@ -1031,15 +1069,37 @@ pollDev();setInterval(()=>{if(!document.hidden||reqId)pollDev()},1500);
 // ---- smart connection ----
 let gmKey='';
 let gHide=false;
+let gmT=0,lastFound='';
+function gmShow(on){
+ const gm=$('#gm');clearTimeout(gmT);
+ if(on){
+  if(gm.hidden){gm.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>gm.classList.add('on')))}
+  else gm.classList.add('on');
+ }else if(!gm.hidden){
+  gm.classList.remove('on');
+  gmT=setTimeout(()=>{if(!gm.classList.contains('on'))gm.hidden=true},300);
+ }
+}
+function swapBox(el,html){   // fade the old content out, put the new one in, fade it in
+ if(!el.innerHTML.trim()){el.innerHTML=html;setFound();return}
+ el.classList.add('sw');clearTimeout(el._t);
+ el._t=setTimeout(()=>{el.innerHTML=html;el.classList.remove('sw');setFound()},150);
+}
+function setFound(f){
+ if(f!==undefined)lastFound=f;
+ const w=document.querySelector('#gmb .foundw');if(!w)return;
+ const h=lastFound?'<div class="found">✓ '+t('hsFound',esc(lastFound))+'</div>':'';
+ if(w.dataset.h!==h){w.dataset.h=h;w.innerHTML=h}
+}
 function drawGuide(g){
  const c=$('#gcard'),gm=$('#gm'),gb=$('#gmb');
  if(g&&g.kind==='offline'){
   if(gHide){
-   gm.hidden=true;gmKey='';
+   gmShow(false);gmKey='';
    const h='<div class="gh">📶 '+t('hsBanT')+'</div><div class="gact"><button class="b" data-act="reopen">'+t('hsOpenGuide')+'</button></div>';
    c.className='panel guide warn';if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}c.hidden=false;return}
   c.hidden=true;c.innerHTML='';c.dataset.h='';
-  const found=(g.nets||[])[0]||'',k=g.step+'|'+(g.sel||'')+'|'+found+LANG;
+  const found=(g.nets||[])[0]||'',k=g.step+'|'+(g.sel||'')+LANG;
   if(k!==gmKey){
    gmKey=k;let s='';
    if(g.step===4){
@@ -1047,21 +1107,21 @@ function drawGuide(g){
    }else{
     s='<div class="mic">📶</div><h2>'+t('hs1T')+'</h2>'
      +'<ol class="hl"><li>'+t('hsSt1')+'</li><li>'+t('hsSt2')+'</li><li>'+t('hsSt3')+'</li></ol>'
-     +(found?'<div class="found">✓ '+t('hsFound',esc(found))+'</div>':'')
+     +'<div class="foundw"></div>'
      +'<div class="mbtn"><button class="b" data-w="panel"><svg class="ic"><use href="#i-wifi"/></svg>'+t('hsPanel')+'</button><button class="g" data-w="later">'+t('hsLater')+'</button></div>'
      +'<div class="why"><b>'+t('hsWhyT')+'</b>'+t('hsWhy')+'</div>';
    }
-   gb.innerHTML=s;
+   swapBox(gb,s);
   }
-  gm.hidden=false;return;
+  gmShow(true);setFound(found);return;
  }
- gHide=false;gm.hidden=true;gmKey='';
+ gHide=false;gmShow(false);gmKey='';
  if(!g||!g.kind){c.hidden=true;c.innerHTML='';return}
  let h='';
  if(g.kind==='back'){
   c.className='panel guide good';h='<div class="gh">✅ '+t('gBack')+'</div><div class="gp">'+t('gBackD')+'</div>';
  }else if(g.kind==='joined'){
-  c.className='panel guide good';h='<div class="gh">✅ '+t('hsJoined')+'</div><div class="gp">'+t('hsJoinedD')+'</div>';
+  c.className='panel guide good';h='<div class="gh"><svg class="tick" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>'+(g.net?t('hsJoinedNet',esc(g.net)):t('hsJoined'))+'</div><div class="gp">'+t('hsJoinedD')+'</div>';
  }else{
   c.className='panel guide good';h='<div class="gh">✅ '+t('gDone')+'</div>';
  }
@@ -1092,8 +1152,20 @@ $('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.c
 $('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
 $('#wkReset').onclick=async()=>{if(!confirm(t('wkResetQ')))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
 
+let pullT=0,pulling=false,again=false;
+async function doPull(){
+ if(pulling){again=true;return}
+ pulling=true;
+ const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),6000);   // a stuck request must never freeze the page
+ try{render(await (await fetch('/admin/state',{method:'POST',signal:ac.signal})).json())}catch(e){}
+ clearTimeout(tm);pulling=false;
+ if(again){again=false;doPull()}
+}
+function pull(){clearTimeout(pullT);pullT=setTimeout(doPull,40)}
 (async()=>{render(await api('/admin/state'));
- setInterval(async()=>{if(document.hidden)return;try{render(await (await fetch('/admin/state',{method:'POST'})).json())}catch(e){}},2000)
+ setInterval(()=>{if(!document.hidden)pull()},2000);                      // safety net
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+ try{const es=new EventSource('/admin/events');es.onmessage=pull}catch(e){}   // the PC says "something changed": refresh now
  setTab('connect')
 })();
 </script></body></html>
