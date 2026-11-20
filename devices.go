@@ -430,7 +430,7 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 	if p.Created.IsZero() {
 		p.Created = now
 		notifyState() // the approval window opens on the PC right now
-		go uiShow()   // bring the shareUp window to the front on the PC
+		go uiApprove() // small approval popup (the full window stays closed / in the tray)
 	}
 	left := int(approvalWait.Seconds() - now.Sub(p.Created).Seconds())
 	if left < 0 {

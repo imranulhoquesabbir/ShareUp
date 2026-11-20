@@ -26,10 +26,15 @@ var (
 	pShowWindow    = user32.NewProc("ShowWindow")
 	pSetForeground = user32.NewProc("SetForegroundWindow")
 	pIsIconic      = user32.NewProc("IsIconic")
+	pGetForeground = user32.NewProc("GetForegroundWindow")
+	pSetWindowPos  = user32.NewProc("SetWindowPos")
 	pSysParams     = user32.NewProc("SystemParametersInfoW")
 	winMu          sync.Mutex
 	winHwnd        uintptr // 0 while the window is closed (app lives in the tray)
 	showCh         = make(chan struct{}, 1)
+	popMu          sync.Mutex
+	popView        webview2.WebView // the small approval popup, nil while closed
+	popCh          = make(chan struct{}, 1)
 	updItem        *systray.MenuItem
 )
 
@@ -71,6 +76,82 @@ func uiShow() {
 	case showCh <- struct{}{}:
 	default:
 	}
+}
+
+// uiApprove is called when a new phone asks to connect. It does NOT open the full window: if the
+// main window is already in front, its own approval box is enough; otherwise (tray, minimized,
+// behind other windows) a small always-on-top popup with only Allow / Always / Deny opens.
+func uiApprove() {
+	winMu.Lock()
+	h := winHwnd
+	winMu.Unlock()
+	if h != 0 {
+		fg, _, _ := pGetForeground.Call()
+		if fg == h {
+			return // main window is in front and shows the approval box itself
+		}
+	}
+	select {
+	case popCh <- struct{}{}:
+	default:
+	}
+}
+
+// popupClose closes the small approval popup (called when nothing is waiting any more).
+func popupClose() {
+	popMu.Lock()
+	v := popView
+	popMu.Unlock()
+	if v != nil {
+		v.Dispatch(func() { v.Terminate() })
+	}
+}
+
+// popupLoop owns its own OS thread, separate from the main window's thread.
+func popupLoop() {
+	runtime.LockOSThread()
+	for range popCh {
+		openPopup()
+	}
+}
+
+func openPopup() {
+	popMu.Lock()
+	if popView != nil { // already open: it follows the state by itself
+		popMu.Unlock()
+		return
+	}
+	popMu.Unlock()
+	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", "webview")
+	w := webview2.NewWithOptions(webview2.WebViewOptions{
+		AutoFocus: true,
+		DataPath:  data,
+		WindowOptions: webview2.WindowOptions{
+			Title:  "shareUp",
+			Width:  400,
+			Height: 560,
+			IconId: 2,
+			Center: true,
+		},
+	})
+	if w == nil { // WebView2 not available: fall back to the full window
+		uiShow()
+		return
+	}
+	defer w.Destroy()
+	w.SetSize(400, 560, webview2.HintFixed)
+	popMu.Lock()
+	popView = w
+	popMu.Unlock()
+	hwnd := uintptr(w.Window())
+	// always on top, so it is seen even over a fullscreen app / other windows, without taking focus away for good
+	pSetWindowPos.Call(hwnd, ^uintptr(0), 0, 0, 0, 0, 0x0001|0x0002|0x0040) // HWND_TOPMOST, NOSIZE|NOMOVE|SHOWWINDOW
+	pSetForeground.Call(hwnd)
+	w.Navigate(adminURL() + "?popup=1")
+	w.Run()
+	popMu.Lock()
+	popView = nil
+	popMu.Unlock()
 }
 
 // uiQuit takes the tray icon away. Exiting the process without this leaves a dead icon in
@@ -173,6 +254,7 @@ func openWindow() {
 
 func runUI(silent bool) {
 	go windowLoop()
+	go popupLoop()
 	if !silent {
 		uiShow()
 	}

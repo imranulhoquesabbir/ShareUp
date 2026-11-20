@@ -868,6 +868,10 @@ func main() {
 		writeJSON(w, map[string]any{"ok": true})
 		uiShow()
 	}))
+	mux.HandleFunc("/admin/popupdone", local(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, map[string]any{"ok": true})
+		popupClose() // nothing left to approve: close the small popup
+	}))
 	mux.HandleFunc("/admin/quit", local(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{"ok": true})
 		go quitApp()

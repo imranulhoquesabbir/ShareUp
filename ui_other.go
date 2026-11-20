@@ -15,3 +15,8 @@ func uiShow() { kickUpdate(); openBrowser(adminURL()) }
 func windowOpen() bool { return false }
 
 func uiQuit() {}
+
+// No separate popup outside Windows: use the browser as before.
+func uiApprove() { uiShow() }
+
+func popupClose() {}
