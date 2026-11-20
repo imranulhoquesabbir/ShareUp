@@ -309,6 +309,22 @@ body{animation:pgIn .35s ease both}
 .rst{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;text-align:center;padding:24px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s ease}
 .rst.on{opacity:1;pointer-events:auto}
 .rst h2{margin:0;font-size:20px}.rst p{margin:0;color:var(--mute);font-size:14px}
+/* ---- live devices: rows slide in / out, the online dot breathes ---- */
+.dev.in{animation:devIn .38s cubic-bezier(.2,.8,.2,1) both}
+.dev.out{animation:devOut .3s ease both;pointer-events:none;overflow:hidden}
+@keyframes devIn{from{opacity:0;transform:translateX(-14px);max-height:0;padding-top:0;padding-bottom:0}to{opacity:1;transform:none;max-height:120px}}
+@keyframes devOut{from{opacity:1;max-height:120px}to{opacity:0;transform:translateX(18px);max-height:0;padding-top:0;padding-bottom:0;border-top-width:0}}
+.dev .dd:not(.off){animation:ddPulse 2.2s ease-in-out infinite}
+@keyframes ddPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 45%,transparent)}50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 0%,transparent)}}
+.dev .dd{transition:background .3s ease}
+.fempty{animation:pgIn .3s ease both}
+#mreq:not([hidden]){animation:pgIn .2s ease both}
+#mreq:not([hidden]) .mbox{animation:pop .3s cubic-bezier(.2,.9,.3,1.25) both}
+#mrF{transition:width .3s linear}
+#gm:not(.on){pointer-events:none}
+.hstep{font-size:16px;font-weight:650;line-height:1.5;margin:12px 0}   /* a fading-out guide must never block the window */
+.dot{transition:background .3s ease,box-shadow .3s ease}
+#status{transition:opacity .2s ease}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style></head><body data-tab="connect">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol><symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><path d="M12 10v6M9 13h6"/></symbol><symbol id="i-folderopen" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.3 10H20a2 2 0 0 1 1.9 2.6l-1.6 6A2 2 0 0 1 18.4 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2"/></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.8 0"/></symbol><symbol id="i-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol><symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 13v8M8 17l4 4 4-4M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol><symbol id="i-tray" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16"/></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol></defs></svg>
@@ -462,7 +478,7 @@ hsBanT:["No network. Connect to your phone’s Hotspot to keep using shareUp.","
 hsOpenGuide:["Show steps","Step-গুলো দেখান"],
 hsPanel:["Open Wi-Fi list","Wi-Fi list খুলুন"],
 hsLater:["Not now","এখন না"],
-hsSt1:["Turn on Hotspot on your phone","ফোনে Hotspot চালু করুন"],
+hsNow1:["Step 1 of 2: Turn on Hotspot on your phone, then tap the button below.","ধাপ ১/২: ফোনে Hotspot চালু করুন, তারপর নিচের button চাপুন।"],hsNow2:["Step 2 of 2: In the Wi-Fi list, pick your own phone and connect. A green ✓ will show here when done.","ধাপ ২/২: Wi-Fi list থেকে আপনার নিজের ফোনের নাম বেছে connect করুন। হয়ে গেলে এখানে সবুজ ✓ দেখা যাবে।"],hsOn:["I turned it on","চালু করেছি"],hsSt1:["Turn on Hotspot on your phone","ফোনে Hotspot চালু করুন"],
 hsSt2:["Tap “Open Wi-Fi list” below","নিচের “Wi-Fi list খুলুন” button-এ চাপুন"],
 hsSt3:["Pick your phone and connect. A green ✓ will show up here.","আপনার ফোনের নাম বেছে connect করুন। এখানে সবুজ ✓ দেখা যাবে।"],
 hsFound:["Hotspot found: {0}","Hotspot পাওয়া গেছে: {0}"],
@@ -1128,26 +1144,51 @@ const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/
 async function devAct(op,id,trust,name){const j=await api('/admin/dev',{op,id,trust:!!trust,name:name||''});if(j){DV=j;drawDev()}}
 const dcode=id=>String(id).slice(0,4).toUpperCase();
 async function devRename(id,cur){const n=await ask(t('renameQ'),{input:cur,ok:t('rename')});if(n===null)return;devAct('rename',id,false,n.trim())}
+// Rows are kept per device and only touched when something about them changed, so a phone that
+// connects slides in, one that leaves slides out, and nothing else flickers.
+const ROWS={s:new Map(),t:new Map()};
+function rowLeave(e){
+ if(e._lv)return;e._lv=1;e.classList.remove('in');e.classList.add('out');
+ const kill=()=>e.remove();e.addEventListener('animationend',kill,{once:true});setTimeout(kill,450);
+}
+function syncRows(box,map,items,sig,make){
+ const seen=new Set();
+ items.forEach((d,i)=>{
+  seen.add(d.id);
+  let e=map.get(d.id);
+  if(!e){e=document.createElement('div');e.className='dev in';e._h='';map.set(d.id,e);
+   e.addEventListener('animationend',ev=>{if(ev.animationName==='devIn')e.classList.remove('in')})}
+  const h=sig(d);
+  if(e._h!==h){e._h=h;make(e,d)}
+  const live=[...box.children].filter(c=>!c._lv);
+  if(live[i]!==e)box.insertBefore(e,live[i]||null);
+ });
+ map.forEach((e,id)=>{if(!seen.has(id)){map.delete(id);rowLeave(e)}});
+}
+let reqLeft=0,reqT0=0;
 function drawDev(){
  if(!DV)return;
- const sl=$('#devl');sl.innerHTML='';
- DV.sessions.forEach(d=>{
-  const e=document.createElement('div');e.className='dev';
+ syncRows($('#devl'),ROWS.s,DV.sessions,d=>[d.name,d.ip,d.remote,d.trusted,LANG].join('|'),(e,d)=>{
   e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div><button class="g" data-a="rename">'+t('rename')+'</button>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
-  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct(b.dataset.a,d.id));sl.append(e)});
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct(b.dataset.a,d.id))});
  $('#devn').hidden=DV.sessions.length>0;$('#devp').hidden=false;
- const tl=$('#trl');tl.innerHTML='';
- DV.trusted.forEach(d=>{
-  const e=document.createElement('div');e.className='dev';
+ syncRows($('#trl'),ROWS.t,DV.trusted,d=>[d.name,d.online,d.online?'':ago(d.lastSeen),ago(d.added),LANG].join('|'),(e,d)=>{
   e.innerHTML='<span class="dd'+(d.online?'':' off')+'"></span><div class="dx"><b>'+esc(d.name)+'</b><small>'+(d.online?t('online'):t('lastSeen',ago(d.lastSeen)))+' · '+t('added',ago(d.added))+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div><button class="g" data-a="rename">'+t('rename')+'</button><button class="g dgr" data-a="untrust">'+t('untrust')+'</button>';
-  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct('untrust',d.id));tl.append(e)});
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct('untrust',d.id))});
  $('#trn').hidden=DV.trusted.length>0;
  const p=DV.pending[0],m=$('#mreq');
  if(p){m.hidden=false;reqId=p.id;$('#mrN').textContent=p.name;$('#mrC').textContent=dcode(p.id);$('#mrI').textContent=p.ip+' · '+t(p.remote?'viaNet':'viaLan');
-  $('#mrM').textContent=t('reqLeft',p.left);$('#mrF').style.width=Math.max(0,Math.min(100,p.left/60*100))+'%'}
+  reqLeft=p.left;reqT0=Date.now();tickReq()}
  else{m.hidden=true;reqId='';
   if(POP){clearTimeout(popT);popT=setTimeout(()=>{if(!reqId)fetch('/admin/popupdone',{method:'POST'}).catch(()=>{})},700)}}
 }
+// the approval countdown runs here, so it stays smooth between messages from the PC
+function tickReq(){
+ if(!reqId)return;
+ const l=Math.max(0,reqLeft-(Date.now()-reqT0)/1000);
+ $('#mrM').textContent=t('reqLeft',Math.ceil(l));$('#mrF').style.width=Math.max(0,Math.min(100,l/60*100))+'%';
+}
+setInterval(tickReq,250);
 async function pollDev(){try{DV=await (await fetch('/admin/devices',{method:'POST'})).json();drawDev()}catch(e){}}
 $('#mrA').onclick=()=>reqId&&devAct('allow',reqId,false);
 $('#mrT').onclick=()=>reqId&&devAct('allow',reqId,true);
@@ -1164,18 +1205,21 @@ pollDev();setInterval(()=>{if(!document.hidden||reqId)pollDev()},1500);
 
 // ---- smart connection ----
 let gmKey='';
-let gHide=false;
+let gHide=false,hsStep=1;
 let gmT=0,lastFound='';
+// (It used to start the fade-in with requestAnimationFrame. A hidden window never runs those, so a late
+//  frame could switch the guide back on after it had been switched off, and it stayed on screen.)
 function gmShow(on){
  const gm=$('#gm');clearTimeout(gmT);
  if(on){
-  if(gm.hidden){gm.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>gm.classList.add('on')))}
-  else gm.classList.add('on');
+  if(gm.hidden){gm.hidden=false;void gm.offsetWidth}   // force a layout so the fade starts from 0
+  gm.classList.add('on');
  }else if(!gm.hidden){
   gm.classList.remove('on');
   gmT=setTimeout(()=>{if(!gm.classList.contains('on'))gm.hidden=true},300);
  }
 }
+$('#gm').addEventListener('transitionend',e=>{if(e.target===e.currentTarget&&!e.currentTarget.classList.contains('on'))e.currentTarget.hidden=true});
 function swapBox(el,html){   // fade the old content out, put the new one in, fade it in
  if(!el.innerHTML.trim()){el.innerHTML=html;setFound();return}
  el.classList.add('sw');clearTimeout(el._t);
@@ -1195,23 +1239,25 @@ function drawGuide(g){
    const h='<div class="gh">📶 '+t('hsBanT')+'</div><div class="gact"><button class="b" data-act="reopen">'+t('hsOpenGuide')+'</button></div>';
    c.className='panel guide warn';if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h}c.hidden=false;return}
   c.hidden=true;c.innerHTML='';c.dataset.h='';
-  const found=(g.nets||[])[0]||'',k=g.step+'|'+(g.sel||'')+LANG;
+  const found=(g.nets||[])[0]||'',k=g.step+'|'+(g.sel||'')+'|'+hsStep+LANG;
   if(k!==gmKey){
    gmKey=k;let s='';
    if(g.step===4){
     s='<div class="mic">📶</div><h2>'+t('hs4T')+'</h2><small>'+esc(g.sel)+'</small><div class="spin"></div>';
    }else{
+    // One step at a time, and the PC never guesses which network is the person's phone (it cannot know):
+    // step 1 = turn the Hotspot on, step 2 = open the Wi-Fi list and pick it by hand. The PC only watches for "connected".
     s='<div class="mic">📶</div><h2>'+t('hs1T')+'</h2>'
-     +'<ol class="hl"><li>'+t('hsSt1')+'</li><li>'+t('hsSt2')+'</li><li>'+t('hsSt3')+'</li></ol>'
+     +(hsStep===1?'<div class="hstep">'+t('hsNow1')+'</div><div class="mbtn"><button class="cb cb-blue" data-w="step2">'+t('hsOn')+'</button><button class="cb cb-amb" data-w="later">'+t('hsLater')+'</button></div>'
+      :'<div class="hstep">'+t('hsNow2')+'</div><div class="spin"></div><div class="mbtn"><button class="cb cb-blue" data-w="panel"><svg class="ic"><use href="#i-wifi"/></svg>'+t('hsPanel')+'</button><button class="cb cb-amb" data-w="later">'+t('hsLater')+'</button></div>')
      +'<div class="foundw"></div>'
-     +'<div class="mbtn"><button class="cb cb-blue" data-w="panel"><svg class="ic"><use href="#i-wifi"/></svg>'+t('hsPanel')+'</button><button class="cb cb-amb" data-w="later">'+t('hsLater')+'</button></div>'
      +'<div class="why"><b>'+t('hsWhyT')+'</b>'+t('hsWhy')+'</div>';
    }
    swapBox(gb,s);
   }
   gmShow(true);setFound(found);return;
  }
- gHide=false;gmShow(false);gmKey='';
+ gHide=false;hsStep=1;gmShow(false);gmKey='';
  if(!g||!g.kind){c.hidden=true;c.innerHTML='';return}
  let h='';
  if(g.kind==='back'){
@@ -1226,7 +1272,8 @@ function drawGuide(g){
 }
 $('#gmb').addEventListener('click',async e=>{
  const b=e.target.closest('[data-w]');if(!b)return;
- if(b.dataset.w==='panel')api('/admin/wifi',{op:'panel'});
+ if(b.dataset.w==='step2'){hsStep=2;gmKey='';api('/admin/wifi',{op:'panel'});if(S&&S.smart)drawGuide(S.smart.guide)}
+ else if(b.dataset.w==='panel')api('/admin/wifi',{op:'panel'});
  else if(b.dataset.w==='later'){gHide=true;drawGuide({kind:'offline',step:1})}
 });
 $('#gmb').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='wpw'){e.preventDefault();$('#gmb').querySelector('[data-w="pass"]').click()}});
@@ -1248,20 +1295,34 @@ $('#anOn').onchange=async e=>{const j=await api('/admin/set',{autoNet:e.target.c
 $('#ofOn').onchange=async e=>{const j=await api('/admin/set',{offlineOn:e.target.checked});if(j)render(j)};
 $('#wkReset').onclick=async()=>{if(!await ask(t('wkResetQ'),{kind:'warn',ok:t('wkReset')}))return;const j=await api('/admin/set',{resetFixed:true});if(j)render(j)};
 
-let pullT=0,pulling=false,again=false;
+let pulling=false,again=false;
 async function doPull(){
  if(pulling){again=true;return}
  pulling=true;
  const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),6000);   // a stuck request must never freeze the page
- try{render(await (await fetch('/admin/state',{method:'POST',signal:ac.signal})).json())}catch(e){}
+ let ok=true;
+ try{render(await (await fetch('/admin/state',{method:'POST',signal:ac.signal})).json())}catch(e){ok=false}
  clearTimeout(tm);pulling=false;
- if(again){again=false;doPull()}
+ if(again||!ok){again=false;setTimeout(doPull,ok?0:800)}
 }
-function pull(){clearTimeout(pullT);pullT=setTimeout(doPull,40)}
+function pull(){doPull()}
+// The PC pushes its whole state (and the device lists) down one stream the moment anything changes, so
+// nothing waits for a timer. If the stream goes quiet it is opened again, and the first message of a
+// new stream is a full snapshot, so the window is always put right.
+let esObj=null,esLast=Date.now();
+function openEvents(){
+ try{if(esObj)esObj.close()}catch(e){}
+ let es;try{es=new EventSource('/admin/events')}catch(e){return}
+ esObj=es;esLast=Date.now();
+ es.onmessage=ev=>{esLast=Date.now();
+  try{const m=JSON.parse(ev.data);if(m.s)render(m.s);if(m.d){DV=m.d;drawDev()}}catch(e){pull()}};
+ es.addEventListener('ka',()=>{esLast=Date.now()});
+}
 (async()=>{render(await api('/admin/state'));
- setInterval(()=>{if(!document.hidden)pull()},2000);                      // safety net
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
- try{const es=new EventSource('/admin/events');es.onmessage=pull}catch(e){}   // the PC says "something changed": refresh now
+ openEvents();
+ setInterval(()=>{if(Date.now()-esLast>9000){openEvents();pull()}},2000);   // stream watchdog
+ setInterval(pull,2000);                                                    // safety net
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){pull();pollDev();if(Date.now()-esLast>6000)openEvents()}});
  setTab('connect')
 })();
 </script></body></html>

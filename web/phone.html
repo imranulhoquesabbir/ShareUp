@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0f1115">
+<meta name="su-fixed" content="__SU_FIXED__">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Cpath d='M32 12 14 30h11v16h14V30h11z' fill='white'/%3E%3C/svg%3E">
 <title>shareUp</title>
 <style>
@@ -152,6 +153,35 @@ header{justify-content:space-between;flex-wrap:wrap}
 #gate .gb{width:100%;border:0;border-radius:14px;padding:13px;font:inherit;font-size:16px;font-weight:650;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2))}
 #gate #gok{background:#16a34a}
 #gate #gre{background:#2563eb}
+/* ---- smooth motion: gate, banner, dimming ---- */
+#gate{transition:opacity .28s ease}
+#gate.out{opacity:0;pointer-events:none}
+#gate:not([hidden]):not(.out) .gbox{animation:gBox .38s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes gBox{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.gic{animation:gPop .42s cubic-bezier(.2,.9,.3,1.3) both}
+.gic.ok{animation-name:gPopB}.gic.bad{animation-name:gShake}.gic.wait{animation-name:gPopC}
+@keyframes gPop{from{transform:scale(.55);opacity:0}to{transform:none;opacity:1}}
+@keyframes gPopB{from{transform:scale(.55);opacity:0}60%{transform:scale(1.14)}to{transform:none;opacity:1}}
+@keyframes gPopC{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+@keyframes gShake{0%{transform:scale(.8);opacity:0}30%{transform:translateX(-9px);opacity:1}50%{transform:translateX(8px)}70%{transform:translateX(-5px)}100%{transform:none}}
+#gate h2,#gate p{animation:gTxt .35s ease both}
+@keyframes gTxt{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gbar i{transition:width .5s linear}
+#nb{position:fixed;left:50%;top:max(10px,env(safe-area-inset-top));z-index:110;display:flex;align-items:center;gap:10px;max-width:92vw;padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:650;color:#fff;background:#d97706;box-shadow:0 10px 30px rgba(0,0,0,.35);transform:translate(-50%,-160%);opacity:0;pointer-events:none;transition:transform .5s cubic-bezier(.2,.9,.3,1.15),opacity .3s ease,background .35s ease}
+#nb.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+#nb.ok{background:#16a34a}
+#nbh{position:fixed;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 54px);z-index:109;width:min(92vw,420px);transform:translateX(-50%);padding:12px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:13.5px;line-height:1.55;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:gTxt .35s ease both}
+#nb .sp{width:15px;height:15px;border-radius:50%;border:2.5px solid rgba(255,255,255,.38);border-top-color:#fff;animation:gspin .85s linear infinite;flex:none}
+#nb .ck{width:17px;height:17px;flex:none;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22;animation:gDash .45s ease both}
+@keyframes gDash{from{stroke-dashoffset:22}to{stroke-dashoffset:0}}
+#nb button{border:0;border-radius:999px;padding:5px 12px;font:inherit;font-size:12.5px;font-weight:700;color:#92400e;background:#fff;flex:none}
+.wrap{transition:opacity .4s ease,filter .4s ease}
+body.netlost .wrap{opacity:.42;filter:grayscale(.65);pointer-events:none}
+.card{animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both}
+.card:nth-of-type(2){animation-delay:.06s}.card:nth-of-type(3){animation-delay:.12s}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.up{animation:cardIn .35s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 /* coloured confirm dialog */
 #cf{position:fixed;inset:0;z-index:120;background:rgba(5,8,20,.72);display:flex;align-items:center;justify-content:center;padding:20px}
 #cf[hidden]{display:none}
@@ -187,7 +217,7 @@ header{justify-content:space-between;flex-wrap:wrap}
 .hh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 4px 2px;color:var(--mute);font-size:13px;font-weight:650}
 .hh button{border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:6px 4px;text-decoration:underline}
 .drow.hr{cursor:default}.drow .ok{flex:none;color:var(--ok);font-weight:800;font-size:20px;width:40px;text-align:center}
-</style></head><body><div id="cf" hidden><div class="bx"><p id="cft"></p><div class="rw"><button class="no" id="cfn"></button><button class="yes" id="cfy"></button></div></div></div><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
+</style></head><body><div id="nb" role="status" aria-live="polite"><span class="sp"></span><svg class="ck" viewBox="0 0 24 24" hidden><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span id="nbt"></span><button id="nbd" hidden></button><button id="nbf" hidden></button></div><div id="nbh" hidden></div><div id="cf" hidden><div class="bx"><p id="cft"></p><div class="rw"><button class="no" id="cfn"></button><button class="yes" id="cfy"></button></div></div></div><div id="gate"><div class="gbox"><div class="gic" id="gic"></div><h2 id="gt"></h2><p id="gd"></p><div class="gbar" id="gbar" hidden><i id="gfill"></i></div><div id="gpw" hidden style="width:100%;display:flex;flex-direction:column;gap:10px"><input type="password" id="gin" autocomplete="off"><button class="gb" id="gok"></button></div><button class="gb" id="gre" hidden></button><div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div></div></div><div class="wrap">
 <header>
  <div class="hb"><div class="logo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></div><div><h1>shareUp</h1><div class="sub" data-i="tag"></div></div></div>
  <div class="langs" role="group" aria-label="Language"><button data-l="bn">বাংলা</button><button data-l="en">English</button></div>
@@ -289,7 +319,8 @@ gWaitT:["Waiting for PC approval","PC-র Approval-এর অপেক্ষা�
 gDenyT:["Not allowed","Allow করা হয়নি"],gDenyD:["The PC did not allow this device.","PC এই device-কে Allow করেনি।"],gTry:["Try again","আবার চেষ্টা করুন"],
 gOkT:["Connected!","Connected!"],
 gLockT:["Too many tries","অনেকবার ভুল হয়েছে"],gLockD:["Wait {0} seconds, then try again.","{0} সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন।"],
-gGoneT:["Disconnected","Connection শেষ হয়েছে"],gGoneD:["Tap Reconnect to continue.","চালিয়ে যেতে Reconnect চাপুন।"],gRe:["Reconnect","Reconnect"],
+gGoneT:["Disconnected","Connection শেষ হয়েছে"],gKickT:["Disconnected by the PC","PC আপনাকে Disconnect করেছে"],gKickD:["The PC ended this connection. Tap Reconnect to ask again.","PC এই Connection শেষ করেছে। আবার চাইতে Reconnect চাপুন।"],
+netLost:["Lost contact with the PC · reconnecting…","PC-র সাথে যোগাযোগ নেই · আবার চেষ্টা হচ্ছে…"],netBack:["Connected again","আবার Connect হয়েছে"],netFixed:["Reconnect","আবার Connect করুন"],netS1:["Step 1 of 3: Is the PC on, with shareUp open?","ধাপ ১/৩: PC চালু আছে আর shareUp খোলা আছে?"],netS2:["Step 2 of 3: Is this phone on the same Wi-Fi as the PC?","ধাপ ২/৩: এই ফোন PC-র একই WiFi-তে আছে?"],netS3:["Step 3 of 3: Tap the button below, or scan the QR code on the PC screen again.","ধাপ ৩/৩: নিচের button চাপুন, অথবা PC-র screen-এর QR code আবার scan করুন।"],netDone:["Yes, checked","হ্যাঁ, দেখেছি"],
 gNetT:["Can't reach the PC","PC-র সাথে যোগাযোগ হচ্ছে না"],gNetD:["Check your Wi-Fi or internet. Trying again…","Wi-Fi বা internet দেখুন। আবার চেষ্টা হচ্ছে…"],
 tag:["Phone ⇄ PC","ফোন ⇄ PC"],
 sendH:["Send to PC","PC-তে পাঠান"],sendS:["Pick photos or files from your phone","ফোন থেকে ছবি বা File বেছে নিন"],
@@ -320,7 +351,7 @@ function applyLang(){
  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch(e){}applyLang();gateRender();if(authed){refreshAll();if(!$('#gal').hidden){drawGal();updBar()}}});
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch(e){}applyLang();gateRender();if(typeof CONN!=='undefined'&&CONN==='lost')nbShow('lost');if(authed){refreshAll();if(!$('#gal').hidden){drawGal();updBar()}}});
 let toastT=0;
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),ms||1800)}
 
@@ -338,8 +369,8 @@ const CHUNK=16*1024*1024; // small pieces so big files also work over the intern
 const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 function sendChunk(url,blob,onp){return new Promise(res=>{
  const x=new XMLHttpRequest();x.open('POST',url);
- x.upload.onprogress=e=>{if(e.lengthComputable)onp(e.loaded)};
- x.onload=()=>res({s:x.status,t:x.responseText});
+ x.upload.onprogress=e=>{lastProg=Date.now();if(e.lengthComputable)onp(e.loaded)};
+ x.onload=()=>{lastProg=Date.now();res({s:x.status,t:x.responseText})};
  x.onerror=()=>res({s:0,t:''});x.ontimeout=x.onerror;
  x.send(blob);
 })}
@@ -376,6 +407,7 @@ function up(f){return new Promise(async res=>{
    if(last&&sent){done();break}                                         // final piece already arrived
   }
   sent=true;
+  if(CONN==='lost'){s.textContent=tr('waitNet');await whenOnline();continue}   // the PC is away: wait for it, then carry on from where it stopped
   if(++fails>5){s.textContent='✗ '+tr('failed');s.className='bad';break}
   s.textContent=tr('retrying');await new Promise(r=>setTimeout(r,1500*fails));
  }
@@ -756,29 +788,113 @@ function gateShow(st,j){gs={st,j:j||{}};gateRender()}
 function gateRender(){
  if(!gs)return;const{st,j}=gs;const ic=$('#gic');
  const set=(cls,html,t,d,err)=>{ic.className='gic '+cls;ic.innerHTML=html;$('#gt').textContent=tr(t);const p=$('#gd');p.textContent=d;p.className=err?'gerr':''};
- $('#gbar').hidden=st!=='pending';$('#gpw').hidden=st!=='password';$('#gre').hidden=!(st==='denied'||st==='gone');
- $('#gin').placeholder=tr('gPh');$('#gok').textContent=tr('gGo');$('#gre').textContent=tr(st==='gone'?'gRe':'gTry');
+ $('#gbar').hidden=st!=='pending';$('#gpw').hidden=st!=='password';$('#gre').hidden=!(st==='denied'||st==='gone'||st==='kick');
+ $('#gin').placeholder=tr('gPh');$('#gok').textContent=tr('gGo');$('#gre').textContent=tr(st==='gone'||st==='kick'?'gRe':'gTry');
  if(st==='check'||st==='net')set('wait','<div class="gsp"></div>',st==='net'?'gNetT':'gChk',st==='net'?tr('gNetD'):'');
  else if(st==='password')set('lock','🔒','gPwT',j.bad?tr('gPwBad'):tr('gPwD'),j.bad);
  else if(st==='pending'){set('wait','<div class="gsp"></div>','gWaitT',tr('gWaitD',j.left,devId().slice(0,4).toUpperCase()));$('#gfill').style.width=Math.max(0,Math.min(100,(j.left||0)/60*100))+'%'}
  else if(st==='denied')set('bad','✕','gDenyT',tr('gDenyD'));
  else if(st==='locked')set('bad','✕','gLockT',tr('gLockD',j.wait));
  else if(st==='gone')set('wait','⏻','gGoneT',tr('gGoneD'));
+ else if(st==='kick')set('bad','⏻','gKickT',tr('gKickD'));
  else if(st==='ok')set('ok','✓','gOkT','');
 }
 async function gateCheck(pw){
  clearTimeout(gpoll);let j;
  try{const r=await fetch('/api/session',{method:'POST',body:JSON.stringify({id:devId(),pw:pw||''})});if(!r.ok)throw 0;j=await r.json()}
- catch(e){gateShow('net');gpoll=setTimeout(()=>gateCheck(),3000);return}
- if(j.status==='ok'){gateShow('ok');setTimeout(()=>{$('#gate').hidden=true;authed=true;beat();refreshAll()},700);return}
+ catch(e){gateShow('net');gpoll=setTimeout(()=>gateCheck(),1500);return}
+ if(j.status==='ok'){gateShow('ok');setTimeout(()=>{gateHide();authed=true;pingFails=0;beat();openEvents();refreshAll()},600);return}
  gateShow(j.status,j);
- if(j.status==='pending')gpoll=setTimeout(()=>gateCheck(),1500);
+ if(j.status==='pending')gpoll=setTimeout(()=>gateCheck(),700);   // the PC's "Allow" shows up within a moment
  if(j.status==='locked')gpoll=setTimeout(()=>gateShow('password',{}),(j.wait||5)*1000);
 }
-function lost(){authed=false;clearInterval(hb);gateShow('gone');$('#gate').hidden=false}
-function ping(){fetch('/api/ping',{method:'POST'}).then(r=>{if(r.status===401)lost()}).catch(()=>{})}
-function beat(){clearInterval(hb);hb=setInterval(ping,20000)}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&authed)ping()});
+/* ================= live connection =================
+   The page learns within a second or two when the PC goes away, when it comes back, and when the PC
+   disconnects this phone:
+   - a small heartbeat (every 2.5 s) that is no longer silent when it fails: it shows a banner, dims the
+     page, keeps trying every second, and puts everything right the moment the PC answers again;
+   - an event stream from the PC: "you were disconnected" arrives at once, not after the next heartbeat;
+   - a file that is being sent waits for the PC and carries on from where it stopped. */
+let CONN='ok',pingFails=0,pingBusy=false,pingT=0,lostAt=0,waiters=[],esP=null,nbT=0,gT=0,rfT=0,lastProg=0;
+const FIXED=((document.querySelector('meta[name=su-fixed]')||{}).content||'').trim();
+const okFixed=()=>/^https:\/\//.test(FIXED);
+function whenOnline(){return CONN==='ok'?Promise.resolve():new Promise(r=>waiters.push(r))}
+let HS=0;   // which step the person is on (0, 1, 2): one at a time, the next one only after they tick the last
+function nbFixed(){
+ const f=$('#nbf'),h=$('#nbh'),d=$('#nbd');
+ const wait=CONN==='lost'&&Date.now()-lostAt>7000;
+ h.hidden=!wait;if(wait)h.textContent=tr('netS'+(HS+1));
+ d.hidden=!(wait&&HS<2);d.textContent=tr('netDone');
+ f.hidden=!(wait&&HS>=2&&okFixed());f.textContent=tr('netFixed');
+}
+$('#nbd').onclick=()=>{HS=Math.min(2,HS+1);nbFixed();ping(true)};
+$('#nbf').onclick=()=>{if(okFixed())location.href=FIXED};
+function nbShow(kind){
+ const b=$('#nb');clearTimeout(nbT);
+ if(!kind){b.classList.remove('show');$('#nbh').hidden=true;return}
+ b.classList.add('show');b.classList.toggle('ok',kind==='ok');
+ b.querySelector('.sp').toggleAttribute('hidden',kind!=='lost');
+ b.querySelector('.ck').toggleAttribute('hidden',kind==='lost');
+ $('#nbt').textContent=tr(kind==='lost'?'netLost':'netBack');
+ nbFixed();
+ if(kind==='ok')nbT=setTimeout(()=>b.classList.remove('show'),1800);
+}
+function refreshSoon(){clearTimeout(rfT);rfT=setTimeout(()=>{if(authed)refreshAll()},300)}
+function setConn(c){
+ if(c===CONN)return;CONN=c;
+ document.body.classList.toggle('netlost',c==='lost');
+ if(c==='lost'){lostAt=Date.now();HS=0;nbShow('lost')}
+ else{nbShow('ok');waiters.splice(0).forEach(f=>f());openEvents();refreshSoon()}
+}
+function resetConn(){CONN='ok';document.body.classList.remove('netlost');nbShow('');waiters.splice(0).forEach(f=>f())}
+function gateOpen(){const g=$('#gate');clearTimeout(gT);g.classList.remove('out');g.hidden=false}
+function gateHide(){const g=$('#gate');g.classList.add('out');clearTimeout(gT);gT=setTimeout(()=>{g.hidden=true;g.classList.remove('out')},300)}
+// kind 'kick': the PC disconnected this phone (stay out until the person asks again).
+// anything else: the session just ended (timeout, PC restarted): ask again quietly; a phone that was already let in goes straight back.
+function lost(kind){
+ authed=false;clearTimeout(pingT);closeEvents();resetConn();gateOpen();
+ if(kind==='kick'){gateShow('kick');return}
+ gateShow('check');gateCheck();
+}
+async function ping(force){
+ if(!authed||pingBusy)return;
+ pingBusy=true;
+ const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),3500);
+ try{
+  const r=await fetch('/api/ping?h='+(document.hidden?1:0),{method:'POST',cache:'no-store',signal:ac.signal});
+  clearTimeout(tm);
+  if(r.status===401){pingBusy=false;lost('gone');return}
+  pingFails=0;setConn('ok');
+ }catch(e){
+  clearTimeout(tm);
+  // a file that is still moving proves the line works: the heartbeat is only late because the line is full
+  if(Date.now()-lastProg>6000&&(++pingFails>=2||force===true||!navigator.onLine))setConn('lost');
+ }
+ pingBusy=false;
+}
+function beat(){
+ clearTimeout(pingT);
+ const w=CONN==='lost'?1000:pingFails>0?700:document.hidden?15000:2500;
+ pingT=setTimeout(async()=>{await ping();nbFixed();if(authed)beat()},w);
+}
+function closeEvents(){try{if(esP)esP.close()}catch(e){}esP=null}
+function openEvents(){
+ closeEvents();
+ if(!authed||!window.EventSource)return;
+ let e;try{e=new EventSource('/api/events')}catch(x){return}
+ esP=e;
+ e.addEventListener('bye',ev=>{closeEvents();if(ev.data==='kick')lost('kick');else if(ev.data==='replaced'){ping();openEvents()}else lost('gone')});
+ e.addEventListener('sync',()=>refreshSoon());
+ e.onerror=()=>{if(authed)ping(true)};   // the browser reconnects the stream by itself; the heartbeat decides if the PC is really gone
+}
+document.addEventListener('visibilitychange',()=>{
+ if(!authed)return;
+ if(document.hidden){try{navigator.sendBeacon('/api/ping?h=1')}catch(e){}}   // tell the PC this page sleeps, so it is not dropped for being quiet
+ else{pingFails=0;ping();beat();if(!esP)openEvents()}
+});
+addEventListener('offline',()=>ping(true));
+addEventListener('online',()=>{if(authed){ping();beat()}});
+addEventListener('pageshow',e=>{if(e.persisted&&authed){ping();beat()}});
 addEventListener('pagehide',e=>{if(authed&&!e.persisted&&navigator.sendBeacon)navigator.sendBeacon('/api/bye')});
 $('#gok').onclick=()=>{const v=$('#gin').value;if(v){$('#gin').value='';gateShow('check');gateCheck(v)}};
 $('#gin').onkeydown=e=>{if(e.key==='Enter')$('#gok').click()};
