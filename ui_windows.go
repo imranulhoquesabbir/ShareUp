@@ -30,12 +30,14 @@ var (
 	pIsIconic      = user32.NewProc("IsIconic")
 	pGetForeground = user32.NewProc("GetForegroundWindow")
 	pSetWindowPos  = user32.NewProc("SetWindowPos")
+	pGetWindowRect = user32.NewProc("GetWindowRect")
+	pPostMessage   = user32.NewProc("PostMessageW")
 	pSysParams     = user32.NewProc("SystemParametersInfoW")
 	winMu          sync.Mutex
 	winHwnd        uintptr // 0 while the window is closed (app lives in the tray)
 	showCh         = make(chan struct{}, 1)
 	popMu          sync.Mutex
-	popView        webview2.WebView // the small approval popup, nil while closed
+	popHwnd        uintptr // the small approval popup, 0 while closed
 	popCh          = make(chan struct{}, 1)
 	updItem        *systray.MenuItem
 )
@@ -102,11 +104,17 @@ func uiApprove() {
 // popupClose closes the small approval popup (called when nothing is waiting any more).
 func popupClose() {
 	popMu.Lock()
-	v := popView
+	h := popHwnd
 	popMu.Unlock()
-	if v != nil {
-		v.Dispatch(func() { v.Terminate() })
+	if h != 0 {
+		closeHwnd(h)
 	}
+}
+
+// closeHwnd closes a window the normal way (WM_CLOSE), from any thread. Its message loop then
+// ends by itself. (Only stopping the loop would leave a frozen "Not Responding" window behind.)
+func closeHwnd(h uintptr) {
+	pPostMessage.Call(h, 0x0010, 0, 0) // WM_CLOSE
 }
 
 // popupLoop owns its own OS thread, separate from the main window's thread.
@@ -119,21 +127,21 @@ func popupLoop() {
 
 func openPopup() {
 	popMu.Lock()
-	if popView != nil { // already open: it follows the state by itself
+	if popHwnd != 0 { // already open: it follows the state by itself
 		popMu.Unlock()
 		return
 	}
 	popMu.Unlock()
+	const pw, ph = 340, 430
 	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", "webview")
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		AutoFocus: true,
 		DataPath:  data,
 		WindowOptions: webview2.WindowOptions{
 			Title:  "shareUp",
-			Width:  400,
-			Height: 560,
+			Width:  pw,
+			Height: ph,
 			IconId: 2,
-			Center: true,
 		},
 	})
 	if w == nil { // WebView2 not available: fall back to the full window
@@ -141,18 +149,23 @@ func openPopup() {
 		return
 	}
 	defer w.Destroy()
-	w.SetSize(400, 560, webview2.HintFixed)
-	popMu.Lock()
-	popView = w
-	popMu.Unlock()
+	w.SetSize(pw, ph, webview2.HintFixed)
 	hwnd := uintptr(w.Window())
-	// always on top, so it is seen even over a fullscreen app / other windows, without taking focus away for good
-	pSetWindowPos.Call(hwnd, ^uintptr(0), 0, 0, 0, 0, 0x0001|0x0002|0x0040) // HWND_TOPMOST, NOSIZE|NOMOVE|SHOWWINDOW
-	pSetForeground.Call(hwnd)
+	popMu.Lock()
+	popHwnd = hwnd
+	popMu.Unlock()
+	// bottom-right corner of the usable screen (above the taskbar), always on top, so it does not
+	// cover the work in the middle of the screen
+	var wr, wa struct{ l, t, r, b int32 }
+	pGetWindowRect.Call(hwnd, uintptr(unsafe.Pointer(&wr)))
+	pSysParams.Call(0x0030, 0, uintptr(unsafe.Pointer(&wa)), 0) // SPI_GETWORKAREA
+	x := int(wa.r) - int(wr.r-wr.l) - 12
+	y := int(wa.b) - int(wr.b-wr.t) - 12
+	pSetWindowPos.Call(hwnd, ^uintptr(0), uintptr(x), uintptr(y), 0, 0, 0x0001|0x0040) // HWND_TOPMOST, NOSIZE|SHOWWINDOW
 	w.Navigate(adminURL() + "?popup=1")
 	w.Run()
 	popMu.Lock()
-	popView = nil
+	popHwnd = 0
 	popMu.Unlock()
 }
 
@@ -278,7 +291,7 @@ func openWindowOnce(try int) bool {
 		}
 		if !loaded() && try < 2 {
 			stuck.Store(true)
-			w.Dispatch(func() { w.Terminate() })
+			closeHwnd(uintptr(w.Window()))
 		}
 	}()
 	w.Run()
