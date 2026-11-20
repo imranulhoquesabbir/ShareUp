@@ -156,6 +156,22 @@ func devName(ua string) string {
 	return os + " · " + br
 }
 
+// cleanModel keeps a phone model short and printable.
+func cleanModel(m string) string {
+	m = strings.TrimSpace(m)
+	var b strings.Builder
+	for _, r := range m {
+		if r >= 32 && r < 127 && r != '<' && r != '>' && r != '"' {
+			b.WriteRune(r)
+		}
+	}
+	v := strings.TrimSpace(b.String())
+	if len(v) > 40 {
+		v = v[:40]
+	}
+	return v
+}
+
 func hashPwd(salt, pw string) string {
 	h := sha256.Sum256([]byte(salt + pw))
 	for i := 0; i < 50000; i++ {
@@ -307,8 +323,9 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var q struct {
-		ID string `json:"id"`
-		Pw string `json:"pw"`
+		ID    string `json:"id"`
+		Pw    string `json:"pw"`
+		Model string `json:"model"` // the phone model, when the browser is willing to tell
 	}
 	if json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&q) != nil || !idRe.MatchString(q.ID) {
 		http.Error(w, "bad request", 400)
@@ -318,6 +335,9 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 	ip := clientIP(r)
 	remote := isRemote(r)
 	name := devName(r.UserAgent())
+	if m := cleanModel(q.Model); m != "" && androidModel(r.UserAgent()) == "" && strings.HasPrefix(name, "Android") {
+		name = strings.Replace(name, "Android", "Android "+m, 1) // newer Chrome hides the model in the User-Agent
+	}
 	trusted := isTrusted(c, q.ID)
 	now := time.Now()
 

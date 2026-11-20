@@ -53,6 +53,8 @@ type Config struct {
 	DevKey    string `json:"devKey,omitempty"` // private key that lets this PC update the Worker
 	AutoNet   bool   `json:"autoNet"`
 	OfflineOn bool   `json:"offlineOn"`
+
+	Lang string `json:"lang,omitempty"` // bn | en: language of the desktop notifications (set from the window)
 }
 
 var (
@@ -75,7 +77,7 @@ func loadConfig() {
 	exe, _ := os.Executable()
 	cfgPath = filepath.Join(filepath.Dir(exe), "shareUp.json")
 	home, _ := os.UserHomeDir()
-	cfg = Config{Port: 8080, RecvDir: filepath.Join(home, "Downloads", "shareUp"), AutoUpdate: true, ApprovalOn: true, AutoNet: true}
+	cfg = Config{Lang: "bn", Port: 8080, RecvDir: filepath.Join(home, "Downloads", "shareUp"), AutoUpdate: true, ApprovalOn: true, AutoNet: true}
 	if b, err := os.ReadFile(cfgPath); err == nil {
 		_ = json.Unmarshal(b, &cfg)
 	}
@@ -220,7 +222,7 @@ func stateMap() map[string]any {
 	}
 	return map[string]any{"port": curPort.Load(), "recvDir": c.RecvDir,
 		"shareDir": c.ShareDir, "shareOn": c.ShareOn, "ip": ip, "ips": ips, "url": u,
-		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version}
+		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version, "recvNote": recvNote()}
 }
 
 func adminState(w http.ResponseWriter, r *http.Request) {
@@ -247,6 +249,7 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		AutoNet    *bool   `json:"autoNet"`
 		OfflineOn  *bool   `json:"offlineOn"`
 		ResetFixed *bool   `json:"resetFixed"`
+		Lang       *string `json:"lang"`
 	}
 	if json.NewDecoder(r.Body).Decode(&q) != nil {
 		http.Error(w, "bad request", 400)
@@ -355,6 +358,9 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 	}
 	if q.IP != nil {
 		cfg.IP = *q.IP
+	}
+	if q.Lang != nil && (*q.Lang == "bn" || *q.Lang == "en") {
+		cfg.Lang = *q.Lang
 	}
 	saveLocked()
 	mu.Unlock()
@@ -527,6 +533,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		fmt.Println("Received:", dest)
+		noteReceived(filepath.Base(dest), senderName(r))
 		writeJSON(w, map[string]any{"ok": true})
 		return
 	}
@@ -574,6 +581,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		delete(ups, id)
 		upMu.Unlock()
 		fmt.Println("Received:", st.dest)
+		noteReceived(filepath.Base(st.dest), senderName(r))
 	}
 	writeJSON(w, map[string]any{"ok": true})
 }
