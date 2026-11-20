@@ -178,6 +178,7 @@ body.pop>*:not(.mback){display:none!important}
 body.pop #gm,body.pop #cdlg{display:none!important}
 body.pop{background:var(--bg)}
 body.pop #mreq{background:transparent;padding:8px}
+.shsel{width:auto;flex:none;padding:6px 8px;font-size:13px;border-radius:9px}
 .dev button[data-a=rename]{color:#3b82f6;border-color:#3b82f6}
 .dev button[data-a=trust]{background:#16a34a;color:#fff;border-color:#15803d}
 .dev button[data-a=kick],.dev button[data-a=untrust]{background:#dc2626;color:#fff;border-color:#b91c1c}
@@ -396,6 +397,7 @@ body{animation:pgIn .35s ease both}
   <div class="setblock" id="setShare" hidden>
    <div class="top" style="margin-bottom:14px"><div class="lab" style="margin:0"><svg class="ic"><use href="#i-phone"/></svg><span data-i="shSw"></span></div>
     <div style="display:flex;align-items:center;gap:10px"><span class="chip2 off" id="shst"></span><label class="switch"><input type="checkbox" id="on" data-al="shSw"><span class="slider"></span></label></div></div>
+   <div class="top" style="margin-bottom:14px"><div class="lab" style="margin:0"><span data-i="shWhoT"></span><small style="display:block;color:var(--mute);font-weight:400;margin-top:2px" data-i="shWhoS"></small></div><select id="shWho" style="width:auto;max-width:55%" data-al="shWhoT"><option value="all" data-i="shWhoAll"></option><option value="sel" data-i="shWhoSel"></option></select></div>
    <div class="lab"><svg class="ic"><use href="#i-folder"/></svg><span data-i="defShare"></span></div>
    <div class="path"><input type="text" id="share" data-al="defShare"><button class="g" id="bs"><svg class="ic"><use href="#i-folderopen"/></svg><span data-i="change"></span></button></div>
   </div>
@@ -555,6 +557,8 @@ shareT:["Files shared from this PC","এই PC থেকে Share করা File
 defRecv:["Default save folder","Default Save Folder"],defShare:["Default shared folder","Default Share Folder"],
 change:["Change folder","Folder বদলান"],
 shSw:["Let the phone see these files","ফোনকে File দেখতে দিন"],shOn:["On – phone can see files","চালু – ফোন দেখতে পাচ্ছে"],shOff:["Off – phone can’t see files","বন্ধ – ফোন দেখতে পাচ্ছে না"],
+shWhoT:["Who can see these files","কে এই File দেখতে পাবে"],shWhoS:["A device can be set to Never or Always from the device list. Default follows this.","Device list থেকে প্রতিটা device-কে Never বা Always করা যায়। Default এই সেটিং মানে।"],shWhoAll:["All devices (except Never)","সব device (Never ছাড়া)"],shWhoSel:["Only devices set to Always","শুধু Always করা device"],
+shDef:["PC files: default","PC File: Default"],shNever:["PC files: never","PC File: কখনো না"],shAlways:["PC files: always","PC File: সবসময়"],
 sharingOn:["Sharing on","Sharing চালু হয়েছে"],sharingOff:["Sharing off","Sharing বন্ধ হয়েছে"],
 filesH:["Files in this folder","এই Folder-এর File"],
 pasteHere:["Paste here","এখানে Paste"],moveHere:["Move here","এখানে সরান"],
@@ -708,7 +712,7 @@ function render(s){
  }
  renderUpd(s);filesHook(s);secRender(s);
  setVal('#recv',s.recvDir);setVal('#share',s.shareDir);setVal('#port',s.port);
- $('#on').checked=s.shareOn;$('#auto').checked=s.autostart;
+ $('#shWho').value=s.shareOnlySel?'sel':'all';$('#on').checked=s.shareOn;$('#auto').checked=s.autostart;
  const sh=$('#shst');sh.textContent=t(s.shareOn?'shOn':'shOff');sh.className='chip2 '+(s.shareOn?'ok':'off');
  const ip=$('#ip'),key=s.ips.join();
  if(ip.dataset.k!==key||ip.dataset.s!==s.ip){ip.dataset.k=key;ip.dataset.s=s.ip;ip.innerHTML='';
@@ -755,6 +759,7 @@ $('#ip').onchange=async()=>render(await api('/admin/set',{ip:$('#ip').value}));
 $('#sp').onclick=async()=>{const s=await api('/admin/set',{port:parseInt($('#port').value)});if(s)location.href='http://localhost:'+s.port+'/admin'};
 $('#recv').onchange=async()=>render(await api('/admin/set',{recvDir:$('#recv').value}));
 $('#share').onchange=async()=>render(await api('/admin/set',{shareDir:$('#share').value}));
+$('#shWho').onchange=async()=>{const j=await api('/admin/set',{shareOnlySel:$('#shWho').value==='sel'});if(j)render(j)};
 $('#on').onchange=async()=>{render(await api('/admin/set',{shareOn:$('#on').checked}));toast(t($('#on').checked?'sharingOn':'sharingOff'))};
 $('#auto').onchange=async()=>{const s=await api('/admin/set',{autostart:$('#auto').checked});render(s||await api('/admin/state'));if(s)toast(t(s.autostart?'startOn':'startOff'))};
 $('#br').onclick=async()=>{const j=await api('/admin/browse');if(j&&j.path)render(await api('/admin/set',{recvDir:j.path}))};
@@ -1152,6 +1157,9 @@ const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const ago=u=>{if(!u)return'-';const m=Math.max(0,Math.round((Date.now()/1000-u)/60));return m<1?'now':m<60?m+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' d'};
 async function devAct(op,id,trust,name){const j=await api('/admin/dev',{op,id,trust:!!trust,name:name||''});if(j){DV=j;drawDev()}}
 const dcode=id=>String(id).slice(0,4).toUpperCase();
+// per-device access to the files shared from this PC: default (follows the global setting) / never / always
+function shSel(v){return '<select class="shsel" data-al="shDef"><option value=""'+(!v?' selected':'')+'>'+t('shDef')+'</option><option value="off"'+(v==='off'?' selected':'')+'>'+t('shNever')+'</option><option value="on"'+(v==='on'?' selected':'')+'>'+t('shAlways')+'</option></select>'}
+function shBind(e,id){const s=e.querySelector('.shsel');if(s)s.onchange=async()=>{const j=await api('/admin/dev',{op:'share',id,mode:s.value});if(j){DV=j;drawDev()}}}
 async function devRename(id,cur){const n=await ask(t('renameQ'),{input:cur,ok:t('rename')});if(n===null)return;devAct('rename',id,false,n.trim())}
 // Rows are kept per device and only touched when something about them changed, so a phone that
 // connects slides in, one that leaves slides out, and nothing else flickers.
@@ -1177,13 +1185,15 @@ function syncRows(box,map,items,sig,make){
 let reqLeft=0,reqT0=0;
 function drawDev(){
  if(!DV)return;
- syncRows($('#devl'),ROWS.s,DV.sessions,d=>[d.name,d.ip,d.remote,d.trusted,LANG].join('|'),(e,d)=>{
-  e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div><button class="g" data-a="rename">'+t('rename')+'</button>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
-  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct(b.dataset.a,d.id))});
+ syncRows($('#devl'),ROWS.s,DV.sessions,d=>[d.name,d.ip,d.remote,d.trusted,d.share,LANG].join('|'),(e,d)=>{
+  e.innerHTML='<span class="dd"></span><div class="dx"><b>'+esc(d.name)+(d.trusted?' ✓':'')+'</b><small>'+esc(d.ip)+' · '+t(d.remote?'viaNet':'viaLan')+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div>'+shSel(d.share)+'<button class="g" data-a="rename">'+t('rename')+'</button>'+(d.trusted?'':'<button class="g" data-a="trust">'+t('trust')+'</button>')+'<button class="g dgr" data-a="kick">'+t('kick')+'</button>';
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct(b.dataset.a,d.id));
+  shBind(e,d.id)});
  $('#devn').hidden=DV.sessions.length>0;$('#devp').hidden=false;
- syncRows($('#trl'),ROWS.t,DV.trusted,d=>[d.name,d.online,d.online?'':ago(d.lastSeen),ago(d.added),LANG].join('|'),(e,d)=>{
-  e.innerHTML='<span class="dd'+(d.online?'':' off')+'"></span><div class="dx"><b>'+esc(d.name)+'</b><small>'+(d.online?t('online'):t('lastSeen',ago(d.lastSeen)))+' · '+t('added',ago(d.added))+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div><button class="g" data-a="rename">'+t('rename')+'</button><button class="g dgr" data-a="untrust">'+t('untrust')+'</button>';
-  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct('untrust',d.id))});
+ syncRows($('#trl'),ROWS.t,DV.trusted,d=>[d.name,d.online,d.online?'':ago(d.lastSeen),ago(d.added),d.share,LANG].join('|'),(e,d)=>{
+  e.innerHTML='<span class="dd'+(d.online?'':' off')+'"></span><div class="dx"><b>'+esc(d.name)+'</b><small>'+(d.online?t('online'):t('lastSeen',ago(d.lastSeen)))+' · '+t('added',ago(d.added))+' · '+t('codeL')+' <code>'+dcode(d.id)+'</code></small></div>'+shSel(d.share)+'<button class="g" data-a="rename">'+t('rename')+'</button><button class="g dgr" data-a="untrust">'+t('untrust')+'</button>';
+  e.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.a==='rename'?devRename(d.id,d.name):devAct('untrust',d.id));
+  shBind(e,d.id)});
  $('#trn').hidden=DV.trusted.length>0;
  const p=DV.pending[0],m=$('#mreq');
  if(p){m.hidden=false;reqId=p.id;$('#mrN').textContent=p.name;$('#mrC').textContent=dcode(p.id);$('#mrI').textContent=p.ip+' · '+t(p.remote?'viaNet':'viaLan');
