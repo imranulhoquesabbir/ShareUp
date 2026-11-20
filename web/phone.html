@@ -799,9 +799,15 @@ function gateRender(){
  else if(st==='kick')set('bad','⏻','gKickT',tr('gKickD'));
  else if(st==='ok')set('ok','✓','gOkT','');
 }
+let MODEL='',modelAsked=false;
+async function askModel(){   // Chrome hides the phone model; this asks for it (only works on https, i.e. the internet link)
+ if(modelAsked)return;modelAsked=true;
+ try{if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){const v=await navigator.userAgentData.getHighEntropyValues(['model']);MODEL=String(v.model||'').slice(0,40)}}catch(e){}
+}
 async function gateCheck(pw){
  clearTimeout(gpoll);let j;
- try{const r=await fetch('/api/session',{method:'POST',body:JSON.stringify({id:devId(),pw:pw||''})});if(!r.ok)throw 0;j=await r.json()}
+ await askModel();
+ try{const r=await fetch('/api/session',{method:'POST',body:JSON.stringify({id:devId(),pw:pw||'',model:MODEL})});if(!r.ok)throw 0;j=await r.json()}
  catch(e){gateShow('net');gpoll=setTimeout(()=>gateCheck(),1500);return}
  if(j.status==='ok'){gateShow('ok');setTimeout(()=>{gateHide();authed=true;pingFails=0;beat();openEvents();refreshAll()},600);return}
  gateShow(j.status,j);

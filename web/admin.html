@@ -309,11 +309,16 @@ body{animation:pgIn .35s ease both}
 .rst{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;text-align:center;padding:24px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s ease}
 .rst.on{opacity:1;pointer-events:auto}
 .rst h2{margin:0;font-size:20px}.rst p{margin:0;color:var(--mute);font-size:14px}
+/* device rows: long addresses wrap, buttons drop to the next line instead of sitting on top of the text */
+.dev{flex-wrap:wrap;row-gap:10px}
+.dev .dx{flex:1 1 220px}
+.dev .dx small{display:block;overflow-wrap:anywhere;line-height:1.5}
+.dev .g,.dev .b{flex:none;white-space:nowrap}
 /* ---- live devices: rows slide in / out, the online dot breathes ---- */
 .dev.in{animation:devIn .38s cubic-bezier(.2,.8,.2,1) both}
 .dev.out{animation:devOut .3s ease both;pointer-events:none;overflow:hidden}
-@keyframes devIn{from{opacity:0;transform:translateX(-14px);max-height:0;padding-top:0;padding-bottom:0}to{opacity:1;transform:none;max-height:120px}}
-@keyframes devOut{from{opacity:1;max-height:120px}to{opacity:0;transform:translateX(18px);max-height:0;padding-top:0;padding-bottom:0;border-top-width:0}}
+@keyframes devIn{from{opacity:0;transform:translateX(-14px);max-height:0;padding-top:0;padding-bottom:0}to{opacity:1;transform:none;max-height:260px}}
+@keyframes devOut{from{opacity:1;max-height:260px}to{opacity:0;transform:translateX(18px);max-height:0;padding-top:0;padding-bottom:0;border-top-width:0}}
 .dev .dd:not(.off){animation:ddPulse 2.2s ease-in-out infinite}
 @keyframes ddPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 45%,transparent)}50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 0%,transparent)}}
 .dev .dd{transition:background .3s ease}
@@ -604,7 +609,7 @@ function applyLang(){
  document.querySelectorAll('[data-al]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.al)));
  document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste();paintSel()}
+function setLang(l){LANG=l;try{localStorage.setItem('lang',l)}catch(e){}api('/admin/set',{lang:l});applyLang();if(S)render(S);drawDev();lastL='';loadFiles();updatePaste();paintSel()}
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 
 const $=s=>document.querySelector(s);
@@ -697,6 +702,10 @@ function render(s){
  $('#rbar').hidden=r.status!=='downloading';$('#rfill').style.width=r.progress+'%';
  $('#rlink').hidden=r.status!=='on';$('#nurl').textContent=r.url||'';
 
+ if(s.recvNote){   // files arrived: say what and how many
+  if(lastRN===null)lastRN=s.recvNote.n;
+  else if(s.recvNote.n!==lastRN){lastRN=s.recvNote.n;toast('📥 '+s.recvNote.t,5000)}
+ }
  renderUpd(s);filesHook(s);secRender(s);
  setVal('#recv',s.recvDir);setVal('#share',s.shareDir);setVal('#port',s.port);
  $('#on').checked=s.shareOn;$('#auto').checked=s.autostart;
@@ -705,7 +714,7 @@ function render(s){
  if(ip.dataset.k!==key||ip.dataset.s!==s.ip){ip.dataset.k=key;ip.dataset.s=s.ip;ip.innerHTML='';
   s.ips.forEach(i=>{const o=document.createElement('option');o.value=o.textContent=i;if(i==s.ip)o.selected=true;ip.append(o)})}
 }
-let lastFP=0;
+let lastFP=0,lastRN=null;
 function filesHook(s){
  const d=rootDirOf(s);
  if(d!==lastDir){lastDir=d;cur='';lastL='';loadFiles()}
@@ -1319,6 +1328,7 @@ function openEvents(){
  es.addEventListener('ka',()=>{esLast=Date.now()});
 }
 (async()=>{render(await api('/admin/state'));
+ api('/admin/set',{lang:LANG});   // the desktop notifications speak the same language as this window
  openEvents();
  setInterval(()=>{if(Date.now()-esLast>9000){openEvents();pull()}},2000);   // stream watchdog
  setInterval(pull,2000);                                                    // safety net
