@@ -38,6 +38,20 @@ const (
 	swShow    = 5
 )
 
+func init() {
+	// A window that is minimized, covered by other windows or left alone for a few minutes used to be
+	// slowed down by the browser engine (timers once a second, later once a minute, animation frames
+	// stopped). The window then showed old things, such as "turn on your hotspot", for a long time after
+	// the PC had already joined it. These switches keep the window fully awake. Must be set before the
+	// first window is created.
+	if os.Getenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS") == "" {
+		os.Setenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+			"--disable-background-timer-throttling --disable-renderer-backgrounding "+
+				"--disable-backgrounding-occluded-windows "+
+				"--disable-features=CalculateNativeWinOcclusion,IntensiveWakeUpThrottling")
+	}
+}
+
 // uiShow opens the window, or brings it to the front if it is already open.
 func uiShow() {
 	kickUpdate()

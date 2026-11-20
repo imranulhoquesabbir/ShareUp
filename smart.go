@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -109,13 +108,40 @@ func smartReset() {
 	regMu.Unlock()
 }
 
+// stamp remembers "this just happened" for a message that the window shows for a few seconds,
+// and wakes the window again when that time is over, so a message can never stay on screen
+// longer than it should (the window used to learn about the end only at its next refresh).
+func stamp(a *atomic.Int64, show time.Duration) {
+	a.Store(time.Now().UnixNano())
+	time.AfterFunc(show+150*time.Millisecond, notifyState)
+}
+
+var kickSmart = make(chan struct{}, 1)
+
+// kickSmartNow makes smartLoop work now (new address -> tell the Worker, internet back -> tunnel).
+func kickSmartNow() {
+	select {
+	case kickSmart <- struct{}{}:
+	default:
+	}
+}
+
 // ---------- network checks ----------
 
+// internetUp tries two well-known addresses at the same time and says yes as soon as one answers.
 func internetUp() bool {
+	res := make(chan bool, 2)
 	for _, a := range []string{"1.1.1.1:443", "8.8.8.8:443"} {
-		c, err := net.DialTimeout("tcp", a, 2500*time.Millisecond)
-		if err == nil {
-			c.Close()
+		go func(a string) {
+			c, err := net.DialTimeout("tcp", a, 2*time.Second)
+			if err == nil {
+				c.Close()
+			}
+			res <- err == nil
+		}(a)
+	}
+	for i := 0; i < 2; i++ {
+		if <-res {
 			return true
 		}
 	}
@@ -192,7 +218,7 @@ func netWatch() {
 	last := 0
 	for {
 		select {
-		case <-time.After(4 * time.Second):
+		case <-time.After(3 * time.Second):
 		case <-kickNW: // the network just changed: check right now
 		}
 		up := internetUp()
@@ -200,16 +226,17 @@ func netWatch() {
 		if prev != up {
 			notifyState()
 			kickHotspot()
+			kickSmartNow() // internet back: bring the tunnel and the fixed link up at once
 		}
 		if !up {
 			wasOffline.Store(true)
 		} else if !prev && wasOffline.Load() {
-			backAt.Store(time.Now().UnixNano())
+			stamp(&backAt, 8*time.Second)
 			kickUpdate() // look for a new version right away
 		}
 		n := sessionCount()
 		if !up && n > 0 && last == 0 {
-			doneAt.Store(time.Now().UnixNano())
+			stamp(&doneAt, 5*time.Second)
 		}
 		last = n
 	}
@@ -220,7 +247,10 @@ func netWatch() {
 func smartLoop() {
 	var tunTry time.Time
 	for {
-		time.Sleep(5 * time.Second)
+		select {
+		case <-time.After(5 * time.Second):
+		case <-kickSmart:
+		}
 		c := get()
 		up := onlineNow.Load()
 		if !up {
@@ -228,7 +258,7 @@ func smartLoop() {
 		}
 		if c.AutoNet { // keep the internet link ready by itself
 			st := remoteSnapshot().Status
-			if (st == "off" || st == "error") && time.Since(tunTry) > 30*time.Second && !transferBusy() {
+			if (st == "off" || st == "error") && time.Since(tunTry) > 10*time.Second && !transferBusy() {
 				tunTry = time.Now()
 				remoteStart()
 			}
@@ -265,6 +295,7 @@ func registerWorker(c Config, base, lan, tunnel, sig string) {
 	resp, err := cl.Post(base+"/r/"+c.PubID, "application/json", bytes.NewReader(body))
 	regMu.Lock()
 	defer regMu.Unlock()
+	defer notifyState() // the "ready / cannot reach" chip in the window follows at once
 	regLast = time.Now()
 	if err != nil {
 		regOK, regErr = false, "Cannot reach Worker"
@@ -283,24 +314,11 @@ func registerWorker(c Config, base, lan, tunnel, sig string) {
 	}
 }
 
-var phoneHints = []string{"iphone", "android", "galaxy", "samsung", "redmi", "xiaomi", "poco", "pixel", "oppo", "vivo",
-	"realme", "infinix", "tecno", "itel", "oneplus", "huawei", "honor", "motorola", "nokia", "symphony", "walton", "hotspot"}
-
 // wifiAP is one Wi-Fi network in range.
 type wifiAP struct {
 	Name  string
 	Sig   int  // signal strength in %, 0 when unknown
 	Local bool // the radio address is "locally administered": what a phone hotspot uses, a router almost never does
-}
-
-func looksLikePhone(name string) bool {
-	n := strings.ToLower(name)
-	for _, h := range phoneHints {
-		if strings.Contains(n, h) {
-			return true
-		}
-	}
-	return false
 }
 
 func hotReset() {
@@ -314,7 +332,7 @@ func hotReset() {
 	hotMu.Lock()
 	if was {
 		hotJoinNet = name
-		hotOKAt.Store(time.Now().UnixNano()) // show the green "connected" note
+		stamp(&hotOKAt, 10*time.Second) // show the green "connected" note, then take it away again
 	}
 	hotEpi, hotPanel = false, false
 	hotSel, hotNets, hotBase, hotSeen = "", nil, nil, nil
@@ -325,93 +343,18 @@ func hotReset() {
 	}
 }
 
-// maybeHotspot runs every few seconds. With no network at all it looks for a phone hotspot,
-// joins one the PC already knows by itself, and otherwise lets the guide ask the person
-// one small thing at a time (turn it on, pick it, type the password).
+// maybeHotspot runs every few seconds. It does NOT scan, guess or join anything: when the PC has no
+// network at all it only remembers "no network" (so the window shows the guide with its
+// "Open Wi-Fi list" button), and when a network is back it tells the window "connected".
+// The person picks the Wi-Fi / phone Hotspot by hand in the Windows Wi-Fi list.
 func maybeHotspot(c Config, up bool) {
 	if up || hasNetwork() {
 		hotReset()
 		return
 	}
-	if sessionCount() > 0 || transferBusy() {
-		return
-	}
 	hotMu.Lock()
 	hotEpi = true
 	hotMu.Unlock()
-	aps, saved := wifiScan()
-	cur := wifiCurrent() // the Wi-Fi this PC is on right now is never offered as a hotspot
-	hotMu.Lock()
-	if hotBase == nil {
-		hotBase = map[string]bool{}
-		for _, a := range aps {
-			hotBase[a.Name] = true
-		}
-	}
-	if hotSeen == nil {
-		hotSeen = map[string]int{}
-	}
-	inRange := map[string]bool{}
-	for _, a := range aps {
-		inRange[a.Name] = true
-		hotSeen[a.Name]++
-	}
-	for n := range hotSeen { // a name that vanished for one scan starts counting again
-		if !inRange[n] {
-			delete(hotSeen, n)
-		}
-	}
-	if !hotJoin.IsZero() && time.Since(hotJoin) > 20*time.Second {
-		hotSel, hotJoin, hotLast = "", time.Time{}, time.Now() // auto-join did not work: back to the guide
-	}
-	// Wi-Fi scans are noisy: neighbours' routers blink in and out of range. So a name is only
-	// offered when it has stayed for several scans in a row, and a name that does not look
-	// like a phone must also use a phone-style (locally administered) radio address, have
-	// been absent when the network was lost, and be reasonably strong.
-	var phones, others []string
-	for _, a := range aps {
-		if a.Name == cur {
-			continue
-		}
-		seen := hotSeen[a.Name]
-		switch {
-		case looksLikePhone(a.Name):
-			if seen >= 2 {
-				phones = append(phones, a.Name)
-			}
-		case a.Local && !hotBase[a.Name] && seen >= 3 && (a.Sig == 0 || a.Sig >= 50):
-			others = append(others, a.Name)
-		}
-	}
-	sort.Strings(phones) // stable order, so the list does not jump around on screen
-	sort.Strings(others)
-	nets := append(append([]string(nil), phones...), others...)
-	changed := strings.Join(nets, "\x00") != strings.Join(hotNets, "\x00")
-	hotNets = nets
-	busy := hotSel != "" || time.Since(hotLast) < 30*time.Second
-	openIt := len(phones) > 0 && !hotPanel // a phone hotspot just showed up: open the Wi-Fi list for the person
-	if openIt {
-		hotPanel = true
-	}
-	hotMu.Unlock()
-	if changed {
-		notifyState()
-	}
-	if openIt {
-		go openWifiPanel()
-	}
-	if busy {
-		return
-	}
-	for _, v := range nets { // a hotspot this PC has joined before: no questions
-		if saved[v] {
-			hotMu.Lock()
-			hotSel, hotJoin = v, time.Now()
-			hotMu.Unlock()
-			wifiConnect(v)
-			return
-		}
-	}
 }
 
 // adminWifi: the "Open Wi-Fi list" button of the hotspot guide.
@@ -455,13 +398,6 @@ func guide(c Config) guideInfo {
 		return guideInfo{} // same Wi-Fi / hotspot: the normal QR just works
 	}
 	g := guideInfo{Kind: "offline", Step: 1}
-	hotMu.Lock()
-	if hotSel != "" && !hotJoin.IsZero() {
-		g.Step, g.Sel = 4, hotSel // joining a hotspot this PC already knows
-	} else if len(hotNets) > 0 {
-		g.Nets = append([]string(nil), hotNets...) // a phone hotspot is in range
-	}
-	hotMu.Unlock()
 	return g
 }
 

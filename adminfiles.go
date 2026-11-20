@@ -135,6 +135,7 @@ func adminPut(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	notifyPhones() // a file appeared in a folder the phones may be looking at
 	writeJSON(w, map[string]any{"name": filepath.Base(dest), "size": n})
 }
 
@@ -159,6 +160,7 @@ func adminMkdir(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	notifyPhones()
 	writeJSON(w, map[string]any{"ok": true})
 }
 
@@ -187,6 +189,7 @@ func adminDel(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	notifyPhones()
 	writeJSON(w, map[string]any{"ok": true})
 }
 

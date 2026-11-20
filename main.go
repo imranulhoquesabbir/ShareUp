@@ -192,11 +192,25 @@ func page(name string) http.HandlerFunc {
 	}
 }
 
+var attrEsc = strings.NewReplacer("&", "&amp;", "\"", "&quot;", "<", "&lt;", ">", "&gt;")
+
+// phonePage serves the phone page with this PC's fixed link written into it. When the phone
+// loses the PC for good (the PC joined another Wi-Fi, so its address changed), the page can
+// offer "open the fixed link" and the Worker sends the phone to the new address.
+func phonePage(w http.ResponseWriter, r *http.Request) {
+	b, _ := webFS.ReadFile("web/phone.html")
+	out := strings.Replace(string(b), "__SU_FIXED__", attrEsc.Replace(fixedURL(get())), 1)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Write([]byte(out))
+}
+
 // lastAdminHit is when the admin page last asked for its state: proof that the window really loaded.
 var lastAdminHit atomic.Int64
 
-func adminState(w http.ResponseWriter, r *http.Request) {
-	lastAdminHit.Store(time.Now().UnixNano())
+// stateMap is everything the admin window shows about the PC. It is used by /admin/state and
+// pushed through the event stream (see events.go).
+func stateMap() map[string]any {
 	c := get()
 	ips := localIPs()
 	ip := pickIP(c, ips)
@@ -204,9 +218,14 @@ func adminState(w http.ResponseWriter, r *http.Request) {
 	if ip != "" {
 		u = fmt.Sprintf("http://%s:%d", ip, curPort.Load())
 	}
-	writeJSON(w, map[string]any{"port": curPort.Load(), "recvDir": c.RecvDir,
+	return map[string]any{"port": curPort.Load(), "recvDir": c.RecvDir,
 		"shareDir": c.ShareDir, "shareOn": c.ShareOn, "ip": ip, "ips": ips, "url": u,
-		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version})
+		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version}
+}
+
+func adminState(w http.ResponseWriter, r *http.Request) {
+	lastAdminHit.Store(time.Now().UnixNano())
+	writeJSON(w, stateMap())
 }
 
 func adminSet(w http.ResponseWriter, r *http.Request) {
@@ -339,6 +358,10 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 	}
 	saveLocked()
 	mu.Unlock()
+	if q.ShareOn != nil || q.ShareDir != nil {
+		notifyPhones() // phones refresh their file lists at once
+	}
+	notifyState() // other open windows see the change at once
 	adminState(w, r)
 }
 
@@ -765,9 +788,10 @@ func phoneRoutes(mux *http.ServeMux) {
 			http.NotFound(w, r)
 			return
 		}
-		page("phone.html")(w, r)
+		phonePage(w, r)
 	})
 	mux.HandleFunc("/api/session", apiSession)
+	mux.HandleFunc("/api/events", gate(apiEvents))
 	mux.HandleFunc("/api/ping", apiPing)
 	mux.HandleFunc("/api/bye", apiBye)
 	mux.HandleFunc("/upload", gate(trackXfer(upload)))
@@ -824,6 +848,9 @@ func main() {
 	mux.HandleFunc("/admin/put", local(adminPut))
 	mux.HandleFunc("/admin/mkdir", local(adminMkdir))
 	mux.HandleFunc("/admin/del", local(adminDel))
+	mux.HandleFunc("/admin/rename", local(adminRename))
+	mux.HandleFunc("/admin/copy", local(adminTransfer(false)))
+	mux.HandleFunc("/admin/move", local(adminTransfer(true)))
 	mux.HandleFunc("/admin/open", local(adminOpen))
 	mux.HandleFunc("/admin/pv/", local(adminPreview))
 	mux.HandleFunc("/admin/raw/", local(adminRaw))

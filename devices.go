@@ -6,6 +6,7 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"regexp"
@@ -24,8 +25,10 @@ import (
 
 const (
 	approvalWait = 60 * time.Second  // no answer in this time = Deny
-	sessionIdle  = 120 * time.Second // no heartbeat in this time = disconnected
-	byeGrace     = 12 * time.Second  // page closed: wait a little in case it is just a reload
+	liveIdle     = 10 * time.Second  // a visible phone page beats every 2.5 s: silent this long = gone
+	sessionIdle  = 120 * time.Second // a page in the background (or a transfer running) beats rarely
+	byeGrace     = 4 * time.Second   // page closed: wait a little in case it is just a reload
+	resumeWin    = 10 * time.Minute  // a phone that dropped out comes back without asking again
 )
 
 type TrustedDev struct {
@@ -55,6 +58,10 @@ type sess struct {
 	Created  time.Time
 	LastSeen time.Time
 	ByeAt    time.Time
+	Hidden   bool          // the phone page is in the background: it beats rarely
+	done     chan struct{} // closed the moment this session ends (the phone's event stream hears it)
+	Why      string        // kick | idle | bye | replaced (written before done is closed)
+	Ended    time.Time
 }
 
 type tryInfo struct {
@@ -66,6 +73,7 @@ var (
 	dmu      sync.Mutex
 	pend     = map[string]*pending{} // by device ID
 	sessions = map[string]*sess{}    // by session token
+	lapsed   = map[string]*sess{}    // sessions that just timed out (not kicked), by token: the same phone may resume
 	tries    = map[string]*tryInfo{} // by IP
 
 	idRe = regexp.MustCompile(`^[A-Za-z0-9]{16,64}$`)
@@ -194,11 +202,13 @@ func touchTrusted(id, name string) {
 	}
 	saveLocked()
 	mu.Unlock()
+	notifyState()
 }
 
 func addTrusted(id, name string) {
 	mu.Lock()
 	defer mu.Unlock()
+	defer notifyState()
 	for i := range cfg.Trusted {
 		if cfg.Trusted[i].ID == id {
 			cfg.Trusted[i].LastSeen = time.Now().Unix()
@@ -214,6 +224,7 @@ func addTrusted(id, name string) {
 func removeTrusted(id string) {
 	mu.Lock()
 	defer mu.Unlock()
+	defer notifyState()
 	out := make([]TrustedDev, 0, len(cfg.Trusted))
 	for _, t := range cfg.Trusted {
 		if t.ID != id {
@@ -224,23 +235,41 @@ func removeTrusted(id string) {
 	saveLocked()
 }
 
+// dropSess ends one session: it leaves the list, the phone's event stream is told at once
+// (so a kicked phone shows "disconnected" in an instant), and the PC window refreshes.
+// A session that only timed out is remembered for a while so the same phone can resume.
 // dmu must be held.
-func dropSessionsOf(id string) {
+func dropSess(tok string, s *sess, why string) {
+	if _, ok := sessions[tok]; !ok {
+		return
+	}
+	delete(sessions, tok)
+	s.Why, s.Ended = why, time.Now()
+	close(s.done)
+	if why == "idle" || why == "bye" {
+		lapsed[tok] = s
+	}
+	notifyState()
+}
+
+// dmu must be held.
+func dropSessionsOf(id, why string) {
 	for tok, s := range sessions {
 		if s.DevID == id {
-			delete(sessions, tok)
+			dropSess(tok, s, why)
 		}
 	}
 }
 
 // dmu must be held.
 func grant(w http.ResponseWriter, r *http.Request, id, name, ip string, remote bool) {
-	dropSessionsOf(id)
+	dropSessionsOf(id, "replaced")
 	tok := newToken() + newToken()
 	now := time.Now()
-	sessions[tok] = &sess{DevID: id, Name: name, IP: ip, Remote: remote, Created: now, LastSeen: now}
+	sessions[tok] = &sess{DevID: id, Name: name, IP: ip, Remote: remote, Created: now, LastSeen: now, done: make(chan struct{})}
 	http.SetCookie(w, &http.Cookie{Name: "su_s", Value: tok, Path: "/", HttpOnly: true,
 		SameSite: http.SameSiteLaxMode, Secure: r.Header.Get("X-Forwarded-Proto") == "https"})
+	notifyState() // the new phone shows in the PC window right now
 }
 
 func sessionFrom(r *http.Request) *sess {
@@ -301,6 +330,18 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 		s.ByeAt = time.Time{}
 		writeJSON(w, map[string]any{"status": "ok"})
 		return
+	}
+
+	// The same phone is back soon after its session timed out (the page was in the background, or the
+	// Wi-Fi blinked): it was already let in, so let it straight back in.
+	if ck, err := r.Cookie("su_s"); err == nil {
+		if old := lapsed[ck.Value]; old != nil && old.DevID == q.ID && now.Sub(old.Ended) < resumeWin {
+			delete(lapsed, ck.Value)
+			delete(pend, q.ID)
+			grant(w, r, q.ID, name, ip, remote)
+			writeJSON(w, map[string]any{"status": "ok"})
+			return
+		}
 	}
 
 	p := pend[q.ID]
@@ -368,7 +409,8 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 	}
 	if p.Created.IsZero() {
 		p.Created = now
-		go uiShow() // bring the shareUp window to the front on the PC
+		notifyState() // the approval window opens on the PC right now
+		go uiShow()   // bring the shareUp window to the front on the PC
 	}
 	left := int(approvalWait.Seconds() - now.Sub(p.Created).Seconds())
 	if left < 0 {
@@ -379,11 +421,13 @@ func apiSession(w http.ResponseWriter, r *http.Request) {
 
 // POST /api/ping  (heartbeat)
 func apiPing(w http.ResponseWriter, r *http.Request) {
+	hidden := r.URL.Query().Get("h") == "1" // the page is in the background: it will beat rarely
 	dmu.Lock()
 	s := sessionFrom(r)
 	if s != nil {
 		s.LastSeen = time.Now()
 		s.ByeAt = time.Time{}
+		s.Hidden = hidden
 	}
 	dmu.Unlock()
 	if s == nil {
@@ -403,25 +447,95 @@ func apiBye(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// ---------- phone event stream ----------
+
+// GET /api/events  (phone). The PC talks first, so the phone does not have to ask:
+//   event: bye   -> this phone was disconnected on the PC (data: kick | idle | bye | replaced)
+//   event: sync  -> something changed on the PC (shared files): refresh the lists
+//   event: ka    -> still alive
+func apiEvents(w http.ResponseWriter, r *http.Request) {
+	fl, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming not supported", 500)
+		return
+	}
+	dmu.Lock()
+	s := sessionFrom(r)
+	var done chan struct{}
+	if s != nil {
+		s.LastSeen = time.Now()
+		s.ByeAt = time.Time{}
+		done = s.done
+	}
+	dmu.Unlock()
+	if s == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	h := w.Header()
+	h.Set("Content-Type", "text/event-stream")
+	h.Set("Cache-Control", "no-store")
+	h.Set("X-Accel-Buffering", "no")
+	fmt.Fprint(w, "retry: 1000\n\nevent: hello\ndata: 1\n\n")
+	fl.Flush()
+	ch := phoneWait()
+	tick := time.NewTicker(5 * time.Second)
+	defer tick.Stop()
+	for {
+		select {
+		case <-done:
+			fmt.Fprintf(w, "event: bye\ndata: %s\n\n", s.Why) // Why was written before done was closed
+			fl.Flush()
+			return
+		case <-ch:
+			ch = phoneWait()
+			if _, err := fmt.Fprint(w, "event: sync\ndata: 1\n\n"); err != nil {
+				return
+			}
+		case <-tick.C:
+			if _, err := fmt.Fprint(w, "event: ka\ndata: 1\n\n"); err != nil {
+				return
+			}
+		case <-r.Context().Done():
+			return
+		}
+		fl.Flush()
+	}
+}
+
 // ---------- janitor ----------
 
 func devJanitor() {
 	for {
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Second)
 		now := time.Now()
+		changed := false
 		dmu.Lock()
 		for id, p := range pend {
 			switch {
 			case p.State == "wait" && !p.Created.IsZero() && now.Sub(p.Created) > approvalWait:
 				p.State = "denied" // timed out; the phone will see "denied" on its next check
 				p.Touched = now
+				changed = true
 			case now.Sub(p.Touched) > 5*time.Minute:
 				delete(pend, id)
 			}
 		}
+		busy := transferBusy() // a big file keeps the line full: its heartbeats may be late
 		for tok, s := range sessions {
-			if now.Sub(s.LastSeen) > sessionIdle || (!s.ByeAt.IsZero() && now.Sub(s.ByeAt) > byeGrace) {
-				delete(sessions, tok)
+			limit := liveIdle
+			if s.Hidden || busy {
+				limit = sessionIdle
+			}
+			if now.Sub(s.LastSeen) > limit {
+				dropSess(tok, s, "idle")
+			} else if !s.ByeAt.IsZero() && now.Sub(s.ByeAt) > byeGrace {
+				dropSess(tok, s, "bye")
+			}
+		}
+		for tok, o := range lapsed {
+			if now.Sub(o.Ended) > resumeWin {
+				delete(lapsed, tok)
 			}
 		}
 		for ip, t := range tries {
@@ -430,6 +544,9 @@ func devJanitor() {
 			}
 		}
 		dmu.Unlock()
+		if changed {
+			notifyState()
+		}
 	}
 }
 
@@ -527,7 +644,12 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 			p.Touched = time.Now()
 		}
 	case "kick":
-		dropSessionsOf(q.ID)
+		dropSessionsOf(q.ID, "kick")
+		for tok, o := range lapsed { // a phone that was disconnected on purpose must not slip back in quietly
+			if o.DevID == q.ID {
+				delete(lapsed, tok)
+			}
+		}
 	case "trust":
 		name := "Device"
 		for _, s := range sessions {
@@ -564,5 +686,6 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dmu.Unlock()
+	notifyState()
 	writeJSON(w, devicesSnapshot())
 }

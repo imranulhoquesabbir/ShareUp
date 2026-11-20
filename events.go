@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,17 +11,21 @@ import (
 	"time"
 )
 
-// Live updates for the admin window.
+// Live updates (PC window and phones).
 //
-// Before, the window asked for the state every 2 s, and the PC noticed a network change only
-// every 4-10 s, so things appeared late and then all at once. Now:
 //   - netFast checks the adapters every 0.7 s and wakes the other loops the moment they change;
-//   - notifyState tells every open admin window "something changed", and the window fetches
-//     the new state at once (/admin/events). The 2 s refresh stays as a safety net.
+//   - notifyState tells every open admin window "something changed". The window does NOT ask for
+//     the new state any more: the whole state (PC + devices) is pushed down the event stream, so
+//     it appears at once, even when the window is hidden or its timers are slowed down by Windows;
+//   - notifyPhones tells every connected phone page "something changed on the PC" (shared files);
+//   - the 2 s refresh in the window stays only as a safety net.
 
 var (
 	stMu sync.Mutex
 	stCh = make(chan struct{})
+
+	phMu sync.Mutex
+	phCh = make(chan struct{})
 
 	kickNW = make(chan struct{}, 1) // wakes netWatch (the internet check)
 )
@@ -37,6 +42,20 @@ func stateWait() <-chan struct{} {
 	stMu.Lock()
 	defer stMu.Unlock()
 	return stCh
+}
+
+// notifyPhones wakes every phone page that is connected (the shared files may have changed).
+func notifyPhones() {
+	phMu.Lock()
+	close(phCh)
+	phCh = make(chan struct{})
+	phMu.Unlock()
+}
+
+func phoneWait() <-chan struct{} {
+	phMu.Lock()
+	defer phMu.Unlock()
+	return phCh
 }
 
 // netSig is a short fingerprint of the PC's real network addresses; it changes when Wi-Fi
@@ -65,7 +84,7 @@ func netSig() string {
 func netFast() {
 	last := netSig()
 	for {
-		time.Sleep(700 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		s := netSig()
 		if s == last {
 			continue
@@ -77,10 +96,28 @@ func netFast() {
 		default:
 		}
 		kickHotspot()
+		kickSmartNow() // tell the fixed link (Worker) about the new address right away
+		go func() {
+			// A network is back: drop the "turn on your hotspot" guide now, do not wait for the
+			// next Wi-Fi scan (which can take several seconds).
+			if hasNetwork() {
+				hotReset()
+			}
+		}()
 	}
 }
 
-// adminEvents is a Server-Sent-Events stream: one tiny message each time something changed.
+// stateJSON is what the admin window shows, in one message: the PC state and the device lists.
+func stateJSON() []byte {
+	b, err := json.Marshal(map[string]any{"s": stateMap(), "d": devicesSnapshot()})
+	if err != nil {
+		return []byte("{}")
+	}
+	return b
+}
+
+// adminEvents is a Server-Sent-Events stream. Every time something changed it carries the new
+// state; every few seconds it carries a small "ka" message so the window can tell the stream is alive.
 func adminEvents(w http.ResponseWriter, r *http.Request) {
 	fl, ok := w.(http.Flusher)
 	if !ok {
@@ -91,21 +128,35 @@ func adminEvents(w http.ResponseWriter, r *http.Request) {
 	h.Set("Content-Type", "text/event-stream")
 	h.Set("Cache-Control", "no-store")
 	h.Set("X-Accel-Buffering", "no")
-	fmt.Fprint(w, "retry: 1000\n\n")
-	fl.Flush()
-	tick := time.NewTicker(20 * time.Second)
+	fmt.Fprint(w, "retry: 700\n\n")
+	send := func() bool {
+		if _, err := fmt.Fprintf(w, "data: %s\n\n", stateJSON()); err != nil {
+			return false
+		}
+		fl.Flush()
+		return true
+	}
+	ch := stateWait() // taken before the first snapshot, so a change right after it is never lost
+	if !send() {
+		return
+	}
+	tick := time.NewTicker(4 * time.Second)
 	defer tick.Stop()
-	ch := stateWait()
 	for {
 		select {
 		case <-ch:
+			time.Sleep(30 * time.Millisecond) // a Wi-Fi switch fires many changes: send them as one message
 			ch = stateWait()
-			fmt.Fprint(w, "data: s\n\n")
+			if !send() {
+				return
+			}
 		case <-tick.C:
-			fmt.Fprint(w, ": keep-alive\n\n")
+			if _, err := fmt.Fprint(w, "event: ka\ndata: 1\n\n"); err != nil {
+				return
+			}
+			fl.Flush()
 		case <-r.Context().Done():
 			return
 		}
-		fl.Flush()
 	}
 }

@@ -60,11 +60,21 @@ func remoteSnapshot() remoteState {
 
 func rset(gen int, f func(*remoteState)) bool {
 	rmu.Lock()
-	defer rmu.Unlock()
 	if gen != rGen {
+		rmu.Unlock()
 		return false
 	}
+	old := rs
 	f(&rs)
+	changed := rs != old
+	statusChanged := rs.Status != old.Status
+	rmu.Unlock()
+	if changed {
+		notifyState() // the window follows the internet link live (QR, progress, errors)
+	}
+	if statusChanged {
+		kickSmartNow() // tunnel up: tell the Worker; tunnel lost: start a new one soon
+	}
 	return true
 }
 
@@ -79,6 +89,7 @@ func remoteStart() {
 	rToken = newToken()
 	rs = remoteState{Status: "starting"}
 	rmu.Unlock()
+	notifyState()
 	go runTunnel(gen)
 }
 
@@ -93,6 +104,7 @@ func remoteStop() {
 	if cmd != nil && cmd.Process != nil {
 		cmd.Process.Kill()
 	}
+	notifyState()
 }
 
 // remoteRenew makes a new private key; the old link and old cookies stop working.
@@ -102,6 +114,7 @@ func remoteRenew() {
 		rToken = newToken()
 	}
 	rmu.Unlock()
+	notifyState()
 }
 
 var tunRe = regexp.MustCompile(`https://[a-z0-9-]+\.trycloudflare\.com`)
