@@ -34,6 +34,8 @@ type Config struct {
 	RecvDir  string `json:"recvDir"`
 	ShareDir string `json:"shareDir"`
 	ShareOn  bool   `json:"shareOn"`
+	ShareOnlySel bool              `json:"shareOnlySel"`      // true: only devices set to "always" may use the shared files
+	DevShare     map[string]string `json:"devShare,omitempty"` // device id -> "on" (always) | "off" (never)
 	IP       string `json:"ip"`
 
 	AutoUpdate bool   `json:"autoUpdate"`
@@ -221,7 +223,7 @@ func stateMap() map[string]any {
 		u = fmt.Sprintf("http://%s:%d", ip, curPort.Load())
 	}
 	return map[string]any{"port": curPort.Load(), "recvDir": c.RecvDir,
-		"shareDir": c.ShareDir, "shareOn": c.ShareOn, "ip": ip, "ips": ips, "url": u,
+		"shareDir": c.ShareDir, "shareOn": c.ShareOn, "shareOnlySel": c.ShareOnlySel, "ip": ip, "ips": ips, "url": u,
 		"autostart": autoOn.Load(), "approvalOn": c.ApprovalOn, "pwdOn": c.PwdOn, "pwdSet": c.PwdHash != "", "independent": c.Independent, "remote": remoteSnapshot(), "smart": smartSnapshot(c), "update": updateSnapshot(), "version": version, "recvNote": recvNote()}
 }
 
@@ -236,6 +238,7 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 		RecvDir   *string `json:"recvDir"`
 		ShareDir  *string `json:"shareDir"`
 		ShareOn   *bool   `json:"shareOn"`
+		ShareOnlySel *bool  `json:"shareOnlySel"`
 		IP        *string `json:"ip"`
 		Autostart *bool   `json:"autostart"`
 		AutoUpd   *bool   `json:"autoUpdate"`
@@ -356,6 +359,9 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 	if q.ShareOn != nil {
 		cfg.ShareOn = *q.ShareOn
 	}
+	if q.ShareOnlySel != nil {
+		cfg.ShareOnlySel = *q.ShareOnlySel
+	}
 	if q.IP != nil {
 		cfg.IP = *q.IP
 	}
@@ -364,7 +370,7 @@ func adminSet(w http.ResponseWriter, r *http.Request) {
 	}
 	saveLocked()
 	mu.Unlock()
-	if q.ShareOn != nil || q.ShareDir != nil {
+	if q.ShareOn != nil || q.ShareDir != nil || q.ShareOnlySel != nil {
 		notifyPhones() // phones refresh their file lists at once
 	}
 	notifyState() // other open windows see the change at once
@@ -595,7 +601,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 		T    int64  `json:"t"`
 	}
 	out := []item{}
-	on := c.ShareOn && c.ShareDir != ""
+	on := shareAllowedFor(r, c)
 	sub := ""
 	if on {
 		base := filepath.Clean(c.ShareDir)
@@ -638,7 +644,7 @@ func media(w http.ResponseWriter, r *http.Request) {
 		V    bool   `json:"v"`
 	}
 	out := []item{}
-	on := c.ShareOn && c.ShareDir != ""
+	on := shareAllowedFor(r, c)
 	if on {
 		base := filepath.Clean(c.ShareDir)
 		filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {
@@ -684,7 +690,7 @@ func media(w http.ResponseWriter, r *http.Request) {
 // resolve opens a shared file safely (no path escape, no directories).
 func resolve(w http.ResponseWriter, r *http.Request, prefix string) (*os.File, os.FileInfo, bool) {
 	c := get()
-	if !c.ShareOn || c.ShareDir == "" {
+	if !shareAllowedFor(r, c) {
 		http.Error(w, "sharing off", 403)
 		return nil, nil, false
 	}

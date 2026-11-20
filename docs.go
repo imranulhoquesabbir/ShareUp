@@ -28,7 +28,7 @@ func docs(w http.ResponseWriter, r *http.Request) {
 		K    string `json:"k"`
 	}
 	out := []item{}
-	on := c.ShareOn && c.ShareDir != ""
+	on := shareAllowedFor(r, c)
 	if on {
 		base := filepath.Clean(c.ShareDir)
 		filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {

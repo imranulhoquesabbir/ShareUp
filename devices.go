@@ -586,6 +586,7 @@ type devSession struct {
 	Remote  bool   `json:"remote"`
 	Since   int64  `json:"since"`
 	Trusted bool   `json:"trusted"`
+	Share   string `json:"share"` // "" default | "on" always | "off" never (PC files)
 }
 type devTrusted struct {
 	ID       string `json:"id"`
@@ -593,6 +594,7 @@ type devTrusted struct {
 	Added    int64  `json:"added"`
 	LastSeen int64  `json:"lastSeen"`
 	Online   bool   `json:"online"`
+	Share    string `json:"share"`
 }
 
 // shownName is the name the person gave a trusted device, else the guessed one.
@@ -625,12 +627,12 @@ func devicesSnapshot() map[string]any {
 	online := map[string]bool{}
 	for _, s := range sessions {
 		online[s.DevID] = true
-		sl = append(sl, devSession{s.DevID, shownName(c, s.DevID, s.Name), s.IP, s.Remote, s.Created.Unix(), isTrusted(c, s.DevID)})
+		sl = append(sl, devSession{s.DevID, shownName(c, s.DevID, s.Name), s.IP, s.Remote, s.Created.Unix(), isTrusted(c, s.DevID), c.DevShare[s.DevID]})
 	}
 	sort.Slice(sl, func(i, j int) bool { return sl[i].Since < sl[j].Since })
 	tl := []devTrusted{}
 	for _, t := range c.Trusted {
-		tl = append(tl, devTrusted{t.ID, shownName(c, t.ID, t.Name), t.Added, t.LastSeen, online[t.ID]})
+		tl = append(tl, devTrusted{t.ID, shownName(c, t.ID, t.Name), t.Added, t.LastSeen, online[t.ID], c.DevShare[t.ID]})
 	}
 	return map[string]any{"pending": pl, "sessions": sl, "trusted": tl}
 }
@@ -646,6 +648,7 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		ID    string `json:"id"`
 		Trust bool   `json:"trust"`
 		Name  string `json:"name"`
+		Mode  string `json:"mode"` // for op "share": on | off | "" (default)
 	}
 	if json.NewDecoder(r.Body).Decode(&q) != nil || !idRe.MatchString(q.ID) {
 		http.Error(w, "bad request", 400)
@@ -680,6 +683,8 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		addTrusted(q.ID, name)
 	case "untrust":
 		removeTrusted(q.ID)
+	case "share":
+		setDevShare(q.ID, q.Mode)
 	case "rename":
 		nm := strings.TrimSpace(q.Name)
 		if r := []rune(nm); len(r) > 30 {
@@ -706,6 +711,9 @@ func adminDev(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dmu.Unlock()
+	if q.Op == "share" {
+		notifyPhones() // that phone refreshes its file list at once
+	}
 	notifyState()
 	writeJSON(w, devicesSnapshot())
 }
