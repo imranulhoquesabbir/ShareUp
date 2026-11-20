@@ -6,10 +6,12 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 	"unsafe"
@@ -201,9 +203,25 @@ func windowSize() (int, int) {
 	return w, h
 }
 
+// openWindow shows the main window. If the page never loads (a blank white window, seen right after
+// an update when the old copy's WebView2 was still shutting down and kept the data folder), the
+// window is closed and opened again, with a fresh WebView2 data folder.
 func openWindow() {
+	for try := 0; try < 3; try++ {
+		if !openWindowOnce(try) {
+			return
+		}
+	}
+}
+
+// openWindowOnce returns true when the window was closed because its page never loaded.
+func openWindowOnce(try int) bool {
 	ww, wh := windowSize()
-	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", "webview")
+	dir := "webview"
+	if try > 0 {
+		dir = fmt.Sprintf("webview-r%d", try)
+	}
+	data := filepath.Join(os.Getenv("LOCALAPPDATA"), "shareUp", dir)
 	create := func() webview2.WebView {
 		return webview2.NewWithOptions(webview2.WebViewOptions{
 			AutoFocus: true,
@@ -226,7 +244,7 @@ func openWindow() {
 	}
 	if w == nil { // WebView2 runtime missing: fall back to the browser
 		openBrowser(adminURL())
-		return
+		return false
 	}
 	defer w.Destroy()
 	w.SetSize(420, 520, webview2.HintMin) // resizable, with a sensible minimum
@@ -234,29 +252,53 @@ func openWindow() {
 	winHwnd = uintptr(w.Window())
 	winMu.Unlock()
 	w.Navigate(adminURL())
-	// A blank white window (seen right after an update) means the page never loaded. The page asks for
-	// /admin/state as soon as it starts, so if that has not happened, load it again.
+	// A blank white window means the page never loaded. The page asks for /admin/state as soon as it
+	// starts, so if that has not happened: load it again a few times, and if it still does not,
+	// close the window so it can be opened again from scratch.
+	var stuck atomic.Bool
+	done := make(chan struct{})
 	t0 := time.Now().UnixNano()
 	go func() {
-		for i := 0; i < 8; i++ {
-			time.Sleep(2 * time.Second)
-			if lastAdminHit.Load() > t0 || !windowOpen() {
+		loaded := func() bool { return lastAdminHit.Load() > t0 }
+		for i := 0; i < 4; i++ {
+			select {
+			case <-done:
+				return
+			case <-time.After(2 * time.Second):
+			}
+			if loaded() {
 				return
 			}
 			w.Dispatch(func() { w.Navigate(adminURL()) })
 		}
+		select {
+		case <-done:
+			return
+		case <-time.After(2 * time.Second):
+		}
+		if !loaded() && try < 2 {
+			stuck.Store(true)
+			w.Dispatch(func() { w.Terminate() })
+		}
 	}()
 	w.Run()
+	close(done)
 	winMu.Lock()
 	winHwnd = 0
 	winMu.Unlock()
+	return stuck.Load()
 }
 
 func runUI(silent bool) {
 	go windowLoop()
 	go popupLoop()
 	if !silent {
-		uiShow()
+		go func() {
+			if afterUpd { // let the old copy's WebView2 finish shutting down first
+				time.Sleep(1500 * time.Millisecond)
+			}
+			uiShow()
+		}()
 	}
 	uiUpdateHook = func(tag string) {
 		if updItem != nil {

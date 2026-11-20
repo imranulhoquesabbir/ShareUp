@@ -810,6 +810,8 @@ func phoneRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/pv/", gate(preview))
 }
 
+var afterUpd bool // this copy was started by the updater
+
 func main() {
 	silent := false // launched at sign-in: stay in the tray, no window
 	afterUpdate := false
@@ -821,6 +823,7 @@ func main() {
 			afterUpdate = true
 		}
 	}
+	afterUpd = afterUpdate
 	loadConfig()
 	cleanupOldBuild()
 	if afterUpdate { // the old version is exiting: continue the moment it frees the port
